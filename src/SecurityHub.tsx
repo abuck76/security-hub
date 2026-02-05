@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, Users, Shield, Plus, Trash2, Check } from 'lucide-react';
+import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3 } from 'lucide-react';
 
 const securityGroups = [
   { id: 1, name: 'Admin', description: 'Full system access', userCount: 2, properties: 'All', lastModified: '2024-01-15' },
@@ -33,18 +33,23 @@ const roles = [
 ];
 
 const permissionsData = [
-  { id: 1, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: null },
-  { id: 2, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Add Attachment', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1 },
-  { id: 3, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Adjust Bank Reconciliation Button', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1 },
-  { id: 4, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Bank Reconciliation Upload', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1 },
-  { id: 5, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Delete Attachment', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1 },
-  { id: 6, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Post Bank Reconciliation Button', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1 },
-  { id: 7, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Reconciliation Report', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1 },
-  { id: 8, description: 'Analytics Dashboard', access: 'Access', programType: 'Analytics', isNew: true, parentId: null },
-  { id: 9, description: 'Campaign Manager', access: 'Access', programType: 'Marketing', isNew: false, parentId: null },
-  { id: 10, description: 'Data Export', access: 'No Access', programType: 'Core', isNew: false, parentId: null },
-  { id: 11, description: 'Resident Portal>Messages', access: 'Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: null },
-  { id: 12, description: 'Resident Portal>Payments', access: 'Access', programType: 'Core', isNew: true, parentId: null },
+  { id: 1, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: null, licensed: true, shared: false },
+  { id: 2, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Add Attachment', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1, licensed: true, shared: false },
+  { id: 3, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Adjust Bank Reconciliation Button', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1, licensed: true, shared: false },
+  { id: 4, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Bank Reconciliation Upload', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1, licensed: true, shared: false },
+  { id: 5, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Delete Attachment', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1, licensed: true, shared: false },
+  { id: 6, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Post Bank Reconciliation Button', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1, licensed: true, shared: false },
+  { id: 7, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Reconciliation Report', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: 1, licensed: true, shared: false },
+  { id: 8, description: 'Analytics Dashboard', access: 'Access', programType: 'Analytics', isNew: true, parentId: null, licensed: true, shared: false },
+  { id: 9, description: 'Campaign Manager', access: 'Access', programType: 'Marketing', isNew: false, parentId: null, licensed: true, shared: false },
+  { id: 10, description: 'Data Export', access: 'No Access', programType: 'Core', isNew: false, parentId: null, licensed: true, shared: false },
+  { id: 11, description: 'Resident Portal>Messages', access: 'Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: null, licensed: true, shared: false },
+  { id: 12, description: 'Resident Portal>Payments', access: 'Access', programType: 'Core', isNew: true, parentId: null, licensed: true, shared: false },
+  // Element Access permissions
+  { id: 13, description: 'Hold Charge toggle on Unpaid Charges screen on payers', access: 'Access', programType: 'Element Access - ARManagerNET A13', isNew: false, parentId: null, licensed: true, shared: true },
+  { id: 14, description: 'Ability to add marketing accounts', access: 'Access', programType: 'Element Access - Marketing IQ', isNew: false, parentId: null, licensed: true, shared: true },
+  { id: 15, description: 'Ability to add marketing accounts from CPD', access: 'Access', programType: 'Element Access - Marketing IQ', isNew: false, parentId: null, licensed: true, shared: true },
+  { id: 16, description: 'Ability to map a marketing source to a vendor', access: 'Access', programType: 'Element Access - Marketing IQ', isNew: false, parentId: null, licensed: true, shared: true },
 ];
 
 const accountsData = {
@@ -125,6 +130,123 @@ const displayTypesData = {
   ],
 };
 
+const auditTablesData = ['Property', 'Tenant', 'Bank', 'Vendor', 'Owner', 'AchData', 'Exchange Rate', 'Customer', 'Unit', 'Lease'];
+
+const auditLogData = [
+  { id: 1, auditTable: 'property', code: 'sunset', auditField: 'Code', oldValue: '', newValue: 'sunset', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 2, auditTable: 'property', code: 'sunset', auditField: 'Address1', oldValue: '', newValue: 'Sunset Apartments', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 3, auditTable: 'property', code: 'sunset', auditField: 'Address2', oldValue: '', newValue: '123 Main Street', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 4, auditTable: 'property', code: 'sunset', auditField: 'City', oldValue: '', newValue: 'Los Angeles', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 5, auditTable: 'property', code: 'sunset', auditField: 'State', oldValue: '', newValue: 'CA', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 6, auditTable: 'property', code: 'sunset', auditField: 'ZipCode', oldValue: '', newValue: '90001', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 7, auditTable: 'property', code: 'sunset', auditField: 'Residential', oldValue: '', newValue: '1', date: '02/02/2026', time: '10:43AM', action: 'Created', user: 'schen@company.com' },
+  { id: 8, auditTable: 'property', code: 'oakgrove', auditField: 'Code', oldValue: '', newValue: 'oakgrove', date: '02/01/2026', time: '02:30PM', action: 'Created', user: 'mjohnson@company.com' },
+  { id: 9, auditTable: 'property', code: 'oakgrove', auditField: 'Address1', oldValue: '', newValue: 'Oak Grove Complex', date: '02/01/2026', time: '02:30PM', action: 'Created', user: 'mjohnson@company.com' },
+  { id: 10, auditTable: 'property', code: 'oakgrove', auditField: 'City', oldValue: '', newValue: 'San Diego', date: '02/01/2026', time: '02:30PM', action: 'Created', user: 'mjohnson@company.com' },
+  { id: 11, auditTable: 'tenant', code: 't001', auditField: 'Name', oldValue: 'John Smith', newValue: 'John A. Smith', date: '02/01/2026', time: '09:15AM', action: 'Modified', user: 'mjohnson@company.com' },
+  { id: 12, auditTable: 'tenant', code: 't002', auditField: 'Email', oldValue: '', newValue: 'tenant@email.com', date: '02/01/2026', time: '11:30AM', action: 'Created', user: 'rbrown@company.com' },
+  { id: 13, auditTable: 'tenant', code: 't001', auditField: 'Phone', oldValue: '555-1234', newValue: '555-5678', date: '01/31/2026', time: '03:20PM', action: 'Modified', user: 'rbrown@company.com' },
+  { id: 14, auditTable: 'bank', code: 'bnk001', auditField: 'AccountNumber', oldValue: '****1234', newValue: '****5678', date: '01/31/2026', time: '02:45PM', action: 'Modified', user: 'edavis@company.com' },
+  { id: 15, auditTable: 'bank', code: 'bnk001', auditField: 'RoutingNumber', oldValue: '****4321', newValue: '****8765', date: '01/31/2026', time: '02:46PM', action: 'Modified', user: 'edavis@company.com' },
+  { id: 16, auditTable: 'vendor', code: 'v100', auditField: 'Status', oldValue: 'Active', newValue: 'Inactive', date: '01/30/2026', time: '04:20PM', action: 'Modified', user: 'jwilson@company.com' },
+  { id: 17, auditTable: 'vendor', code: 'v101', auditField: 'Name', oldValue: '', newValue: 'ABC Maintenance Co', date: '01/30/2026', time: '10:15AM', action: 'Created', user: 'jwilson@company.com' },
+  { id: 18, auditTable: 'owner', code: 'own001', auditField: 'Email', oldValue: 'old@email.com', newValue: 'new@email.com', date: '01/29/2026', time: '11:00AM', action: 'Modified', user: 'awhite@company.com' },
+];
+
+// Security Analytics Report Data
+const securityAnalyticsReports = ['Menus By Group', 'Login Attempt', 'Permission Descriptions', 'Permission Exception', 'SOX Users', 'User Monitor'];
+
+const loginAttemptData = [
+  { id: 1, userName: 'schen', ipAddress: '192.168.1.100', webserver: 'WEB01', loginDate: '01/15/2026 08:30:00 AM', result: 'SUCCESS' },
+  { id: 2, userName: 'schen', ipAddress: '192.168.1.100', webserver: 'WEB01', loginDate: '01/14/2026 09:15:22 AM', result: 'SUCCESS' },
+  { id: 3, userName: 'mjohnson', ipAddress: '192.168.1.101', webserver: 'WEB01', loginDate: '01/14/2026 08:45:00 AM', result: 'SUCCESS' },
+  { id: 4, userName: 'mjohnson', ipAddress: '192.168.1.101', webserver: 'WEB01', loginDate: '01/14/2026 08:44:30 AM', result: 'FAILED' },
+  { id: 5, userName: 'edavis', ipAddress: '192.168.1.102', webserver: 'WEB01', loginDate: '01/15/2026 07:55:11 AM', result: 'SUCCESS' },
+  { id: 6, userName: 'jwilson', ipAddress: '192.168.1.103', webserver: 'WEB02', loginDate: '01/13/2026 10:48:36 AM', result: 'SUCCESS' },
+  { id: 7, userName: 'landerson', ipAddress: '192.168.1.104', webserver: 'WEB02', loginDate: '01/01/2026 02:30:25 PM', result: 'SUCCESS' },
+  { id: 8, userName: 'rbrown', ipAddress: '192.168.1.105', webserver: 'WEB01', loginDate: '01/15/2026 09:20:00 AM', result: 'SUCCESS' },
+  { id: 9, userName: 'awhite', ipAddress: '192.168.1.106', webserver: 'WEB01', loginDate: '01/14/2026 08:00:00 AM', result: 'SUCCESS' },
+  { id: 10, userName: 'dlee', ipAddress: '192.168.1.107', webserver: 'WEB02', loginDate: '01/10/2026 11:30:00 AM', result: 'SUCCESS' },
+  { id: 11, userName: 'unknown', ipAddress: '10.0.0.55', webserver: 'WEB01', loginDate: '01/12/2026 03:45:00 AM', result: 'FAILED' },
+  { id: 12, userName: 'schen', ipAddress: '10.0.0.55', webserver: 'WEB01', loginDate: '01/12/2026 03:45:30 AM', result: 'FAILED' },
+];
+
+const permissionDescriptionsData = [
+  { id: 1, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation', programType: 'Role - Voyager 8 Residential Accounting', description: 'Access to Bank Reconciliation screen' },
+  { id: 2, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Add Attachment', programType: 'Role - Voyager 8 Residential Accounting', description: 'Ability to add attachments to bank reconciliation' },
+  { id: 3, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Adjust Bank Reconciliation Button', programType: 'Role - Voyager 8 Residential Accounting', description: 'Ability to adjust bank reconciliation entries' },
+  { id: 4, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Bank Reconciliation Upload', programType: 'Role - Voyager 8 Residential Accounting', description: 'Ability to upload bank reconciliation files' },
+  { id: 5, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Delete Attachment', programType: 'Role - Voyager 8 Residential Accounting', description: 'Ability to delete attachments from bank reconciliation' },
+  { id: 6, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Post Bank Reconciliation Button', programType: 'Role - Voyager 8 Residential Accounting', description: 'Ability to post bank reconciliation entries' },
+  { id: 7, securityToken: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation>Reconciliation Report', programType: 'Role - Voyager 8 Residential Accounting', description: 'Access to reconciliation report' },
+  { id: 8, securityToken: 'Analytics Dashboard', programType: 'Analytics', description: 'Access to Analytics Dashboard' },
+  { id: 9, securityToken: 'Campaign Manager', programType: 'Marketing', description: 'Access to Campaign Manager for marketing campaigns' },
+  { id: 10, securityToken: 'Data Export', programType: 'Core', description: 'Ability to export data from the system' },
+  { id: 11, securityToken: 'Resident Portal>Messages', programType: 'Role - Voyager 8 Residential Accounting', description: 'Access to resident portal messaging' },
+  { id: 12, securityToken: 'Resident Portal>Payments', programType: 'Core', description: 'Access to resident portal payment processing' },
+  { id: 13, securityToken: 'Hold Charge toggle on Unpaid Charges screen on payers', programType: 'Element Access - ARManagerNET A13', description: 'Ability to toggle hold charge on unpaid charges' },
+  { id: 14, securityToken: 'Ability to add marketing accounts', programType: 'Element Access - Marketing IQ', description: 'Ability to add new marketing accounts' },
+  { id: 15, securityToken: 'Ability to add marketing accounts from CPD', programType: 'Element Access - Marketing IQ', description: 'Ability to add marketing accounts from CPD' },
+  { id: 16, securityToken: 'Ability to map a marketing source to a vendor', programType: 'Element Access - Marketing IQ', description: 'Ability to map marketing sources to vendors' },
+];
+
+const soxUsersData = [
+  { id: 1, modifiedBy: 'schen', modified: 'mjohnson', action: 'Modify', dateModified: '01/30/2026', columnName: 'sEmail', columnDescription: 'Email', oldValue: 'mike.j@company.com', newValue: 'mjohnson@company.com' },
+  { id: 2, modifiedBy: 'schen', modified: 'mjohnson', action: 'Modify', dateModified: '01/30/2026', columnName: 'hGroup', columnDescription: 'Security Group ID', oldValue: '3', newValue: '2' },
+  { id: 3, modifiedBy: 'schen', modified: 'landerson', action: 'Modify', dateModified: '01/25/2026', columnName: 'bActive', columnDescription: 'Active Status', oldValue: 'true', newValue: 'false' },
+  { id: 4, modifiedBy: 'awhite', modified: 'edavis', action: 'Modify', dateModified: '01/23/2026', columnName: 'hGroup', columnDescription: 'Security Group ID', oldValue: '4', newValue: '3' },
+  { id: 5, modifiedBy: 'awhite', modified: 'jwilson', action: 'Modify', dateModified: '01/22/2026', columnName: 'hPropList', columnDescription: 'Property List', oldValue: '5', newValue: '10' },
+  { id: 6, modifiedBy: 'schen', modified: 'rbrown', action: 'Modify', dateModified: '01/21/2026', columnName: 'bReadOnly', columnDescription: 'Readonly User', oldValue: 'true', newValue: 'false' },
+  { id: 7, modifiedBy: 'schen', modified: 'dlee', action: 'Add', dateModified: '01/20/2026', columnName: 'N/A', columnDescription: 'New User', oldValue: 'n/a', newValue: 'n/a' },
+  { id: 8, modifiedBy: 'awhite', modified: 'dlee', action: 'Modify', dateModified: '01/20/2026', columnName: 'hGroup', columnDescription: 'Security Group ID', oldValue: '1', newValue: '6' },
+  { id: 9, modifiedBy: 'schen', modified: 'awhite', action: 'Modify', dateModified: '01/18/2026', columnName: 'bBat', columnDescription: 'View All financial batches', oldValue: 'false', newValue: 'true' },
+];
+
+const userMonitorData = [
+  { id: 1, userCode: 'schen', userName: 'Sarah Chen', ipAddress: '192.168.1.100', webserver: 'WEB01', loginDate: '01/15/2026 08:30 AM', logoutDate: '01/15/2026 05:45 PM' },
+  { id: 2, userCode: 'schen', userName: 'Sarah Chen', ipAddress: '192.168.1.100', webserver: 'WEB01', loginDate: '01/14/2026 09:15 AM', logoutDate: '01/14/2026 06:30 PM' },
+  { id: 3, userCode: 'mjohnson', userName: 'Mike Johnson', ipAddress: '192.168.1.101', webserver: 'WEB01', loginDate: '01/14/2026 08:45 AM', logoutDate: '01/14/2026 04:30 PM' },
+  { id: 4, userCode: 'edavis', userName: 'Emily Davis', ipAddress: '192.168.1.102', webserver: 'WEB01', loginDate: '01/15/2026 07:55 AM', logoutDate: '01/15/2026 05:00 PM' },
+  { id: 5, userCode: 'jwilson', userName: 'James Wilson', ipAddress: '192.168.1.103', webserver: 'WEB02', loginDate: '01/13/2026 10:48 AM', logoutDate: '01/13/2026 06:15 PM' },
+  { id: 6, userCode: 'rbrown', userName: 'Robert Brown', ipAddress: '192.168.1.105', webserver: 'WEB01', loginDate: '01/15/2026 09:20 AM', logoutDate: '01/15/2026 05:30 PM' },
+  { id: 7, userCode: 'awhite', userName: 'Amanda White', ipAddress: '192.168.1.106', webserver: 'WEB01', loginDate: '01/14/2026 08:00 AM', logoutDate: '01/14/2026 06:00 PM' },
+  { id: 8, userCode: 'dlee', userName: 'David Lee', ipAddress: '192.168.1.107', webserver: 'WEB02', loginDate: '01/10/2026 11:30 AM', logoutDate: '01/10/2026 03:45 PM' },
+  { id: 9, userCode: 'landerson', userName: 'Lisa Anderson', ipAddress: '192.168.1.104', webserver: 'WEB02', loginDate: '01/01/2026 02:30 PM', logoutDate: '01/01/2026 04:00 PM' },
+];
+
+const databasesData = [
+  { id: 1, code: 'B', name: 'Blue Moon V3 Temp', type: 'Temp' },
+  { id: 2, code: 'F', name: 'Flex Temp', type: 'Temp' },
+  { id: 3, code: 'L', name: 'Live', type: 'Production' },
+  { id: 4, code: 'T', name: 'Test', type: 'Test' },
+  { id: 5, code: 'Y', name: 'Yardi Test', type: 'Test' },
+];
+
+const menusByGroupData = [
+  { id: 1, menuCaption: 'Dashboard', menuUrl: '/dashboard', menuSet: 'Main' },
+  { id: 2, menuCaption: 'Properties', menuUrl: '/properties', menuSet: 'Main' },
+  { id: 3, menuCaption: 'Tenants', menuUrl: '/tenants', menuSet: 'Main' },
+  { id: 4, menuCaption: 'Leasing', menuUrl: '/leasing', menuSet: 'Main' },
+  { id: 5, menuCaption: 'Maintenance', menuUrl: '/maintenance', menuSet: 'Main' },
+  { id: 6, menuCaption: 'Accounting', menuUrl: '/accounting', menuSet: 'Finance' },
+  { id: 7, menuCaption: 'Accounts Payable', menuUrl: '/ap', menuSet: 'Finance' },
+  { id: 8, menuCaption: 'Accounts Receivable', menuUrl: '/ar', menuSet: 'Finance' },
+  { id: 9, menuCaption: 'Reports', menuUrl: '/reports', menuSet: 'Reports' },
+  { id: 10, menuCaption: 'Financial Reports', menuUrl: '/reports/financial', menuSet: 'Reports' },
+  { id: 11, menuCaption: 'User Management', menuUrl: '/admin/users', menuSet: 'Admin' },
+  { id: 12, menuCaption: 'Security Groups', menuUrl: '/admin/groups', menuSet: 'Admin' },
+];
+
+const permissionExceptionData = [
+  { id: 1, progName: 'propertylist.aspx', securityToken: 'PR-Admin-Admin', permissionType: 'PR-Admin-Access', userCode: 'schen@company.com', userName: 'Sarah Chen', securityGroup: 'Admin', permissionException: 'Access to Admin Section' },
+  { id: 2, progName: 'propertylist.aspx', securityToken: 'PR-Admin-Admin', permissionType: 'PR-Admin-Access', userCode: 'awhite@company.com', userName: 'Amanda White', securityGroup: 'Admin', permissionException: 'Access to Admin Section' },
+  { id: 3, progName: 'financials.aspx', securityToken: 'FIN-Reports', permissionType: 'FIN-Access', userCode: 'mjohnson@company.com', userName: 'Mike Johnson', securityGroup: 'Property Manager', permissionException: 'Access to Financial Reports' },
+  { id: 4, progName: 'residentportal.aspx', securityToken: 'Resident-Admin', permissionType: 'Resident-Access', userCode: 'rbrown@company.com', userName: 'Robert Brown', securityGroup: 'Leasing Agent', permissionException: 'Access to Resident Admin' },
+  { id: 5, progName: 'workorders.aspx', securityToken: 'WO-Create', permissionType: 'WO-Access', userCode: 'jwilson@company.com', userName: 'James Wilson', securityGroup: 'Maintenance', permissionException: 'Create Work Orders' },
+  { id: 6, progName: 'accounting.aspx', securityToken: 'ACC-GL', permissionType: 'ACC-Access', userCode: 'edavis@company.com', userName: 'Emily Davis', securityGroup: 'Accountant', permissionException: 'Access to G/L Entries' },
+  { id: 7, progName: 'reports.aspx', securityToken: 'RPT-View', permissionType: 'RPT-Access', userCode: 'dlee@company.com', userName: 'David Lee', securityGroup: 'View Only', permissionException: 'View Reports Only' },
+];
+
 export default function SecurityHub() {
   const [activeTab, setActiveTab] = useState('groups');
   const [searchTerm, setSearchTerm] = useState('');
@@ -132,6 +254,19 @@ export default function SecurityHub() {
   const [filterStatus, setFilterStatus] = useState('All');
   const [drawer, setDrawer] = useState({ open: false, type: null, data: null });
   const [drawerTab, setDrawerTab] = useState('users');
+  const [drawerLayer, setDrawerLayer] = useState(1); // 1: Roles/Users, 2: Database Selection, 3: DB-specific settings
+  const [selectedDatabase, setSelectedDatabase] = useState(null);
+  const [databaseSearch, setDatabaseSearch] = useState('');
+  const [databaseAccess, setDatabaseAccess] = useState([1, 3, 5]); // IDs of databases with access (default: Blue Moon, Live, Yardi Test)
+  const [selectedAccessDbs, setSelectedAccessDbs] = useState([]);
+  const [selectedNoAccessDbs, setSelectedNoAccessDbs] = useState([]);
+
+  // Clone Group Modal state
+  const [cloneModalOpen, setCloneModalOpen] = useState(false);
+  const [cloneSourceGroup, setCloneSourceGroup] = useState('');
+  const [cloneType, setCloneType] = useState('New Group');
+  const [cloneTargetGroup, setCloneTargetGroup] = useState('');
+  const [clonePermissions, setClonePermissions] = useState(true);
   const [userDrawerTab, setUserDrawerTab] = useState('details');
   const [selectedGroups, setSelectedGroups] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -172,6 +307,40 @@ export default function SecurityHub() {
   const [selectedReports, setSelectedReports] = useState({});
 
   const [propertySearch, setPropertySearch] = useState('');
+
+  // Audit Analytics state
+  const [selectedAuditTable, setSelectedAuditTable] = useState('Property');
+  const [auditPropertyFilter, setAuditPropertyFilter] = useState('');
+  const [auditTenantFilter, setAuditTenantFilter] = useState('');
+  const [auditBankFilter, setAuditBankFilter] = useState('');
+  const [auditVendorFilter, setAuditVendorFilter] = useState('');
+  const [auditOwnerFilter, setAuditOwnerFilter] = useState('');
+  const [auditCustomerFilter, setAuditCustomerFilter] = useState('');
+  const [auditFromDate, setAuditFromDate] = useState('2026-02-01');
+  const [auditToDate, setAuditToDate] = useState('2026-02-04');
+  const [auditFromTime, setAuditFromTime] = useState('');
+  const [auditToTime, setAuditToTime] = useState('');
+  const [auditSortOn, setAuditSortOn] = useState('TranGroup');
+  const [auditResults, setAuditResults] = useState(auditLogData);
+
+  // Security Analytics state
+  const [securityReport, setSecurityReport] = useState('Login Attempt');
+  const [securityGroup, setSecurityGroup] = useState('admin');
+  const [securityMenuSet, setSecurityMenuSet] = useState('');
+  const [securityMenuCaption, setSecurityMenuCaption] = useState('');
+  const [securityMenuUrl, setSecurityMenuUrl] = useState('');
+  const [securityShowGrid, setSecurityShowGrid] = useState(false);
+  const [securityShowUrl, setSecurityShowUrl] = useState(false);
+  const [securityLoginDateFrom, setSecurityLoginDateFrom] = useState('');
+  const [securityLoginDateTo, setSecurityLoginDateTo] = useState('');
+  const [securityProgramType, setSecurityProgramType] = useState('');
+  const [securitySort, setSecuritySort] = useState('Security Token');
+  const [securityShowDescOnly, setSecurityShowDescOnly] = useState(false);
+  const [securityModifiedBy, setSecurityModifiedBy] = useState('');
+  const [securityDateModifiedFrom, setSecurityDateModifiedFrom] = useState('');
+  const [securityDateModifiedTo, setSecurityDateModifiedTo] = useState('');
+  const [securityUserCode, setSecurityUserCode] = useState('');
+  const [securityContact, setSecurityContact] = useState('');
 
   const reportsData = {
     'Standard Reports': ['Financial Summary', 'Occupancy Report', 'Rent Roll', 'Aging Report', 'Maintenance Log', 'Budget Variance', 'Cash Flow Statement'],
@@ -238,10 +407,16 @@ export default function SecurityHub() {
           <button onClick={() => { setActiveTab('users'); setSearchTerm(''); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'users' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
             <div className="flex items-center gap-2"><Users className="w-4 h-4" />Users</div>
           </button>
+          <button onClick={() => { setActiveTab('audit'); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'audit' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+            <div className="flex items-center gap-2"><FileText className="w-4 h-4" />Audit Analytics</div>
+          </button>
+          <button onClick={() => { setActiveTab('securityAnalytics'); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'securityAnalytics' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+            <div className="flex items-center gap-2"><BarChart3 className="w-4 h-4" />Security Analytics</div>
+          </button>
         </div>
       </div>
 
-      <div className="px-6 py-4 bg-white border-b">
+      {(activeTab !== 'audit' && activeTab !== 'securityAnalytics') && <div className="px-6 py-4 bg-white border-b">
         <div className="flex flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -263,11 +438,460 @@ export default function SecurityHub() {
           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
             <Plus className="w-4 h-4" />{activeTab === 'groups' ? 'Add Group' : 'Add User'}
           </button>
+          {activeTab === 'groups' && (
+            <button
+              onClick={() => setCloneModalOpen(true)}
+              className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 flex items-center gap-2"
+            >
+              <Shield className="w-4 h-4" />Clone Group
+            </button>
+          )}
         </div>
-      </div>
+      </div>}
 
       <div className="p-6">
-        {activeTab === 'groups' ? (
+        {activeTab === 'audit' ? (
+          <div className="bg-white rounded-xl border overflow-hidden">
+            <div className="p-4 border-b bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Audit Table Analytic</h2>
+              <div className="flex gap-6">
+                {/* Audit Tables List */}
+                <div className="w-40">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Audit Tables</label>
+                  <select
+                    multiple
+                    size={8}
+                    value={[selectedAuditTable]}
+                    onChange={(e) => setSelectedAuditTable(e.target.value)}
+                    className="w-full border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {auditTablesData.map(table => (
+                      <option key={table} value={table} className="px-2 py-1">{table}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Filter Fields */}
+                <div className="flex-1 grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-blue-600 underline cursor-pointer w-20">Property</label>
+                    <input type="text" value={auditPropertyFilter} onChange={(e) => setAuditPropertyFilter(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600 w-20">From Date</label>
+                    <input type="date" value={auditFromDate} onChange={(e) => setAuditFromDate(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <span className="text-sm text-gray-500">to</span>
+                    <input type="date" value={auditToDate} onChange={(e) => setAuditToDate(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-blue-600 underline cursor-pointer w-20">Tenant</label>
+                    <input type="text" value={auditTenantFilter} onChange={(e) => setAuditTenantFilter(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600 w-20">From Time</label>
+                    <input type="time" value={auditFromTime} onChange={(e) => setAuditFromTime(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <span className="text-sm text-gray-500">to</span>
+                    <input type="time" value={auditToTime} onChange={(e) => setAuditToTime(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-blue-600 underline cursor-pointer w-20">Bank</label>
+                    <input type="text" value={auditBankFilter} onChange={(e) => setAuditBankFilter(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600 w-20">Sort On</label>
+                    <select value={auditSortOn} onChange={(e) => setAuditSortOn(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="TranGroup">TranGroup</option>
+                      <option value="Date">Date</option>
+                      <option value="User">User</option>
+                      <option value="Action">Action</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-blue-600 underline cursor-pointer w-20">Vendor</label>
+                    <input type="text" value={auditVendorFilter} onChange={(e) => setAuditVendorFilter(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-blue-600 underline cursor-pointer">User</span>
+                    <span className="text-sm text-blue-600 underline cursor-pointer ml-4">Group</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-blue-600 underline cursor-pointer w-20">Owner</label>
+                    <input type="text" value={auditOwnerFilter} onChange={(e) => setAuditOwnerFilter(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div></div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-blue-600 underline cursor-pointer w-20">Customer</label>
+                    <input type="text" value={auditCustomerFilter} onChange={(e) => setAuditCustomerFilter(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 w-24">
+                  <button onClick={() => {
+                    setAuditPropertyFilter(''); setAuditTenantFilter(''); setAuditBankFilter('');
+                    setAuditVendorFilter(''); setAuditOwnerFilter(''); setAuditCustomerFilter('');
+                    setAuditFromDate('2026-02-01'); setAuditToDate('2026-02-04');
+                    setAuditFromTime(''); setAuditToTime('');
+                  }} className="px-3 py-1.5 border rounded text-sm font-medium hover:bg-gray-100">Clear</button>
+                  <button className="px-3 py-1.5 border rounded text-sm font-medium hover:bg-gray-100">Excel</button>
+                  <button className="px-3 py-1.5 border rounded text-sm font-medium hover:bg-gray-100">PDF</button>
+                  <button onClick={() => {
+                    const filtered = auditLogData.filter(log =>
+                      log.auditTable.toLowerCase() === selectedAuditTable.toLowerCase()
+                    );
+                    setAuditResults(filtered);
+                  }} className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700">Display</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Results Table */}
+            <div className="overflow-auto max-h-[500px]">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 border-b sticky top-0">
+                  <tr>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Audit Table</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Code</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Audit Field</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Old Value</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">New Value</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Date</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Time</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Action</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">User</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {auditResults.filter(log => log.auditTable.toLowerCase() === selectedAuditTable.toLowerCase()).map((log, idx) => (
+                    <tr key={log.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-3 py-2 text-gray-700">{log.auditTable}</td>
+                      <td className="px-3 py-2 text-gray-700">{log.code}</td>
+                      <td className="px-3 py-2 text-gray-700">{log.auditField}</td>
+                      <td className="px-3 py-2 text-gray-500">{log.oldValue}</td>
+                      <td className="px-3 py-2 text-blue-600">{log.newValue}</td>
+                      <td className="px-3 py-2 text-gray-700">{log.date}</td>
+                      <td className="px-3 py-2 text-gray-700">{log.time}</td>
+                      <td className="px-3 py-2 text-gray-700">{log.action}</td>
+                      <td className="px-3 py-2 text-gray-700">{log.user}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : activeTab === 'securityAnalytics' ? (
+          <div className="bg-white rounded-xl border overflow-hidden">
+            <div className="p-4 border-b bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Security Analytics</h2>
+              <div className="flex gap-6">
+                {/* Left side filters */}
+                <div className="flex-1">
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-600 w-20">Report</label>
+                      <select value={securityReport} onChange={(e) => setSecurityReport(e.target.value)} className="flex-1 px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        {securityAnalyticsReports.map(report => (
+                          <option key={report} value={report}>{report}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Dynamic filters based on report type */}
+                    {securityReport === 'Menus By Group' && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-gray-600 w-24">Menu Caption</label>
+                          <input type="text" value={securityMenuCaption} onChange={(e) => setSecurityMenuCaption(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                        </div>
+                      </>
+                    )}
+
+                    {(securityReport === 'Login Attempt' || securityReport === 'User Monitor') && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-gray-600 w-24">Login Date</label>
+                          <input type="date" value={securityLoginDateFrom} onChange={(e) => setSecurityLoginDateFrom(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                          <span className="text-sm text-gray-500">To</span>
+                          <input type="date" value={securityLoginDateTo} onChange={(e) => setSecurityLoginDateTo(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                        </div>
+                      </>
+                    )}
+
+                    {securityReport === 'Permission Descriptions' && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-blue-600 underline cursor-pointer w-24">Program Type</label>
+                          <input type="text" value={securityProgramType} onChange={(e) => setSecurityProgramType(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                        </div>
+                      </>
+                    )}
+
+                    {securityReport === 'SOX Users' && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-blue-600 underline cursor-pointer w-24">Modified By</label>
+                          <input type="text" value={securityModifiedBy} onChange={(e) => setSecurityModifiedBy(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                        </div>
+                      </>
+                    )}
+
+                    {securityReport === 'Permission Exception' && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm text-blue-600 underline cursor-pointer w-24">Contact</label>
+                          <input type="text" value={securityContact} onChange={(e) => setSecurityContact(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-blue-600 underline cursor-pointer w-20">Group</label>
+                      <input type="text" value={securityGroup} onChange={(e) => setSecurityGroup(e.target.value)} className="flex-1 px-2 py-1.5 border rounded text-sm bg-blue-50" />
+                    </div>
+
+                    {securityReport === 'Menus By Group' && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm text-gray-600 w-24">Menu URL</label>
+                        <input type="text" value={securityMenuUrl} onChange={(e) => setSecurityMenuUrl(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                      </div>
+                    )}
+
+                    {securityReport === 'Permission Descriptions' && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm text-gray-600 w-24">Sort</label>
+                        <select value={securitySort} onChange={(e) => setSecuritySort(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm">
+                          <option value="Security Token">Security Token</option>
+                          <option value="Program Type">Program Type</option>
+                          <option value="Description">Description</option>
+                        </select>
+                      </div>
+                    )}
+
+                    {securityReport === 'SOX Users' && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm text-gray-600 w-32">Date Modified From</label>
+                        <input type="date" value={securityDateModifiedFrom} onChange={(e) => setSecurityDateModifiedFrom(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                        <span className="text-sm text-gray-500">To</span>
+                        <input type="date" value={securityDateModifiedTo} onChange={(e) => setSecurityDateModifiedTo(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                      </div>
+                    )}
+
+                    {securityReport === 'User Monitor' && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm text-blue-600 underline cursor-pointer w-24">UserCode</label>
+                        <input type="text" value={securityUserCode} onChange={(e) => setSecurityUserCode(e.target.value)} className="flex-1 px-2 py-1 border rounded text-sm" />
+                      </div>
+                    )}
+                  </div>
+
+                  {(securityReport === 'Menus By Group' || securityReport === 'Permission Descriptions') && (
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm text-blue-600 underline cursor-pointer w-20">Menu Set</label>
+                        <input type="text" value={securityMenuSet} onChange={(e) => setSecurityMenuSet(e.target.value)} className="flex-1 px-2 py-1.5 border rounded text-sm" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right side checkboxes and buttons */}
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={securityShowGrid} onChange={(e) => setSecurityShowGrid(e.target.checked)} className="w-4 h-4 rounded" />
+                    Show Grid
+                  </label>
+                  {securityReport === 'Menus By Group' && (
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" checked={securityShowUrl} onChange={(e) => setSecurityShowUrl(e.target.checked)} className="w-4 h-4 rounded" />
+                      Show URL
+                    </label>
+                  )}
+                  {securityReport === 'Permission Descriptions' && (
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" checked={securityShowDescOnly} onChange={(e) => setSecurityShowDescOnly(e.target.checked)} className="w-4 h-4 rounded" />
+                      Show Descriptions Only
+                    </label>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex flex-col gap-2 w-24">
+                  <button onClick={() => {
+                    setSecurityGroup('admin'); setSecurityMenuSet(''); setSecurityMenuCaption('');
+                    setSecurityMenuUrl(''); setSecurityShowGrid(false); setSecurityShowUrl(false);
+                    setSecurityLoginDateFrom(''); setSecurityLoginDateTo('');
+                    setSecurityProgramType(''); setSecuritySort('Security Token');
+                    setSecurityShowDescOnly(false); setSecurityModifiedBy('');
+                    setSecurityDateModifiedFrom(''); setSecurityDateModifiedTo('');
+                    setSecurityUserCode(''); setSecurityContact('');
+                  }} className="px-3 py-1.5 border rounded text-sm font-medium hover:bg-gray-100">Clear</button>
+                  <button className="px-3 py-1.5 border rounded text-sm font-medium hover:bg-gray-100">PDF</button>
+                  <button className="px-3 py-1.5 border rounded text-sm font-medium hover:bg-gray-100">Excel</button>
+                  <button className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700">Display</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Results Table - changes based on report type */}
+            <div className="overflow-auto max-h-[500px]">
+              {securityReport === 'Login Attempt' && (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">UserName</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">IP Address</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Webserver</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Login Date</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Result</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {loginAttemptData.map((row, idx) => (
+                      <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-3 py-2">{row.userName}</td>
+                        <td className="px-3 py-2">{row.ipAddress}</td>
+                        <td className="px-3 py-2">{row.webserver}</td>
+                        <td className="px-3 py-2">{row.loginDate}</td>
+                        <td className="px-3 py-2">{row.result}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {securityReport === 'Permission Descriptions' && (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Security Token</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Program Type</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {permissionDescriptionsData.map((row, idx) => (
+                      <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-3 py-2">{row.securityToken}</td>
+                        <td className="px-3 py-2">{row.programType}</td>
+                        <td className="px-3 py-2">{row.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {securityReport === 'SOX Users' && (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Modified By</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Modified</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Action</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Date Modified</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Column Name</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Column Description</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Old Value</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">New Value</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {soxUsersData.map((row, idx) => (
+                      <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-3 py-2">{row.modifiedBy}</td>
+                        <td className="px-3 py-2">{row.modified}</td>
+                        <td className="px-3 py-2">{row.action}</td>
+                        <td className="px-3 py-2">{row.dateModified}</td>
+                        <td className="px-3 py-2">{row.columnName}</td>
+                        <td className="px-3 py-2">{row.columnDescription}</td>
+                        <td className="px-3 py-2 text-gray-500">{row.oldValue}</td>
+                        <td className="px-3 py-2 text-blue-600">{row.newValue}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {securityReport === 'User Monitor' && (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">UserCode</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">UserName</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">IP Address</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Webserver</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Login Date</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Logout Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {userMonitorData.map((row, idx) => (
+                      <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-3 py-2">{row.userCode}</td>
+                        <td className="px-3 py-2">{row.userName}</td>
+                        <td className="px-3 py-2">{row.ipAddress}</td>
+                        <td className="px-3 py-2">{row.webserver}</td>
+                        <td className="px-3 py-2">{row.loginDate}</td>
+                        <td className="px-3 py-2">{row.logoutDate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {securityReport === 'Menus By Group' && (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Menu Caption</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Menu URL</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Menu Set</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {menusByGroupData.map((row, idx) => (
+                      <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-3 py-2">{row.menuCaption}</td>
+                        <td className="px-3 py-2">{row.menuUrl}</td>
+                        <td className="px-3 py-2">{row.menuSet}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {securityReport === 'Permission Exception' && (
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Prog Name</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Security Token</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Permission Type</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">UserCode</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">UserName</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Security Group</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-gray-600">Permission Exception</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {permissionExceptionData.map((row, idx) => (
+                      <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-3 py-2">{row.progName}</td>
+                        <td className="px-3 py-2">{row.securityToken}</td>
+                        <td className="px-3 py-2">{row.permissionType}</td>
+                        <td className="px-3 py-2">{row.userCode}</td>
+                        <td className="px-3 py-2">{row.userName}</td>
+                        <td className="px-3 py-2">{row.securityGroup}</td>
+                        <td className="px-3 py-2">{row.permissionException}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        ) : activeTab === 'groups' ? (
           <div className="bg-white rounded-xl border overflow-hidden">
             {selectedGroups.length > 0 && (
               <div className="px-4 py-3 bg-blue-50 border-b flex items-center justify-between">
@@ -378,7 +1002,7 @@ export default function SecurityHub() {
 
       {drawer.open && <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setDrawer({ open: false, type: null, data: null })} />}
 
-      <div className={`fixed right-0 top-0 h-full w-[800px] min-w-[800px] max-w-[800px] bg-white shadow-2xl z-50 transform transition-transform duration-300 overflow-hidden ${drawer.open ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed right-0 top-0 h-full w-[1400px] min-w-[1400px] max-w-[1400px] bg-white shadow-2xl z-50 transform transition-transform duration-300 overflow-hidden ${drawer.open ? 'translate-x-0' : 'translate-x-full'}`}>
         {drawer.data && (
           <div className="h-full flex flex-col">
             <div className="px-6 py-4 border-b flex items-center justify-between">
@@ -408,23 +1032,219 @@ export default function SecurityHub() {
                   )}
                 </div>
               </div>
-              <button onClick={() => setDrawer({ open: false, type: null, data: null })} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+              <button onClick={() => { setDrawer({ open: false, type: null, data: null }); setDrawerLayer(1); setSelectedDatabase(null); }} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
 
             {drawer.type === 'group' ? (
               <>
-                <div className="px-6 border-b">
-                  <div className="flex gap-1">
-                    {['users', 'roles', 'permissions', 'accounts', 'accountTrees', 'chargeCodes', 'displayTypes', 'book', 'reports'].map(tab => (
-                      <button key={tab} onClick={() => setDrawerTab(tab)} className={`px-2 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${drawerTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
-                        {tab === 'chargeCodes' ? 'Charge Codes' : tab === 'accountTrees' ? 'Acct Trees' : tab === 'displayTypes' ? 'Display Types' : tab === 'book' ? 'Book' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {/* Layer Navigation Breadcrumb */}
+                <div className="px-6 py-2 bg-gray-50 border-b flex items-center gap-2 text-sm">
+                  <button
+                    onClick={() => { setDrawerLayer(1); setSelectedDatabase(null); setDrawerTab('users'); }}
+                    className={`${drawerLayer === 1 ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Multitenant
+                  </button>
+                  {drawerLayer >= 2 && (
+                    <>
+                      <span className="text-gray-400">/</span>
+                      <button
+                        onClick={() => { setDrawerLayer(2); setSelectedDatabase(null); }}
+                        className={`${drawerLayer === 2 ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                      >
+                        Databases
                       </button>
-                    ))}
-                  </div>
+                    </>
+                  )}
+                  {drawerLayer === 3 && selectedDatabase && (
+                    <>
+                      <span className="text-gray-400">/</span>
+                      <span className="text-blue-600 font-medium">{selectedDatabase.name}</span>
+                    </>
+                  )}
                 </div>
 
+                {/* Layer 1: Multitenant - Users & Roles */}
+                {drawerLayer === 1 && (
+                  <div className="px-6 border-b">
+                    <div className="flex gap-1">
+                      {['users', 'roles'].map(tab => (
+                        <button key={tab} onClick={() => setDrawerTab(tab)} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${drawerTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
+                          {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </button>
+                      ))}
+                      <div className="flex-1" />
+                      <button
+                        onClick={() => setDrawerLayer(2)}
+                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Configure Database Settings
+                        <span className="ml-1">→</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Layer 2: Database Selection */}
+                {drawerLayer === 2 && (
+                  <div className="px-6 border-b">
+                    <div className="flex items-center gap-4 py-3">
+                      <button onClick={() => { setDrawerLayer(1); setDrawerTab('users'); }} className="text-sm text-gray-500 hover:text-gray-700">← Back to Roles & Users</button>
+                      <span className="text-sm text-gray-700 font-medium">Select a database to configure permissions and settings</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Layer 3: Database-specific Settings */}
+                {drawerLayer === 3 && (
+                  <div className="px-6 border-b">
+                    <div className="flex gap-1">
+                      <button onClick={() => { setDrawerLayer(2); setSelectedDatabase(null); }} className="px-3 py-3 text-sm text-gray-500 hover:text-gray-700">← Back</button>
+                      {['permissions', 'accounts', 'accountTrees', 'chargeCodes', 'displayTypes', 'book', 'reports'].map(tab => (
+                        <button key={tab} onClick={() => setDrawerTab(tab)} className={`px-2 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${drawerTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
+                          {tab === 'chargeCodes' ? 'Charge Codes' : tab === 'accountTrees' ? 'Acct Trees' : tab === 'displayTypes' ? 'Display Types' : tab === 'book' ? 'Book' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex-1 overflow-auto p-6 w-full min-h-0" style={{height: 'calc(100vh - 200px)'}}>
-                  {drawerTab === 'users' && (
+                  {/* Layer 2: Database Selection Content */}
+                  {drawerLayer === 2 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <Users className="w-4 h-4" />
+                        Managing database access for <span className="font-semibold text-gray-900">{isMultiGroup ? `${drawerGroups.length} groups` : drawerGroups[0]?.name}</span>
+                      </div>
+
+                      <div className="relative mb-4">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Search databases..."
+                          value={databaseSearch}
+                          onChange={(e) => setDatabaseSearch(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div className="flex gap-4">
+                        {/* Access Column */}
+                        <div className="flex-1">
+                          <div className="bg-teal-600 text-white text-sm font-medium px-3 py-2 rounded-t flex items-center justify-between">
+                            <span>Access</span>
+                            <span className="bg-teal-500 px-2 py-0.5 rounded text-xs">{databasesData.filter(db => databaseAccess.includes(db.id)).length}</span>
+                          </div>
+                          <div className="border border-t-0 rounded-b h-64 overflow-auto">
+                            {databasesData
+                              .filter(db => databaseAccess.includes(db.id) && db.name.toLowerCase().includes(databaseSearch.toLowerCase()))
+                              .map(db => (
+                              <div
+                                key={db.id}
+                                className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 ${selectedAccessDbs.includes(db.id) ? 'bg-blue-50' : ''}`}
+                                onClick={() => setSelectedAccessDbs(prev => prev.includes(db.id) ? prev.filter(id => id !== db.id) : [...prev, db.id])}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedAccessDbs.includes(db.id)}
+                                  onChange={() => {}}
+                                  className="w-4 h-4 rounded border-gray-300"
+                                />
+                                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-semibold">
+                                  {db.code}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium">{db.name}</div>
+                                  <div className="text-xs text-gray-500">{db.type}</div>
+                                </div>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setSelectedDatabase(db); setDrawerLayer(3); setDrawerTab('permissions'); }}
+                                  className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                  Configure
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Transfer Buttons */}
+                        <div className="flex flex-col justify-center gap-2">
+                          <button
+                            onClick={() => {
+                              setDatabaseAccess(prev => prev.filter(id => !selectedAccessDbs.includes(id)));
+                              setSelectedAccessDbs([]);
+                            }}
+                            disabled={selectedAccessDbs.length === 0}
+                            className="px-3 py-2 border rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            →
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDatabaseAccess(prev => [...prev, ...selectedNoAccessDbs]);
+                              setSelectedNoAccessDbs([]);
+                            }}
+                            disabled={selectedNoAccessDbs.length === 0}
+                            className="px-3 py-2 border rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            ←
+                          </button>
+                        </div>
+
+                        {/* No Access Column */}
+                        <div className="flex-1">
+                          <div className="bg-gray-500 text-white text-sm font-medium px-3 py-2 rounded-t flex items-center justify-between">
+                            <span>No Access</span>
+                            <span className="bg-gray-400 px-2 py-0.5 rounded text-xs">{databasesData.filter(db => !databaseAccess.includes(db.id)).length}</span>
+                          </div>
+                          <div className="border border-t-0 rounded-b h-64 overflow-auto">
+                            {databasesData
+                              .filter(db => !databaseAccess.includes(db.id) && db.name.toLowerCase().includes(databaseSearch.toLowerCase()))
+                              .map(db => (
+                              <div
+                                key={db.id}
+                                className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 ${selectedNoAccessDbs.includes(db.id) ? 'bg-blue-50' : ''}`}
+                                onClick={() => setSelectedNoAccessDbs(prev => prev.includes(db.id) ? prev.filter(id => id !== db.id) : [...prev, db.id])}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedNoAccessDbs.includes(db.id)}
+                                  onChange={() => {}}
+                                  className="w-4 h-4 rounded border-gray-300"
+                                />
+                                <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-semibold">
+                                  {db.code}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium text-gray-600">{db.name}</div>
+                                  <div className="text-xs text-gray-400">{db.type}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                        <p className="text-xs text-gray-500">
+                          Select databases and use the arrows to grant or revoke access. Click "Configure" to manage permissions, accounts, and other settings.
+                        </p>
+                        <button
+                          onClick={() => { setSelectedDatabase({ id: 'all', name: 'All Databases', code: 'ALL' }); setDrawerLayer(3); setDrawerTab('permissions'); }}
+                          disabled={databaseAccess.length === 0}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                        >
+                          Configure All ({databaseAccess.length})
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Layer 1: Users Tab */}
+                  {drawerLayer === 1 && drawerTab === 'users' && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm text-gray-500">{groupUsers.length} users in {isMultiGroup ? 'these groups' : 'this group'}</span>
@@ -452,7 +1272,8 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'roles' && (
+                  {/* Layer 1: Roles Tab */}
+                  {drawerLayer === 1 && drawerTab === 'roles' && (
                     <div className="space-y-2">
                       {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing roles for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}.</p>
@@ -481,9 +1302,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'permissions' && (
+                  {/* Layer 3: Permissions Tab */}
+                  {drawerLayer === 3 && drawerTab === 'permissions' && (
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600"><Users className="w-4 h-4" />Affecting <span className="font-semibold text-gray-900">{totalUsersInDrawer}</span> users across <span className="font-semibold text-gray-900">{drawerGroups.length}</span> group{drawerGroups.length > 1 ? 's' : ''}</div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Affecting <span className="font-semibold text-gray-900">{totalUsersInDrawer}</span> users across <span className="font-semibold text-gray-900">{drawerGroups.length}</span> group{drawerGroups.length > 1 ? 's' : ''}</div>
                       <div className="flex flex-wrap gap-2 items-center">
                         <select value={permProgramType} onChange={(e) => setPermProgramType(e.target.value)} className="px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                           <option value="All">All Program Types</option>
@@ -508,6 +1330,8 @@ export default function SecurityHub() {
                               <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Description</th>
                               <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 uppercase w-28">Access</th>
                               <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 uppercase w-36">Program Type</th>
+                              <th className="text-center px-3 py-2 text-xs font-semibold text-gray-500 uppercase w-20">Licensed</th>
+                              <th className="text-center px-3 py-2 text-xs font-semibold text-gray-500 uppercase w-16">Shared</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y">
@@ -530,6 +1354,12 @@ export default function SecurityHub() {
                                     </select>
                                   </td>
                                   <td className={`px-3 py-2 text-xs truncate ${isDisabled ? 'text-gray-400' : 'text-gray-600'}`}>{perm.programType}</td>
+                                  <td className="px-3 py-2 text-center">
+                                    {perm.licensed && <Check className="w-4 h-4 text-teal-600 mx-auto" />}
+                                  </td>
+                                  <td className="px-3 py-2 text-center">
+                                    {perm.shared && <Check className="w-4 h-4 text-teal-600 mx-auto" />}
+                                  </td>
                                 </tr>
                               );
                             })}
@@ -539,9 +1369,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'accounts' && (
+                  {/* Layer 3: Accounts Tab */}
+                  {drawerLayer === 3 && drawerTab === 'accounts' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing accounts for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing accounts for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Code</label><input type="text" value={accountCodeFilter} onChange={(e) => setAccountCodeFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Description</label><input type="text" value={accountDescFilter} onChange={(e) => setAccountDescFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -574,9 +1405,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'accountTrees' && (
+                  {/* Layer 3: Account Trees Tab */}
+                  {drawerLayer === 3 && drawerTab === 'accountTrees' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing account trees for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing account trees for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Tree Code</label><input type="text" value={accountTreeCodeFilter} onChange={(e) => setAccountTreeCodeFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Tree Description</label><input type="text" value={accountTreeDescFilter} onChange={(e) => setAccountTreeDescFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -609,9 +1441,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'chargeCodes' && (
+                  {/* Layer 3: Charge Codes Tab */}
+                  {drawerLayer === 3 && drawerTab === 'chargeCodes' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing charge codes for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing charge codes for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Charge Code</label><input type="text" value={chargeCodeFilter} onChange={(e) => setChargeCodeFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Charge Code Description</label><input type="text" value={chargeCodeDescFilter} onChange={(e) => setChargeCodeDescFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -644,9 +1477,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'displayTypes' && (
+                  {/* Layer 3: Display Types Tab */}
+                  {drawerLayer === 3 && drawerTab === 'displayTypes' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing display types for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing display types for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div><label className="block text-xs font-medium text-gray-600 mb-1">Display Type</label>
                         <select value={displayTypeCategory} onChange={(e) => setDisplayTypeCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                           <option value="All">All</option>
@@ -685,9 +1519,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'book' && (
+                  {/* Layer 3: Book Tab */}
+                  {drawerLayer === 3 && drawerTab === 'book' && (
                     <div className="space-y-2">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing books for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing books for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <p className="text-sm text-gray-500 mb-4">Assign book access to {isMultiGroup ? 'these security groups' : 'this security group'}.</p>
                       {booksList.map(book => (
                         <label key={book.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
@@ -711,9 +1546,10 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {drawerTab === 'reports' && (
+                  {/* Layer 3: Reports Tab */}
+                  {drawerLayer === 3 && drawerTab === 'reports' && (
                     <div className="space-y-2">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing reports for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing reports for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <p className="text-sm text-gray-500 mb-4">Select reports accessible to {isMultiGroup ? 'these groups' : 'this group'}.</p>
                       <select value={reportType} onChange={(e) => setReportType(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3">
                         <option value="Standard Reports">Standard Reports</option>
@@ -1002,6 +1838,117 @@ export default function SecurityHub() {
           </div>
         )}
       </div>
+
+      {/* Clone Group Modal */}
+      {cloneModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-xl shadow-2xl w-[500px] overflow-hidden">
+            <div className="px-6 py-4 border-b bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-900">Clone Group with Menu and Permissions</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-3 gap-4 items-center">
+                <label className="text-sm text-blue-600 underline cursor-pointer">Group (Source)</label>
+                <div className="col-span-2">
+                  <select
+                    value={cloneSourceGroup}
+                    onChange={(e) => setCloneSourceGroup(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select a group...</option>
+                    {securityGroups.map(g => (
+                      <option key={g.id} value={g.name}>{g.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 items-center">
+                <label className="text-sm text-gray-700">Clone Type</label>
+                <div className="col-span-2">
+                  <select
+                    value={cloneType}
+                    onChange={(e) => setCloneType(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="New Group">New Group</option>
+                    <option value="Existing Group">Existing Group</option>
+                  </select>
+                </div>
+              </div>
+
+              {cloneType === 'Existing Group' && (
+                <div className="grid grid-cols-3 gap-4 items-center">
+                  <label className="text-sm text-gray-700">Target Group</label>
+                  <div className="col-span-2">
+                    <select
+                      value={cloneTargetGroup}
+                      onChange={(e) => setCloneTargetGroup(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select a group...</option>
+                      {securityGroups.filter(g => g.name !== cloneSourceGroup).map(g => (
+                        <option key={g.id} value={g.name}>{g.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {cloneType === 'New Group' && (
+                <div className="grid grid-cols-3 gap-4 items-center">
+                  <label className="text-sm text-gray-700">New Group Name</label>
+                  <div className="col-span-2">
+                    <input
+                      type="text"
+                      value={cloneTargetGroup}
+                      onChange={(e) => setCloneTargetGroup(e.target.value)}
+                      placeholder="Enter new group name..."
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-3 gap-4 items-center">
+                <label className="text-sm text-gray-700">Clone Permissions?</label>
+                <div className="col-span-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={clonePermissions}
+                      onChange={(e) => setClonePermissions(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <span className="text-sm text-gray-600">Include all permissions and settings</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => { setCloneModalOpen(false); setCloneSourceGroup(''); setCloneTargetGroup(''); setCloneType('New Group'); }}
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setCloneModalOpen(false); setCloneSourceGroup(''); setCloneTargetGroup(''); setCloneType('New Group'); }}
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-100"
+              >
+                Help
+              </button>
+              <button
+                onClick={() => { setCloneModalOpen(false); setCloneSourceGroup(''); setCloneTargetGroup(''); setCloneType('New Group'); }}
+                disabled={!cloneSourceGroup || !cloneTargetGroup}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Clone
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
