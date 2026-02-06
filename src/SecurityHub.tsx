@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3 } from 'lucide-react';
+import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star } from 'lucide-react';
 
 const securityGroups = [
   { id: 1, name: 'Admin', description: 'Full system access', userCount: 2, properties: 'All', lastModified: '2024-01-15' },
@@ -22,14 +22,14 @@ const users = [
 ];
 
 const roles = [
-  { id: 1, name: 'AR Manager', enabled: true },
-  { id: 2, name: 'AR Manager - Payments', enabled: false },
-  { id: 3, name: 'AR Manager - Payments Admin', enabled: false },
-  { id: 4, name: 'CRM IQ', enabled: true },
-  { id: 5, name: 'Procure to Pay v2', enabled: false },
-  { id: 6, name: 'System Administration', enabled: true },
-  { id: 7, name: 'Voyager 8 Residential', enabled: true },
-  { id: 8, name: 'Voyager 8 Residential - Leasing', enabled: false },
+  { id: 1, name: 'AR Manager', enabled: true, isDefault: false },
+  { id: 2, name: 'AR Manager - Payments', enabled: false, isDefault: false },
+  { id: 3, name: 'AR Manager - Payments Admin', enabled: false, isDefault: false },
+  { id: 4, name: 'CRM IQ', enabled: true, isDefault: false },
+  { id: 5, name: 'Procure to Pay v2', enabled: false, isDefault: false },
+  { id: 6, name: 'System Administration', enabled: true, isDefault: false },
+  { id: 7, name: 'Voyager 8 Residential', enabled: true, isDefault: true },
+  { id: 8, name: 'Voyager 8 Residential - Leasing', enabled: false, isDefault: false },
 ];
 
 const permissionsData = [
@@ -1276,7 +1276,7 @@ export default function SecurityHub() {
                   {drawerLayer === 1 && drawerTab === 'roles' && (
                     <div className="space-y-2">
                       {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing roles for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
-                      <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}.</p>
+                      <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}. Click the <Star className="w-3 h-3 inline text-amber-500 fill-amber-500" /> to set the default role used upon login.</p>
                       
                       <div className="relative mb-4">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -1292,12 +1292,22 @@ export default function SecurityHub() {
                       {rolesList
                         .filter(role => role.name.toLowerCase().includes(rolesSearch.toLowerCase()))
                         .map(role => (
-                        <label key={role.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
-                          <span className="text-sm">{role.name}</span>
+                        <div key={role.id} className={`flex items-center justify-between p-3 rounded-lg ${role.isDefault ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50'} hover:bg-gray-100`}>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setRolesList(prev => prev.map(r => ({ ...r, isDefault: r.id === role.id })))}
+                              className={`p-1 rounded transition-colors ${role.isDefault ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
+                              title={role.isDefault ? 'Default role on login' : 'Set as default role'}
+                            >
+                              <Star className={`w-4 h-4 ${role.isDefault ? 'fill-amber-500' : ''}`} />
+                            </button>
+                            <span className="text-sm">{role.name}</span>
+                            {role.isDefault && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Default</span>}
+                          </div>
                           <div onClick={() => setRolesList(prev => prev.map(r => r.id === role.id ? {...r, enabled: !r.enabled} : r))} className={`w-10 h-6 rounded-full p-1 transition-colors cursor-pointer ${role.enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
                             <div className={`w-4 h-4 bg-white rounded-full transition-transform ${role.enabled ? 'translate-x-4' : ''}`} />
                           </div>
-                        </label>
+                        </div>
                       ))}
                     </div>
                   )}
