@@ -1989,13 +1989,13 @@ export default function SecurityHub() {
                     className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="All">All Properties</option>
-                    <option value="All">All</option>
-                    <option value="2">2 Properties</option>
-                    <option value="3">3 Properties</option>
-                    <option value="4">4 Properties</option>
-                    <option value="5">5 Properties</option>
-                    <option value="8">8 Properties</option>
-                    <option value="10">10 Properties</option>
+                    {[...new Set(users.map(u => u.properties))].sort((a, b) => {
+                      if (a === 'All') return -1;
+                      if (b === 'All') return 1;
+                      return parseInt(a) - parseInt(b);
+                    }).map(prop => (
+                      <option key={prop} value={prop}>{prop === 'All' ? 'All Properties Assigned' : `${prop} Properties`}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="flex-1">
