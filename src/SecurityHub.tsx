@@ -1230,14 +1230,14 @@ export default function SecurityHub() {
 
                       <div className="flex items-center justify-between mt-4 pt-4 border-t">
                         <p className="text-xs text-gray-500">
-                          Select databases and use the arrows to grant or revoke access. Click "Configure" to manage permissions, accounts, and other settings.
+                          Select databases and use the arrows to grant or revoke access. Check databases in the Access column, then click "Configure Selected" to manage settings for multiple databases at once.
                         </p>
                         <button
-                          onClick={() => { setSelectedDatabase({ id: 'all', name: 'All Databases', code: 'ALL' }); setDrawerLayer(3); setDrawerTab('permissions'); }}
-                          disabled={databaseAccess.length === 0}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                          onClick={() => { setSelectedDatabase({ id: 'selected', name: `${selectedAccessDbs.length} Selected Databases`, code: 'SEL', selectedIds: selectedAccessDbs }); setDrawerLayer(3); setDrawerTab('permissions'); }}
+                          disabled={selectedAccessDbs.length === 0}
+                          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                         >
-                          Configure All ({databaseAccess.length})
+                          Configure Selected ({selectedAccessDbs.length})
                         </button>
                       </div>
                     </div>
