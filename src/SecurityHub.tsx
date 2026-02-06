@@ -266,6 +266,13 @@ export default function SecurityHub() {
   const [cloneSourceGroup, setCloneSourceGroup] = useState('');
   const [cloneType, setCloneType] = useState('New Group');
   const [cloneTargetGroup, setCloneTargetGroup] = useState('');
+
+  // Add User Modal state
+  const [addUserModalOpen, setAddUserModalOpen] = useState(false);
+  const [addUserPropertyFilter, setAddUserPropertyFilter] = useState('All');
+  const [addUserGroupFilter, setAddUserGroupFilter] = useState('All');
+  const [addUserSearch, setAddUserSearch] = useState('');
+  const [selectedUsersToAdd, setSelectedUsersToAdd] = useState<number[]>([]);
   const [clonePermissions, setClonePermissions] = useState(true);
   const [userDrawerTab, setUserDrawerTab] = useState('details');
   const [selectedGroups, setSelectedGroups] = useState([]);
@@ -1248,7 +1255,10 @@ export default function SecurityHub() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm text-gray-500">{groupUsers.length} users in {isMultiGroup ? 'these groups' : 'this group'}</span>
-                        <button className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-1"><Plus className="w-3 h-3" /> Add User</button>
+                        <button
+                          onClick={() => { setAddUserModalOpen(true); setSelectedUsersToAdd([]); setAddUserPropertyFilter('All'); setAddUserGroupFilter('All'); setAddUserSearch(''); }}
+                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-1"
+                        ><Plus className="w-3 h-3" /> Add User</button>
                       </div>
                       {groupUsers.map(user => (
                         <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -1955,6 +1965,179 @@ export default function SecurityHub() {
               >
                 Clone
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add User Modal */}
+      {addUserModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-xl shadow-2xl w-[700px] max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-900">Add Users to {isMultiGroup ? 'Groups' : drawerGroups[0]?.name}</h2>
+            </div>
+
+            {/* Filters */}
+            <div className="px-6 py-4 border-b bg-gray-50 space-y-3">
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Property</label>
+                  <select
+                    value={addUserPropertyFilter}
+                    onChange={(e) => setAddUserPropertyFilter(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="All">All Properties</option>
+                    <option value="All">All</option>
+                    <option value="2">2 Properties</option>
+                    <option value="3">3 Properties</option>
+                    <option value="4">4 Properties</option>
+                    <option value="5">5 Properties</option>
+                    <option value="8">8 Properties</option>
+                    <option value="10">10 Properties</option>
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Group</label>
+                  <select
+                    value={addUserGroupFilter}
+                    onChange={(e) => setAddUserGroupFilter(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="All">All Groups</option>
+                    {securityGroups.map(g => (
+                      <option key={g.id} value={g.name}>{g.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by name or email..."
+                  value={addUserSearch}
+                  onChange={(e) => setAddUserSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* User List */}
+            <div className="flex-1 overflow-auto p-4">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={
+                      users
+                        .filter(u => !groupUsers.some(gu => gu.id === u.id))
+                        .filter(u => addUserPropertyFilter === 'All' || u.properties === addUserPropertyFilter)
+                        .filter(u => addUserGroupFilter === 'All' || u.group === addUserGroupFilter)
+                        .filter(u => addUserSearch === '' || u.name.toLowerCase().includes(addUserSearch.toLowerCase()) || u.email.toLowerCase().includes(addUserSearch.toLowerCase()))
+                        .length > 0 &&
+                      users
+                        .filter(u => !groupUsers.some(gu => gu.id === u.id))
+                        .filter(u => addUserPropertyFilter === 'All' || u.properties === addUserPropertyFilter)
+                        .filter(u => addUserGroupFilter === 'All' || u.group === addUserGroupFilter)
+                        .filter(u => addUserSearch === '' || u.name.toLowerCase().includes(addUserSearch.toLowerCase()) || u.email.toLowerCase().includes(addUserSearch.toLowerCase()))
+                        .every(u => selectedUsersToAdd.includes(u.id))
+                    }
+                    onChange={(e) => {
+                      const filteredUsers = users
+                        .filter(u => !groupUsers.some(gu => gu.id === u.id))
+                        .filter(u => addUserPropertyFilter === 'All' || u.properties === addUserPropertyFilter)
+                        .filter(u => addUserGroupFilter === 'All' || u.group === addUserGroupFilter)
+                        .filter(u => addUserSearch === '' || u.name.toLowerCase().includes(addUserSearch.toLowerCase()) || u.email.toLowerCase().includes(addUserSearch.toLowerCase()));
+                      if (e.target.checked) {
+                        setSelectedUsersToAdd(filteredUsers.map(u => u.id));
+                      } else {
+                        setSelectedUsersToAdd([]);
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-gray-300"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Select All</span>
+                </label>
+                <span className="text-sm text-gray-500">
+                  {selectedUsersToAdd.length} selected
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                {users
+                  .filter(u => !groupUsers.some(gu => gu.id === u.id))
+                  .filter(u => addUserPropertyFilter === 'All' || u.properties === addUserPropertyFilter)
+                  .filter(u => addUserGroupFilter === 'All' || u.group === addUserGroupFilter)
+                  .filter(u => addUserSearch === '' || u.name.toLowerCase().includes(addUserSearch.toLowerCase()) || u.email.toLowerCase().includes(addUserSearch.toLowerCase()))
+                  .map(user => (
+                    <label
+                      key={user.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${selectedUsersToAdd.includes(user.id) ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 hover:bg-gray-100'}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedUsersToAdd.includes(user.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedUsersToAdd(prev => [...prev, user.id]);
+                          } else {
+                            setSelectedUsersToAdd(prev => prev.filter(id => id !== user.id));
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-semibold">
+                        {user.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500">{user.group}</div>
+                        <div className="text-xs text-gray-400">{user.properties === 'All' ? 'All Properties' : `${user.properties} Properties`}</div>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {user.status}
+                      </span>
+                    </label>
+                  ))}
+                {users
+                  .filter(u => !groupUsers.some(gu => gu.id === u.id))
+                  .filter(u => addUserPropertyFilter === 'All' || u.properties === addUserPropertyFilter)
+                  .filter(u => addUserGroupFilter === 'All' || u.group === addUserGroupFilter)
+                  .filter(u => addUserSearch === '' || u.name.toLowerCase().includes(addUserSearch.toLowerCase()) || u.email.toLowerCase().includes(addUserSearch.toLowerCase()))
+                  .length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No users found matching your filters</p>
+                    </div>
+                  )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t bg-gray-50 flex justify-between items-center">
+              <span className="text-sm text-gray-500">
+                {selectedUsersToAdd.length} user{selectedUsersToAdd.length !== 1 ? 's' : ''} will be added to {isMultiGroup ? `${drawerGroups.length} groups` : drawerGroups[0]?.name}
+              </span>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setAddUserModalOpen(false); setSelectedUsersToAdd([]); }}
+                  className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { setAddUserModalOpen(false); setSelectedUsersToAdd([]); }}
+                  disabled={selectedUsersToAdd.length === 0}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add {selectedUsersToAdd.length} User{selectedUsersToAdd.length !== 1 ? 's' : ''}
+                </button>
+              </div>
             </div>
           </div>
         </div>
