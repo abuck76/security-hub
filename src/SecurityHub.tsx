@@ -2,12 +2,34 @@ import { useState } from 'react';
 import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star } from 'lucide-react';
 
 const securityGroups = [
-  { id: 1, name: 'Admin', description: 'Full system access', userCount: 2, properties: 'All', lastModified: '2024-01-15' },
-  { id: 2, name: 'Property Manager', description: 'Manage assigned properties', userCount: 5, properties: '12', lastModified: '2024-01-10' },
-  { id: 3, name: 'Accountant', description: 'Financial operations', userCount: 3, properties: '8', lastModified: '2024-01-08' },
-  { id: 4, name: 'Maintenance', description: 'Work order management', userCount: 8, properties: '15', lastModified: '2024-01-12' },
-  { id: 5, name: 'Leasing Agent', description: 'Tenant applications & leases', userCount: 4, properties: '6', lastModified: '2024-01-14' },
-  { id: 6, name: 'View Only', description: 'Read-only access', userCount: 2, properties: '3', lastModified: '2024-01-05' },
+  { id: 1, name: 'Admin', description: 'Full system access', userCount: 2, properties: 'All', lastModified: '2024-01-15', roles: [
+    { roleId: 1, enabled: true, isDefault: false },
+    { roleId: 4, enabled: true, isDefault: false },
+    { roleId: 6, enabled: true, isDefault: true },
+    { roleId: 7, enabled: true, isDefault: false },
+  ]},
+  { id: 2, name: 'Property Manager', description: 'Manage assigned properties', userCount: 5, properties: '12', lastModified: '2024-01-10', roles: [
+    { roleId: 4, enabled: true, isDefault: false },
+    { roleId: 7, enabled: true, isDefault: true },
+    { roleId: 8, enabled: true, isDefault: false },
+  ]},
+  { id: 3, name: 'Accountant', description: 'Financial operations', userCount: 3, properties: '8', lastModified: '2024-01-08', roles: [
+    { roleId: 1, enabled: true, isDefault: true },
+    { roleId: 2, enabled: true, isDefault: false },
+    { roleId: 3, enabled: true, isDefault: false },
+    { roleId: 5, enabled: true, isDefault: false },
+  ]},
+  { id: 4, name: 'Maintenance', description: 'Work order management', userCount: 8, properties: '15', lastModified: '2024-01-12', roles: [
+    { roleId: 7, enabled: true, isDefault: true },
+  ]},
+  { id: 5, name: 'Leasing Agent', description: 'Tenant applications & leases', userCount: 4, properties: '6', lastModified: '2024-01-14', roles: [
+    { roleId: 4, enabled: true, isDefault: false },
+    { roleId: 7, enabled: true, isDefault: false },
+    { roleId: 8, enabled: true, isDefault: true },
+  ]},
+  { id: 6, name: 'View Only', description: 'Read-only access', userCount: 2, properties: '3', lastModified: '2024-01-05', roles: [
+    { roleId: 7, enabled: true, isDefault: true },
+  ]},
 ];
 
 const users = [
@@ -21,15 +43,16 @@ const users = [
   { id: 8, name: 'David Lee', email: 'dlee@company.com', group: 'View Only', properties: '2', status: 'Active', lastLogin: '2024-01-10' },
 ];
 
-const roles = [
-  { id: 1, name: 'AR Manager', enabled: true, isDefault: false },
-  { id: 2, name: 'AR Manager - Payments', enabled: false, isDefault: false },
-  { id: 3, name: 'AR Manager - Payments Admin', enabled: false, isDefault: false },
-  { id: 4, name: 'CRM IQ', enabled: true, isDefault: false },
-  { id: 5, name: 'Procure to Pay v2', enabled: false, isDefault: false },
-  { id: 6, name: 'System Administration', enabled: true, isDefault: false },
-  { id: 7, name: 'Voyager 8 Residential', enabled: true, isDefault: true },
-  { id: 8, name: 'Voyager 8 Residential - Leasing', enabled: false, isDefault: false },
+// Master list of available roles (enabled/isDefault is configured per security group)
+const rolesMaster = [
+  { id: 1, name: 'AR Manager' },
+  { id: 2, name: 'AR Manager - Payments' },
+  { id: 3, name: 'AR Manager - Payments Admin' },
+  { id: 4, name: 'CRM IQ' },
+  { id: 5, name: 'Procure to Pay v2' },
+  { id: 6, name: 'System Administration' },
+  { id: 7, name: 'Voyager 8 Residential' },
+  { id: 8, name: 'Voyager 8 Residential - Leasing' },
 ];
 
 const permissionsData = [
@@ -297,7 +320,7 @@ export default function SecurityHub() {
   const [permNewOnly, setPermNewOnly] = useState(false);
   const [permBulkAction, setPermBulkAction] = useState('');
   const [permissionsList, setPermissionsList] = useState(permissionsData);
-  const [rolesList, setRolesList] = useState(roles);
+  const [groupsList, setGroupsList] = useState(securityGroups);
   const [rolesSearch, setRolesSearch] = useState('');
   const [booksList, setBooksList] = useState([
     { id: 1, name: 'All', enabled: true },
@@ -371,7 +394,7 @@ export default function SecurityHub() {
 
   const programTypes = [...new Set(permissionsData.map(p => p.programType))];
 
-  const filteredGroups = securityGroups.filter(g =>
+  const filteredGroups = groupsList.filter(g =>
     g.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     g.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -919,6 +942,7 @@ export default function SecurityHub() {
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Group Name</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Description</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Users</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Roles</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Properties</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Last Modified</th>
                 </tr>
@@ -937,6 +961,7 @@ export default function SecurityHub() {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>{group.description}</td>
                     <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}><span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium">{group.userCount} users</span></td>
+                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('roles'); }}><span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">{group.roles?.filter(r => r.enabled).length || 0} roles</span></td>
                     <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>{group.properties}</td>
                     <td className="px-4 py-3 text-sm text-gray-500" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>{group.lastModified}</td>
                   </tr>
@@ -1283,11 +1308,79 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 1: Roles Tab */}
-                  {drawerLayer === 1 && drawerTab === 'roles' && (
+                  {drawerLayer === 1 && drawerTab === 'roles' && (() => {
+                    // Get the current group(s) from groupsList (stateful) using IDs from drawerGroups
+                    const currentGroupIds = drawerGroups.map(g => g.id);
+                    const currentGroups = groupsList.filter(g => currentGroupIds.includes(g.id));
+
+                    // Helper to get role config for a group
+                    const getRoleConfig = (groupId: number, roleId: number) => {
+                      const group = currentGroups.find(g => g.id === groupId);
+                      return group?.roles?.find(r => r.roleId === roleId);
+                    };
+
+                    // For single group: direct lookup. For multi-group: show if ANY group has it enabled
+                    const isRoleEnabled = (roleId: number) => {
+                      if (!isMultiGroup) {
+                        return getRoleConfig(currentGroups[0]?.id, roleId)?.enabled ?? false;
+                      }
+                      return currentGroups.some(g => g.roles?.some(r => r.roleId === roleId && r.enabled));
+                    };
+
+                    const isRoleDefault = (roleId: number) => {
+                      if (!isMultiGroup) {
+                        return getRoleConfig(currentGroups[0]?.id, roleId)?.isDefault ?? false;
+                      }
+                      // For multi-group, show if ANY group has it as default
+                      return currentGroups.some(g => g.roles?.some(r => r.roleId === roleId && r.isDefault));
+                    };
+
+                    // Toggle role enabled for selected group(s)
+                    const toggleRoleEnabled = (roleId: number) => {
+                      setGroupsList(prev => prev.map(group => {
+                        if (!currentGroupIds.includes(group.id)) return group;
+
+                        const existingRole = group.roles?.find(r => r.roleId === roleId);
+                        if (existingRole) {
+                          // Toggle existing
+                          return {
+                            ...group,
+                            roles: group.roles.map(r =>
+                              r.roleId === roleId ? { ...r, enabled: !r.enabled } : r
+                            )
+                          };
+                        } else {
+                          // Add new role config
+                          return {
+                            ...group,
+                            roles: [...(group.roles || []), { roleId, enabled: true, isDefault: false }]
+                          };
+                        }
+                      }));
+                    };
+
+                    // Set role as default for selected group(s)
+                    const setRoleDefault = (roleId: number) => {
+                      setGroupsList(prev => prev.map(group => {
+                        if (!currentGroupIds.includes(group.id)) return group;
+
+                        const existingRole = group.roles?.find(r => r.roleId === roleId);
+                        const updatedRoles = group.roles?.map(r => ({ ...r, isDefault: r.roleId === roleId })) || [];
+
+                        if (!existingRole) {
+                          // Add the role if it doesn't exist
+                          updatedRoles.push({ roleId, enabled: true, isDefault: true });
+                        }
+
+                        return { ...group, roles: updatedRoles };
+                      }));
+                    };
+
+                    return (
                     <div className="space-y-2">
                       {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing roles for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}. Click the <Star className="w-3 h-3 inline text-amber-500 fill-amber-500" /> to set the default role used upon login.</p>
-                      
+
                       <div className="relative mb-4">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
@@ -1299,28 +1392,31 @@ export default function SecurityHub() {
                         />
                       </div>
 
-                      {rolesList
+                      {rolesMaster
                         .filter(role => role.name.toLowerCase().includes(rolesSearch.toLowerCase()))
-                        .map(role => (
-                        <div key={role.id} className={`flex items-center justify-between p-3 rounded-lg ${role.isDefault ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50'} hover:bg-gray-100`}>
+                        .map(role => {
+                          const enabled = isRoleEnabled(role.id);
+                          const isDefault = isRoleDefault(role.id);
+                          return (
+                        <div key={role.id} className={`flex items-center justify-between p-3 rounded-lg ${isDefault ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50'} hover:bg-gray-100`}>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setRolesList(prev => prev.map(r => ({ ...r, isDefault: r.id === role.id })))}
-                              className={`p-1 rounded transition-colors ${role.isDefault ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
-                              title={role.isDefault ? 'Default role on login' : 'Set as default role'}
+                              onClick={() => setRoleDefault(role.id)}
+                              className={`p-1 rounded transition-colors ${isDefault ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
+                              title={isDefault ? 'Default role on login' : 'Set as default role'}
                             >
-                              <Star className={`w-4 h-4 ${role.isDefault ? 'fill-amber-500' : ''}`} />
+                              <Star className={`w-4 h-4 ${isDefault ? 'fill-amber-500' : ''}`} />
                             </button>
                             <span className="text-sm">{role.name}</span>
-                            {role.isDefault && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Default</span>}
+                            {isDefault && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Default</span>}
                           </div>
-                          <div onClick={() => setRolesList(prev => prev.map(r => r.id === role.id ? {...r, enabled: !r.enabled} : r))} className={`w-10 h-6 rounded-full p-1 transition-colors cursor-pointer ${role.enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${role.enabled ? 'translate-x-4' : ''}`} />
+                          <div onClick={() => toggleRoleEnabled(role.id)} className={`w-10 h-6 rounded-full p-1 transition-colors cursor-pointer ${enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-4' : ''}`} />
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
-                  )}
+                  );})()}
 
                   {/* Layer 3: Permissions Tab */}
                   {drawerLayer === 3 && drawerTab === 'permissions' && (
