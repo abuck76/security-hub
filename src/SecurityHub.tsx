@@ -277,12 +277,11 @@ export default function SecurityHub() {
   const [filterStatus, setFilterStatus] = useState('All');
   const [drawer, setDrawer] = useState({ open: false, type: null, data: null });
   const [drawerTab, setDrawerTab] = useState('users');
-  const [drawerLayer, setDrawerLayer] = useState(1); // 1: Roles/Users, 2: Database Selection, 3: DB-specific settings
-  const [selectedDatabase, setSelectedDatabase] = useState(null);
-  const [databaseSearch, setDatabaseSearch] = useState('');
-  const [databaseAccess, setDatabaseAccess] = useState([1, 3, 5]); // IDs of databases with access (default: Blue Moon, Live, Yardi Test)
-  const [selectedAccessDbs, setSelectedAccessDbs] = useState([]);
-  const [selectedNoAccessDbs, setSelectedNoAccessDbs] = useState([]);
+  const [drawerLayer, setDrawerLayer] = useState(1); // 1: Roles/Users, 2: Settings (Permissions, Accounts, etc.)
+
+  // Database connection state
+  const [isProductionDb, setIsProductionDb] = useState(true);
+  const [connectedDbName, setConnectedDbName] = useState('PROD_NORTHEAST_01');
 
   // Clone Group Modal state
   const [cloneModalOpen, setCloneModalOpen] = useState(false);
@@ -927,7 +926,7 @@ export default function SecurityHub() {
               <div className="px-4 py-3 bg-blue-50 border-b flex items-center justify-between">
                 <span className="text-sm text-blue-700 font-medium">{selectedGroups.length} group{selectedGroups.length > 1 ? 's' : ''} selected</span>
                 <div className="flex gap-2">
-                  <button onClick={() => { const selectedGroupData = securityGroups.filter(g => selectedGroups.includes(g.id)); setDrawer({ open: true, type: 'group', data: selectedGroupData }); setDrawerTab('users'); }} className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded">Open Drawer</button>
+                  <button onClick={() => { const selectedGroupData = securityGroups.filter(g => selectedGroups.includes(g.id)); setDrawer({ open: true, type: 'group', data: selectedGroupData }); setDrawerTab('general'); }} className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded">Open Drawer</button>
                   <button className="px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded">Delete</button>
                   <button onClick={() => setSelectedGroups([])} className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded">Clear Selection</button>
                 </div>
@@ -953,17 +952,17 @@ export default function SecurityHub() {
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <input type="checkbox" checked={selectedGroups.includes(group.id)} onChange={(e) => { if (e.target.checked) { setSelectedGroups([...selectedGroups, group.id]); } else { setSelectedGroups(selectedGroups.filter(id => id !== group.id)); } }} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                     </td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>
+                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><Shield className="w-4 h-4 text-blue-600" /></div>
                         <span className="font-medium text-gray-900">{group.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>{group.description}</td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}><span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium">{group.userCount} users</span></td>
+                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>{group.description}</td>
+                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}><span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium">{group.userCount} users</span></td>
                     <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('roles'); }}><span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">{group.roles?.filter(r => r.enabled).length || 0} roles</span></td>
-                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>{group.properties}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('users'); }}>{group.lastModified}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>{group.properties}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>{group.lastModified}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1064,75 +1063,78 @@ export default function SecurityHub() {
                   )}
                 </div>
               </div>
-              <button onClick={() => { setDrawer({ open: false, type: null, data: null }); setDrawerLayer(1); setSelectedDatabase(null); }} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+              <button onClick={() => { setDrawer({ open: false, type: null, data: null }); setDrawerLayer(1); }} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
 
             {drawer.type === 'group' ? (
               <>
+                {/* Database Indicator Bar */}
+                <div className="px-6 py-2 bg-white border-b flex items-center gap-3 text-sm">
+                  <div className={`w-2.5 h-2.5 rounded-full ${isProductionDb ? 'bg-green-500' : 'bg-amber-500'}`} />
+                  <span className="text-gray-500">Connected Database:</span>
+                  <span className="font-semibold text-gray-900">{connectedDbName}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${isProductionDb ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-amber-100 text-amber-700 border border-amber-300'}`}>
+                    {isProductionDb ? 'Production' : 'Test / Dev'}
+                  </span>
+                  <div className="ml-auto flex gap-1">
+                    <button
+                      onClick={() => { setIsProductionDb(true); setConnectedDbName('PROD_NORTHEAST_01'); }}
+                      className={`px-3 py-1 text-xs rounded border ${isProductionDb ? 'border-purple-600 bg-purple-50 text-purple-700 font-semibold' : 'border-gray-300 bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      Production
+                    </button>
+                    <button
+                      onClick={() => { setIsProductionDb(false); setConnectedDbName('TEST_NORTHEAST_01'); }}
+                      className={`px-3 py-1 text-xs rounded border ${!isProductionDb ? 'border-purple-600 bg-purple-50 text-purple-700 font-semibold' : 'border-gray-300 bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      Test / Dev
+                    </button>
+                  </div>
+                </div>
+
                 {/* Layer Navigation Breadcrumb */}
                 <div className="px-6 py-2 bg-gray-50 border-b flex items-center gap-2 text-sm">
                   <button
-                    onClick={() => { setDrawerLayer(1); setSelectedDatabase(null); setDrawerTab('users'); }}
+                    onClick={() => { setDrawerLayer(1); setDrawerTab('general'); }}
                     className={`${drawerLayer === 1 ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                   >
-                    Multitenant
+                    Group Settings
                   </button>
-                  {drawerLayer >= 2 && (
+                  {drawerLayer === 2 && (
                     <>
                       <span className="text-gray-400">/</span>
-                      <button
-                        onClick={() => { setDrawerLayer(2); setSelectedDatabase(null); }}
-                        className={`${drawerLayer === 2 ? 'text-blue-600 font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                      >
-                        Databases
-                      </button>
-                    </>
-                  )}
-                  {drawerLayer === 3 && selectedDatabase && (
-                    <>
-                      <span className="text-gray-400">/</span>
-                      <span className="text-blue-600 font-medium">{selectedDatabase.name}</span>
+                      <span className="text-blue-600 font-medium">Permissions & Access</span>
                     </>
                   )}
                 </div>
 
-                {/* Layer 1: Multitenant - Users & Roles */}
+                {/* Layer 1: Group Settings - General, Users & Roles */}
                 {drawerLayer === 1 && (
                   <div className="px-6 border-b">
                     <div className="flex gap-1">
-                      {['users', 'roles'].map(tab => (
+                      {['general', 'users', 'v7menus', 'conversion', 'roles'].map(tab => (
                         <button key={tab} onClick={() => setDrawerTab(tab)} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${drawerTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
-                          {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                          {tab === 'roles' ? 'Voyager 8 Roles' : tab === 'conversion' ? 'V7 → V8 Mapper' : tab === 'v7menus' ? 'Voyager 7 Menus' : tab === 'general' ? 'General' : 'Users'}
                         </button>
                       ))}
                       <div className="flex-1" />
                       <button
-                        onClick={() => setDrawerLayer(2)}
+                        onClick={() => { setDrawerLayer(2); setDrawerTab('permissions'); }}
                         className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
                       >
                         <Shield className="w-4 h-4" />
-                        Configure Database Settings
+                        Configure Permissions & Access
                         <span className="ml-1">→</span>
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Layer 2: Database Selection */}
+                {/* Layer 2: Permissions & Access Settings */}
                 {drawerLayer === 2 && (
                   <div className="px-6 border-b">
-                    <div className="flex items-center gap-4 py-3">
-                      <button onClick={() => { setDrawerLayer(1); setDrawerTab('users'); }} className="text-sm text-gray-500 hover:text-gray-700">← Back to Roles & Users</button>
-                      <span className="text-sm text-gray-700 font-medium">Select a database to configure permissions and settings</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Layer 3: Database-specific Settings */}
-                {drawerLayer === 3 && (
-                  <div className="px-6 border-b">
                     <div className="flex gap-1">
-                      <button onClick={() => { setDrawerLayer(2); setSelectedDatabase(null); }} className="px-3 py-3 text-sm text-gray-500 hover:text-gray-700">← Back</button>
+                      <button onClick={() => { setDrawerLayer(1); setDrawerTab('users'); }} className="px-3 py-3 text-sm text-gray-500 hover:text-gray-700">← Back</button>
                       {['permissions', 'accounts', 'accountTrees', 'chargeCodes', 'displayTypes', 'book', 'reports'].map(tab => (
                         <button key={tab} onClick={() => setDrawerTab(tab)} className={`px-2 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${drawerTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
                           {tab === 'chargeCodes' ? 'Charge Codes' : tab === 'accountTrees' ? 'Acct Trees' : tab === 'displayTypes' ? 'Display Types' : tab === 'book' ? 'Book' : tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -1143,134 +1145,52 @@ export default function SecurityHub() {
                 )}
 
                 <div className="flex-1 overflow-auto p-6 w-full min-h-0" style={{height: 'calc(100vh - 200px)'}}>
-                  {/* Layer 2: Database Selection Content */}
-                  {drawerLayer === 2 && (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <Users className="w-4 h-4" />
-                        Managing database access for <span className="font-semibold text-gray-900">{isMultiGroup ? `${drawerGroups.length} groups` : drawerGroups[0]?.name}</span>
-                      </div>
-
-                      <div className="relative mb-4">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder="Search databases..."
-                          value={databaseSearch}
-                          onChange={(e) => setDatabaseSearch(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-
-                      <div className="flex gap-4">
-                        {/* Access Column */}
-                        <div className="flex-1">
-                          <div className="bg-teal-600 text-white text-sm font-medium px-3 py-2 rounded-t flex items-center justify-between">
-                            <span>Access</span>
-                            <span className="bg-teal-500 px-2 py-0.5 rounded text-xs">{databasesData.filter(db => databaseAccess.includes(db.id)).length}</span>
-                          </div>
-                          <div className="border border-t-0 rounded-b h-64 overflow-auto">
-                            {databasesData
-                              .filter(db => databaseAccess.includes(db.id) && db.name.toLowerCase().includes(databaseSearch.toLowerCase()))
-                              .map(db => (
-                              <div
-                                key={db.id}
-                                className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 ${selectedAccessDbs.includes(db.id) ? 'bg-blue-50' : ''}`}
-                                onClick={() => setSelectedAccessDbs(prev => prev.includes(db.id) ? prev.filter(id => id !== db.id) : [...prev, db.id])}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedAccessDbs.includes(db.id)}
-                                  onChange={() => {}}
-                                  className="w-4 h-4 rounded border-gray-300"
-                                />
-                                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-semibold">
-                                  {db.code}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="text-sm font-medium">{db.name}</div>
-                                  <div className="text-xs text-gray-500">{db.type}</div>
-                                </div>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setSelectedDatabase(db); setDrawerLayer(3); setDrawerTab('permissions'); }}
-                                  className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-                                >
-                                  Configure
-                                </button>
-                              </div>
-                            ))}
+                  {/* Layer 1: General Tab */}
+                  {drawerLayer === 1 && drawerTab === 'general' && (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-3 gap-6">
+                        {/* General Section */}
+                        <div>
+                          <h3 className="text-sm font-bold text-gray-900 mb-4">General</h3>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Description</label>
+                              <input type="text" defaultValue={drawerGroups[0]?.description || ''} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm" />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Code <span className="text-red-500">*</span></label>
+                              <input type="text" defaultValue={drawerGroups[0]?.name?.toLowerCase().replace(/\s+/g, '') || ''} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm" />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">URL</label>
+                              <input type="text" defaultValue="" className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm" />
+                            </div>
                           </div>
                         </div>
 
-                        {/* Transfer Buttons */}
-                        <div className="flex flex-col justify-center gap-2">
-                          <button
-                            onClick={() => {
-                              setDatabaseAccess(prev => prev.filter(id => !selectedAccessDbs.includes(id)));
-                              setSelectedAccessDbs([]);
-                            }}
-                            disabled={selectedAccessDbs.length === 0}
-                            className="px-3 py-2 border rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            →
-                          </button>
-                          <button
-                            onClick={() => {
-                              setDatabaseAccess(prev => [...prev, ...selectedNoAccessDbs]);
-                              setSelectedNoAccessDbs([]);
-                            }}
-                            disabled={selectedNoAccessDbs.length === 0}
-                            className="px-3 py-2 border rounded text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            ←
-                          </button>
-                        </div>
-
-                        {/* No Access Column */}
-                        <div className="flex-1">
-                          <div className="bg-gray-500 text-white text-sm font-medium px-3 py-2 rounded-t flex items-center justify-between">
-                            <span>No Access</span>
-                            <span className="bg-gray-400 px-2 py-0.5 rounded text-xs">{databasesData.filter(db => !databaseAccess.includes(db.id)).length}</span>
-                          </div>
-                          <div className="border border-t-0 rounded-b h-64 overflow-auto">
-                            {databasesData
-                              .filter(db => !databaseAccess.includes(db.id) && db.name.toLowerCase().includes(databaseSearch.toLowerCase()))
-                              .map(db => (
-                              <div
-                                key={db.id}
-                                className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50 ${selectedNoAccessDbs.includes(db.id) ? 'bg-blue-50' : ''}`}
-                                onClick={() => setSelectedNoAccessDbs(prev => prev.includes(db.id) ? prev.filter(id => id !== db.id) : [...prev, db.id])}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedNoAccessDbs.includes(db.id)}
-                                  onChange={() => {}}
-                                  className="w-4 h-4 rounded border-gray-300"
-                                />
-                                <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-semibold">
-                                  {db.code}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="text-sm font-medium text-gray-600">{db.name}</div>
-                                  <div className="text-xs text-gray-400">{db.type}</div>
-                                </div>
-                              </div>
-                            ))}
+                        {/* Other Section */}
+                        <div>
+                          <h3 className="text-sm font-bold text-gray-900 mb-4">Other</h3>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Notes</label>
+                            <textarea rows={4} className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm resize-none" placeholder="Enter notes about this security group..." />
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                        <p className="text-xs text-gray-500">
-                          Select databases and use the arrows to grant or revoke access. Check databases in the Access column, then click "Configure Selected" to manage settings for multiple databases at once.
-                        </p>
-                        <button
-                          onClick={() => { setSelectedDatabase({ id: 'selected', name: `${selectedAccessDbs.length} Selected Databases`, code: 'SEL', selectedIds: selectedAccessDbs }); setDrawerLayer(3); setDrawerTab('permissions'); }}
-                          disabled={selectedAccessDbs.length === 0}
-                          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-medium hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                        >
-                          Configure Selected ({selectedAccessDbs.length})
-                        </button>
+                        {/* Journal Entry Restrictions */}
+                        <div>
+                          <h3 className="text-sm font-bold text-gray-900 mb-4">Journal Entry Restrictions</h3>
+                          <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-sm text-gray-700">
+                              <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
+                              No cash JE
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-gray-700">
+                              <input type="checkbox" className="w-4 h-4 rounded border-gray-300" />
+                              No accrual JE
+                            </label>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1304,6 +1224,163 @@ export default function SecurityHub() {
                           <button className="p-1.5 hover:bg-red-100 rounded text-gray-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Layer 1: Voyager 7 Menus Tab */}
+                  {drawerLayer === 1 && drawerTab === 'v7menus' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 border rounded-full text-sm w-40" />
+                          </div>
+                          <span className="bg-purple-700 text-white text-xs font-bold px-2 py-1 rounded-full">6</span>
+                          <span className="font-semibold text-sm text-gray-700">Menusets</span>
+                        </div>
+                      </div>
+
+                      <table className="w-full">
+                        <thead>
+                          <tr className="text-left text-xs text-gray-500 border-b">
+                            <th className="pb-2 font-medium">Name</th>
+                            <th className="pb-2 font-medium">Configurations</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-sm">
+                          {[
+                            { name: 'Res_Demo', checked: true },
+                            { name: 'acctq', checked: false },
+                            { name: 'iData', checked: false },
+                            { name: '--- Select ---', checked: false },
+                            { name: '--- Select ---', checked: false },
+                            { name: '--- Select ---', checked: false },
+                          ].map((item, idx) => (
+                            <tr key={idx} className="border-b border-gray-100">
+                              <td className="py-2">
+                                <select className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm bg-white">
+                                  <option>{item.name}</option>
+                                  <option>Res_Demo</option>
+                                  <option>acctq</option>
+                                  <option>iData</option>
+                                  <option>Commercial_Main</option>
+                                  <option>Affordable_Housing</option>
+                                </select>
+                              </td>
+                              <td className="py-2">
+                                <input type="checkbox" defaultChecked={item.checked} className="w-4 h-4 rounded border-gray-300" />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* Layer 1: V7 to V8 Conversion/Mapper Tab */}
+                  {drawerLayer === 1 && drawerTab === 'conversion' && (
+                    <div className="space-y-4">
+                      {/* Info Banner */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-3">
+                        <span className="text-lg">💡</span>
+                        <div className="text-sm text-blue-800">
+                          <strong>Menu to Role Mapper:</strong> This tool helps you convert Voyager 7 menu assignments to Voyager 8 roles.
+                          Select V7 menus on the left to see recommended V8 role mappings. Click "Apply Mapping" to automatically assign the suggested roles.
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        {/* V7 Menus Column */}
+                        <div>
+                          <div className="bg-gray-700 text-white text-sm font-semibold px-3 py-2 rounded-t flex items-center justify-between">
+                            <span>Voyager 7 Menus (Source)</span>
+                            <span className="bg-gray-600 px-2 py-0.5 rounded text-xs">3 assigned</span>
+                          </div>
+                          <div className="border border-t-0 rounded-b max-h-64 overflow-auto">
+                            {[
+                              { name: 'Res_Demo', mapped: true, roles: ['Voyager 8 Residential', 'Voyager 8 Residential - Leasing'] },
+                              { name: 'acctq', mapped: true, roles: ['AR Manager', 'AR Manager - Payments'] },
+                              { name: 'iData', mapped: false, roles: [] },
+                            ].map((menu, idx) => (
+                              <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 border-b border-gray-100 ${menu.mapped ? 'bg-green-50' : 'bg-white'}`}>
+                                <input type="checkbox" defaultChecked={menu.mapped} className="w-4 h-4 rounded border-gray-300" />
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium">{menu.name}</div>
+                                  {menu.mapped && (
+                                    <div className="text-xs text-green-600">→ {menu.roles.length} role(s) mapped</div>
+                                  )}
+                                </div>
+                                {menu.mapped && <span className="text-green-500">✓</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* V8 Roles Column */}
+                        <div>
+                          <div className="bg-purple-700 text-white text-sm font-semibold px-3 py-2 rounded-t flex items-center justify-between">
+                            <span>Voyager 8 Roles (Target)</span>
+                            <span className="bg-purple-600 px-2 py-0.5 rounded text-xs">4 suggested</span>
+                          </div>
+                          <div className="border border-t-0 rounded-b max-h-64 overflow-auto">
+                            {[
+                              { name: 'Voyager 8 Residential', source: 'Res_Demo', auto: true },
+                              { name: 'Voyager 8 Residential - Leasing', source: 'Res_Demo', auto: true },
+                              { name: 'AR Manager', source: 'acctq', auto: true },
+                              { name: 'AR Manager - Payments', source: 'acctq', auto: true },
+                              { name: 'CRM IQ', source: null, auto: false },
+                              { name: 'System Administration', source: null, auto: false },
+                              { name: 'Procure to Pay v2', source: null, auto: false },
+                            ].map((role, idx) => (
+                              <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 border-b border-gray-100 ${role.auto ? 'bg-purple-50' : 'bg-white'}`}>
+                                <input type="checkbox" defaultChecked={role.auto} className="w-4 h-4 rounded border-gray-300" />
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium">{role.name}</div>
+                                  {role.source && (
+                                    <div className="text-xs text-purple-600">← from {role.source}</div>
+                                  )}
+                                </div>
+                                {role.auto && <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Auto</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Mapping Rules Info */}
+                      <div className="bg-gray-50 border rounded-lg p-4">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2">Mapping Rules Applied:</h4>
+                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                            Res_Demo → Voyager 8 Residential, Leasing
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                            acctq → AR Manager, AR Manager - Payments
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-gray-300"></span>
+                            iData → No mapping defined
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center justify-between pt-2">
+                        <button className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                          Reset to Defaults
+                        </button>
+                        <div className="flex gap-2">
+                          <button className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Preview Changes
+                          </button>
+                          <button className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
+                            Apply Mapping to V8 Roles
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -1378,8 +1455,28 @@ export default function SecurityHub() {
 
                     return (
                     <div className="space-y-2">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing roles for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
-                      <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}. Click the <Star className="w-3 h-3 inline text-amber-500 fill-amber-500" /> to set the default role used upon login.</p>
+                      {/* Locked State for Test/Dev DB */}
+                      {!isProductionDb && (
+                        <div className="bg-gray-100 border border-gray-300 rounded-lg p-8 text-center text-gray-500">
+                          <div className="text-4xl mb-3">🔒</div>
+                          <p className="font-semibold text-gray-700 mb-2">Voyager 8 Role assignments are only available on a Production database.</p>
+                          <p className="text-sm">You are currently connected to a Test / Dev database. Please switch to your Production database to manage Elevate role assignments for this Security Group.</p>
+                        </div>
+                      )}
+
+                      {/* Active State for Production DB */}
+                      {isProductionDb && (
+                        <>
+                          {/* Warning Banner */}
+                          <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mb-4 flex gap-3">
+                            <span className="text-lg">⚠️</span>
+                            <p className="text-sm text-yellow-800">
+                              <strong>Important – Elevate Multi-Tenant Update:</strong> Saving role assignments on this tab will <strong>immediately update role assignments for all users in this Security Group</strong> within the Elevate / Voyager 8 platform. This action modifies the multi-tenant database and cannot be undone automatically. Please review all selected roles carefully before saving.
+                            </p>
+                          </div>
+
+                          {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing roles for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                          <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}. Click the <Star className="w-3 h-3 inline text-amber-500 fill-amber-500" /> to set the default role used upon login.</p>
 
                       <div className="relative mb-4">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -1415,13 +1512,15 @@ export default function SecurityHub() {
                           </div>
                         </div>
                       )})}
+                        </>
+                      )}
                     </div>
                   );})()}
 
                   {/* Layer 3: Permissions Tab */}
-                  {drawerLayer === 3 && drawerTab === 'permissions' && (
+                  {drawerLayer === 2 && drawerTab === 'permissions' && (
                     <div className="space-y-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Affecting <span className="font-semibold text-gray-900">{totalUsersInDrawer}</span> users across <span className="font-semibold text-gray-900">{drawerGroups.length}</span> group{drawerGroups.length > 1 ? 's' : ''}</div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600"><Users className="w-4 h-4" />Affecting <span className="font-semibold text-gray-900">{totalUsersInDrawer}</span> users across <span className="font-semibold text-gray-900">{drawerGroups.length}</span> group{drawerGroups.length > 1 ? 's' : ''}</div>
                       <div className="flex flex-wrap gap-2 items-center">
                         <select value={permProgramType} onChange={(e) => setPermProgramType(e.target.value)} className="px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                           <option value="All">All Program Types</option>
@@ -1486,9 +1585,9 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 3: Accounts Tab */}
-                  {drawerLayer === 3 && drawerTab === 'accounts' && (
+                  {drawerLayer === 2 && drawerTab === 'accounts' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing accounts for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing accounts for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Code</label><input type="text" value={accountCodeFilter} onChange={(e) => setAccountCodeFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Description</label><input type="text" value={accountDescFilter} onChange={(e) => setAccountDescFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -1522,9 +1621,9 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 3: Account Trees Tab */}
-                  {drawerLayer === 3 && drawerTab === 'accountTrees' && (
+                  {drawerLayer === 2 && drawerTab === 'accountTrees' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing account trees for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing account trees for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Tree Code</label><input type="text" value={accountTreeCodeFilter} onChange={(e) => setAccountTreeCodeFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Account Tree Description</label><input type="text" value={accountTreeDescFilter} onChange={(e) => setAccountTreeDescFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -1558,9 +1657,9 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 3: Charge Codes Tab */}
-                  {drawerLayer === 3 && drawerTab === 'chargeCodes' && (
+                  {drawerLayer === 2 && drawerTab === 'chargeCodes' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing charge codes for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing charge codes for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div className="grid grid-cols-2 gap-3">
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Charge Code</label><input type="text" value={chargeCodeFilter} onChange={(e) => setChargeCodeFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
                         <div><label className="block text-xs font-medium text-gray-600 mb-1">Charge Code Description</label><input type="text" value={chargeCodeDescFilter} onChange={(e) => setChargeCodeDescFilter(e.target.value)} className="w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
@@ -1594,9 +1693,9 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 3: Display Types Tab */}
-                  {drawerLayer === 3 && drawerTab === 'displayTypes' && (
+                  {drawerLayer === 2 && drawerTab === 'displayTypes' && (
                     <div className="space-y-3">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing display types for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing display types for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <div><label className="block text-xs font-medium text-gray-600 mb-1">Display Type</label>
                         <select value={displayTypeCategory} onChange={(e) => setDisplayTypeCategory(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                           <option value="All">All</option>
@@ -1636,9 +1735,9 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 3: Book Tab */}
-                  {drawerLayer === 3 && drawerTab === 'book' && (
+                  {drawerLayer === 2 && drawerTab === 'book' && (
                     <div className="space-y-2">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing books for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing books for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <p className="text-sm text-gray-500 mb-4">Assign book access to {isMultiGroup ? 'these security groups' : 'this security group'}.</p>
                       {booksList.map(book => (
                         <label key={book.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
@@ -1663,9 +1762,9 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 3: Reports Tab */}
-                  {drawerLayer === 3 && drawerTab === 'reports' && (
+                  {drawerLayer === 2 && drawerTab === 'reports' && (
                     <div className="space-y-2">
-                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Database: <span className="font-semibold text-blue-600">{selectedDatabase?.name}</span> • Editing reports for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
+                      {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing reports for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
                       <p className="text-sm text-gray-500 mb-4">Select reports accessible to {isMultiGroup ? 'these groups' : 'this group'}.</p>
                       <select value={reportType} onChange={(e) => setReportType(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3">
                         <option value="Standard Reports">Standard Reports</option>
