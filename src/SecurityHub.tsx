@@ -1,59 +1,152 @@
 import { useState } from 'react';
-import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star } from 'lucide-react';
+import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star, User, Settings, Eye, Clock, Database } from 'lucide-react';
 
+// ════ ROLE CATALOG ════════════════════════════════════════════════════
+// Mirrors the actual Elevate role table structure: role, menu, product, licensed, type
+const ROLE_CATALOG = [
+  { id: 1, name: "Condo Board Member", menu: "Voyager 8 Board Member", product: "Voyager 8 Condo", licensed: true, type: "Global" },
+  { id: 2, name: "Voyager 8 Commercial", menu: "Voyager 8 Commercial", product: "Voyager 8 Commercial", licensed: true, type: "Global" },
+  { id: 3, name: "Voyager 8 Commercial - Accounting", menu: "Voyager 8 Commercial", product: "Voyager 8 Commercial", licensed: true, type: "Global" },
+  { id: 4, name: "Voyager 8 Commercial - Lease Admin", menu: "Voyager 8 Commercial", product: "Voyager 8 Commercial", licensed: true, type: "Global" },
+  { id: 5, name: "Voyager 8 Condo", menu: "Voyager 8 Condo new", product: "Voyager 8 Condo", licensed: true, type: "Global" },
+  { id: 6, name: "Voyager 8 CRM IQ - Admin", menu: "Voyager 8 CRM IQ - Admin", product: "CRM IQ NET", licensed: true, type: "Global" },
+  { id: 7, name: "Voyager 8 CRM IQ - Community Manager", menu: "Voyager 8 CRM IQ - Community Manager", product: "CRM IQ NET", licensed: true, type: "Global" },
+  { id: 8, name: "Voyager 8 CRM IQ - Leasing", menu: "Voyager 8 CRM IQ - Leasing", product: "CRM IQ NET", licensed: true, type: "Global" },
+  { id: 9, name: "Voyager 8 CRM IQ - Prospecting", menu: "Voyager 8 CRM IQ - Prospecting", product: "CRM IQ NET", licensed: true, type: "Global" },
+  { id: 10, name: "Voyager 8 CRM IQ - Renewal Manager", menu: "Voyager 8 CRM IQ - Renewal Manager", product: "CRM IQ NET", licensed: true, type: "Global" },
+  { id: 11, name: "Voyager 8 New York", menu: "Voyager 8 New York", product: "CRM IQ New York Net", licensed: true, type: "Global" },
+  { id: 12, name: "Voyager 8 Residential", menu: "Voyager 8 Residential", product: "Res Manager", licensed: true, type: "Global" },
+  { id: 13, name: "Voyager 8 Residential - Accounting", menu: "Voyager 8 Residential - Accounting", product: "Res Manager", licensed: true, type: "Global" },
+  { id: 14, name: "Voyager 8 Residential - Accounts Payable", menu: "Voyager 8 Res - AP", product: "Res Manager", licensed: true, type: "Global" },
+  { id: 15, name: "Voyager 8 Residential - Community Manager", menu: "Voyager 8 Res - CM", product: "Res Manager", licensed: true, type: "Global" },
+  { id: 16, name: "Voyager 8 Residential - Leasing", menu: "Voyager 8 Res - Leasing", product: "Res Manager", licensed: true, type: "Global" },
+  { id: 17, name: "Voyager 8 Residential - Maintenance", menu: "Voyager 8 Res - Maintenance", product: "Res Manager", licensed: true, type: "Global" },
+  { id: 18, name: "Voyager 8 - Finance", menu: "Voyager 8 Finance", product: "Voyager 8 Finance", licensed: true, type: "Global" },
+  { id: 19, name: "Voyager 8 - Reporting Only", menu: "Voyager 8 Reporting", product: "Voyager 8 Base", licensed: false, type: "Global" },
+  { id: 20, name: "Voyager 8 Affordable Housing", menu: "Voyager 8 Affordable Housing", product: "Affordable Housing", licensed: false, type: "Global" },
+  { id: 21, name: "crmiqnet", menu: "CRM IQ Net", product: "CRM IQ NET", licensed: true, type: "Global" },
+  { id: 22, name: "Revenue IQ - Manager", menu: "Revenue IQ Manager", product: "Revenue IQ", licensed: true, type: "Global" },
+  { id: 23, name: "Revenue IQ - Executive", menu: "Revenue IQ Executive", product: "Revenue IQ", licensed: true, type: "Global" },
+  { id: 24, name: "Forecast IQ - Admin", menu: "Forecast IQ Admin", product: "Forecast IQ", licensed: true, type: "Global" },
+  { id: 25, name: "Forecast IQ - Leasing", menu: "Forecast IQ Leasing", product: "Forecast IQ", licensed: true, type: "Global" },
+  { id: 26, name: "AR Manager", menu: "AR Manager", product: "AR IQ", licensed: true, type: "Global" },
+  { id: 27, name: "P2P - Accounts Payable", menu: "P2P AP", product: "P2P", licensed: true, type: "Global" },
+];
+
+// Helper to get role ID by name
+const getRoleIdByName = (name: string) => ROLE_CATALOG.find(r => r.name === name)?.id;
+
+// ════ SECURITY GROUPS ════════════════════════════════════════════════════
 const securityGroups = [
-  { id: 1, name: 'Admin', description: 'Full system access', userCount: 2, properties: 'All', lastModified: '2024-01-15', roles: [
-    { roleId: 1, enabled: true, isDefault: false },
-    { roleId: 4, enabled: true, isDefault: false },
-    { roleId: 6, enabled: true, isDefault: true },
-    { roleId: 7, enabled: true, isDefault: false },
-  ]},
-  { id: 2, name: 'Property Manager', description: 'Manage assigned properties', userCount: 5, properties: '12', lastModified: '2024-01-10', roles: [
-    { roleId: 4, enabled: true, isDefault: false },
-    { roleId: 7, enabled: true, isDefault: true },
-    { roleId: 8, enabled: true, isDefault: false },
-  ]},
-  { id: 3, name: 'Accountant', description: 'Financial operations', userCount: 3, properties: '8', lastModified: '2024-01-08', roles: [
-    { roleId: 1, enabled: true, isDefault: true },
-    { roleId: 2, enabled: true, isDefault: false },
-    { roleId: 3, enabled: true, isDefault: false },
-    { roleId: 5, enabled: true, isDefault: false },
-  ]},
-  { id: 4, name: 'Maintenance', description: 'Work order management', userCount: 8, properties: '15', lastModified: '2024-01-12', roles: [
-    { roleId: 7, enabled: true, isDefault: true },
-  ]},
-  { id: 5, name: 'Leasing Agent', description: 'Tenant applications & leases', userCount: 4, properties: '6', lastModified: '2024-01-14', roles: [
-    { roleId: 4, enabled: true, isDefault: false },
-    { roleId: 7, enabled: true, isDefault: false },
-    { roleId: 8, enabled: true, isDefault: true },
-  ]},
-  { id: 6, name: 'View Only', description: 'Read-only access', userCount: 2, properties: '3', lastModified: '2024-01-05', roles: [
-    { roleId: 7, enabled: true, isDefault: true },
-  ]},
+  { id: 1, name: "Residential Manager", code: "resmgr", description: "Property management staff", userCount: 42, properties: "All", lastModified: "2024-01-15",
+    existingElevateRoles: ["Revenue IQ - Manager", "Forecast IQ - Admin", "AR Manager"],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 Residential"), enabled: true, isDefault: true },
+      { roleId: getRoleIdByName("Voyager 8 Residential - Accounting"), enabled: true, isDefault: false },
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Admin"), enabled: true, isDefault: false },
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Leasing"), enabled: true, isDefault: false },
+    ]
+  },
+  { id: 2, name: "Accounting", code: "acctg", description: "Financial operations", userCount: 18, properties: "All", lastModified: "2024-01-14",
+    existingElevateRoles: ["AR Manager", "P2P - Accounts Payable"],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 Residential - Accounting"), enabled: true, isDefault: true },
+      { roleId: getRoleIdByName("Voyager 8 Residential - Accounts Payable"), enabled: true, isDefault: false },
+      { roleId: getRoleIdByName("Voyager 8 - Finance"), enabled: true, isDefault: false },
+    ]
+  },
+  { id: 3, name: "Leasing Agent", code: "lease", description: "Tenant applications & leases", userCount: 35, properties: "12", lastModified: "2024-01-13",
+    existingElevateRoles: ["Forecast IQ - Leasing"],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 Residential - Leasing"), enabled: true, isDefault: true },
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Leasing"), enabled: true, isDefault: false },
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Prospecting"), enabled: true, isDefault: false },
+    ]
+  },
+  { id: 4, name: "Maintenance Tech", code: "maint", description: "Work order management", userCount: 27, properties: "15", lastModified: "2024-01-12",
+    existingElevateRoles: [],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 Residential - Maintenance"), enabled: true, isDefault: true },
+    ]
+  },
+  { id: 5, name: "Community Manager", code: "comgr", description: "Community operations", userCount: 14, properties: "8", lastModified: "2024-01-11",
+    existingElevateRoles: ["Revenue IQ - Manager"],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 Residential - Community Manager"), enabled: true, isDefault: true },
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Community Manager"), enabled: true, isDefault: false },
+    ]
+  },
+  { id: 6, name: "Accounts Payable", code: "ap", description: "AP processing", userCount: 9, properties: "All", lastModified: "2024-01-10",
+    existingElevateRoles: ["P2P - Accounts Payable", "AR Manager"],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 Residential - Accounts Payable"), enabled: true, isDefault: true },
+    ]
+  },
+  { id: 7, name: "CRM Admin", code: "crmadm", description: "CRM administration", userCount: 6, properties: "All", lastModified: "2024-01-09",
+    existingElevateRoles: ["Forecast IQ - Admin"],
+    roles: [
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Admin"), enabled: true, isDefault: true },
+      { roleId: getRoleIdByName("Voyager 8 CRM IQ - Renewal Manager"), enabled: true, isDefault: false },
+    ]
+  },
+  { id: 8, name: "Executive", code: "exec", description: "Executive leadership", userCount: 5, properties: "All", lastModified: "2024-01-08",
+    existingElevateRoles: ["Revenue IQ - Executive", "Forecast IQ - Admin"],
+    roles: []
+  },
+  { id: 9, name: "Read Only", code: "readonly", description: "Read-only access", userCount: 21, properties: "3", lastModified: "2024-01-07",
+    existingElevateRoles: [],
+    roles: []
+  },
+  { id: 10, name: "Commercial Manager", code: "comml", description: "Commercial property management", userCount: 11, properties: "5", lastModified: "2024-01-06",
+    existingElevateRoles: ["Voyager 8 Commercial"],
+    roles: []
+  },
 ];
 
+// ════ USERS ════════════════════════════════════════════════════
 const users = [
-  { id: 1, name: 'Sarah Chen', email: 'schen@company.com', group: 'Admin', properties: 'All', status: 'Active', lastLogin: '2024-01-15' },
-  { id: 2, name: 'Mike Johnson', email: 'mjohnson@company.com', group: 'Property Manager', properties: '5', status: 'Active', lastLogin: '2024-01-14' },
-  { id: 3, name: 'Emily Davis', email: 'edavis@company.com', group: 'Accountant', properties: '8', status: 'Active', lastLogin: '2024-01-15' },
-  { id: 4, name: 'James Wilson', email: 'jwilson@company.com', group: 'Maintenance', properties: '10', status: 'Active', lastLogin: '2024-01-13' },
-  { id: 5, name: 'Lisa Anderson', email: 'landerson@company.com', group: 'Property Manager', properties: '3', status: 'Inactive', lastLogin: '2024-01-01' },
-  { id: 6, name: 'Robert Brown', email: 'rbrown@company.com', group: 'Leasing Agent', properties: '4', status: 'Active', lastLogin: '2024-01-15' },
-  { id: 7, name: 'Amanda White', email: 'awhite@company.com', group: 'Admin', properties: 'All', status: 'Active', lastLogin: '2024-01-14' },
-  { id: 8, name: 'David Lee', email: 'dlee@company.com', group: 'View Only', properties: '2', status: 'Active', lastLogin: '2024-01-10' },
+  // Residential Manager (group 1)
+  { id: 101, name: 'Alice Chen', email: 'achen@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/1/2026 09:12 AM', existingRoles: ['Revenue IQ - Manager', 'AR Manager'] },
+  { id: 102, name: 'Brian Torres', email: 'btorres@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/2/2026 11:30 AM', existingRoles: ['Revenue IQ - Manager', 'Forecast IQ - Admin'] },
+  { id: 103, name: 'Carol Smith', email: 'csmith@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '2/28/2026 03:45 PM', existingRoles: ['AR Manager'] },
+  { id: 104, name: 'David Kim', email: 'dkim@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/3/2026 08:00 AM', existingRoles: ['Revenue IQ - Manager', 'AR Manager', 'P2P - Accounts Payable'] },
+  { id: 105, name: 'Evelyn Park', email: 'epark@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/1/2026 02:15 PM', existingRoles: [] },
+  // Accounting (group 2)
+  { id: 201, name: 'Frank Lee', email: 'flee@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '3/2/2026 10:00 AM', existingRoles: ['AR Manager', 'P2P - Accounts Payable'] },
+  { id: 202, name: 'Grace Huang', email: 'ghuang@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '3/1/2026 04:30 PM', existingRoles: ['P2P - Accounts Payable'] },
+  { id: 203, name: 'Henry Wu', email: 'hwu@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '2/27/2026 09:00 AM', existingRoles: ['AR Manager'] },
+  // Leasing Agent (group 3)
+  { id: 301, name: 'Iris Nakamura', email: 'inakamura@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/3/2026 10:45 AM', existingRoles: ['Forecast IQ - Leasing'] },
+  { id: 302, name: 'James Ortiz', email: 'jortiz@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/2/2026 01:00 PM', existingRoles: [] },
+  { id: 303, name: 'Karen Patel', email: 'kpatel@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/1/2026 11:20 AM', existingRoles: ['Forecast IQ - Leasing'] },
+  { id: 304, name: 'Liam Brown', email: 'lbrown@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/3/2026 08:30 AM', existingRoles: [] },
+  // Maintenance Tech (group 4)
+  { id: 401, name: 'Mike Johnson', email: 'mjohnson@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Active', lastLogin: '3/2/2026 07:00 AM', existingRoles: [] },
+  { id: 402, name: 'Nancy Davis', email: 'ndavis@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Active', lastLogin: '3/1/2026 06:45 AM', existingRoles: [] },
+  { id: 403, name: 'Oscar Reyes', email: 'oreyes@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Inactive', lastLogin: '2/25/2026 08:00 AM', existingRoles: [] },
+  // Community Manager (group 5)
+  { id: 501, name: 'Paula White', email: 'pwhite@acme.com', group: 'Community Manager', properties: '8', status: 'Active', lastLogin: '3/3/2026 09:00 AM', existingRoles: ['Revenue IQ - Manager'] },
+  { id: 502, name: 'Quinn Hall', email: 'qhall@acme.com', group: 'Community Manager', properties: '8', status: 'Active', lastLogin: '3/2/2026 03:00 PM', existingRoles: ['Revenue IQ - Manager', 'Forecast IQ - Admin'] },
+  // Accounts Payable (group 6)
+  { id: 601, name: 'Rachel Green', email: 'rgreen@acme.com', group: 'Accounts Payable', properties: 'All', status: 'Active', lastLogin: '3/3/2026 10:00 AM', existingRoles: ['P2P - Accounts Payable', 'AR Manager'] },
+  { id: 602, name: 'Sam Carter', email: 'scarter@acme.com', group: 'Accounts Payable', properties: 'All', status: 'Active', lastLogin: '3/1/2026 02:00 PM', existingRoles: ['P2P - Accounts Payable'] },
+  // CRM Admin (group 7)
+  { id: 701, name: 'Tina Lewis', email: 'tlewis@acme.com', group: 'CRM Admin', properties: 'All', status: 'Active', lastLogin: '3/2/2026 01:30 PM', existingRoles: ['Forecast IQ - Admin'] },
+  { id: 702, name: 'Uma Singh', email: 'usingh@acme.com', group: 'CRM Admin', properties: 'All', status: 'Active', lastLogin: '3/3/2026 11:00 AM', existingRoles: ['Forecast IQ - Admin', 'Revenue IQ - Manager'] },
+  // Executive (group 8)
+  { id: 801, name: 'Victor Ross', email: 'vross@acme.com', group: 'Executive', properties: 'All', status: 'Active', lastLogin: '3/3/2026 12:00 PM', existingRoles: ['Revenue IQ - Executive', 'Forecast IQ - Admin'] },
+  { id: 802, name: 'Wendy Chang', email: 'wchang@acme.com', group: 'Executive', properties: 'All', status: 'Active', lastLogin: '3/2/2026 09:45 AM', existingRoles: ['Revenue IQ - Executive'] },
+  // Read Only (group 9)
+  { id: 901, name: 'Xander Reed', email: 'xreed@acme.com', group: 'Read Only', properties: '3', status: 'Active', lastLogin: '3/1/2026 10:00 AM', existingRoles: [] },
+  { id: 902, name: 'Yara Pinto', email: 'ypinto@acme.com', group: 'Read Only', properties: '3', status: 'Active', lastLogin: '3/2/2026 08:00 AM', existingRoles: [] },
+  { id: 903, name: 'Zoe Adams', email: 'zadams@acme.com', group: 'Read Only', properties: '3', status: 'Inactive', lastLogin: '2/28/2026 04:00 PM', existingRoles: [] },
+  // Commercial Manager (group 10)
+  { id: 1001, name: 'Aaron Hill', email: 'ahill@acme.com', group: 'Commercial Manager', properties: '5', status: 'Active', lastLogin: '3/3/2026 07:30 AM', existingRoles: ['Voyager 8 Commercial'] },
+  { id: 1002, name: 'Beth Moore', email: 'bmoore@acme.com', group: 'Commercial Manager', properties: '5', status: 'Active', lastLogin: '3/2/2026 10:30 AM', existingRoles: ['Voyager 8 Commercial'] },
 ];
 
-// Master list of available roles (enabled/isDefault is configured per security group)
-const rolesMaster = [
-  { id: 1, name: 'AR Manager' },
-  { id: 2, name: 'AR Manager - Payments' },
-  { id: 3, name: 'AR Manager - Payments Admin' },
-  { id: 4, name: 'CRM IQ' },
-  { id: 5, name: 'Procure to Pay v2' },
-  { id: 6, name: 'System Administration' },
-  { id: 7, name: 'Voyager 8 Residential' },
-  { id: 8, name: 'Voyager 8 Residential - Leasing' },
-];
+// Use ROLE_CATALOG as the master list (replacing old rolesMaster)
+const rolesMaster = ROLE_CATALOG;
 
 const permissionsData = [
   { id: 1, description: 'Accounting>G/L>Bank Reconciliation>Bank Reconciliation', access: 'No Access', programType: 'Role - Voyager 8 Residential Accounting', isNew: false, parentId: null, licensed: true, shared: false },
@@ -275,7 +368,13 @@ export default function SecurityHub() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGroup, setFilterGroup] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [groupsStatFilter, setGroupsStatFilter] = useState('All'); // For stats dashboard: 'All', 'Configured', 'NoRoles'
+  const [bulkDefaultRole, setBulkDefaultRole] = useState(''); // For bulk actions toolbar
+  const [groupSearchTerm, setGroupSearchTerm] = useState(''); // Search within groups table
+  const [userSearchTerm, setUserSearchTerm] = useState(''); // Global user search
+  const [userSearchFocused, setUserSearchFocused] = useState(false); // Track if user search is focused
   const [drawer, setDrawer] = useState({ open: false, type: null, data: null });
+  const [previousDrawer, setPreviousDrawer] = useState<{ open: boolean; type: string | null; data: any; tab?: string } | null>(null);
   const [drawerTab, setDrawerTab] = useState('users');
   const [drawerLayer, setDrawerLayer] = useState(1); // 1: Roles/Users, 2: Settings (Permissions, Accounts, etc.)
 
@@ -319,9 +418,12 @@ export default function SecurityHub() {
   const [permNewOnly, setPermNewOnly] = useState(false);
   const [permBulkAction, setPermBulkAction] = useState('');
   const [permissionsList, setPermissionsList] = useState(permissionsData);
+  const [originalPermissions] = useState(() => JSON.parse(JSON.stringify(permissionsData))); // Deep copy for change tracking
   const [groupsList, setGroupsList] = useState(securityGroups);
+  const [originalGroups] = useState(() => JSON.parse(JSON.stringify(securityGroups))); // Deep copy for change tracking
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [rolesSearch, setRolesSearch] = useState('');
-  const [booksList, setBooksList] = useState([
+  const initialBooks = [
     { id: 1, name: 'All', enabled: true },
     { id: 2, name: 'Cash', enabled: true },
     { id: 3, name: 'Accrual', enabled: true },
@@ -330,7 +432,9 @@ export default function SecurityHub() {
     { id: 6, name: 'History', enabled: true },
     { id: 7, name: 'TAX', enabled: false },
     { id: 8, name: 'GAAP', enabled: true },
-  ]);
+  ];
+  const [booksList, setBooksList] = useState(initialBooks);
+  const [originalBooks] = useState(() => JSON.parse(JSON.stringify(initialBooks)));
   const [reportType, setReportType] = useState('Standard Reports');
   const [reportSearch, setReportSearch] = useState('');
   const [selectedReports, setSelectedReports] = useState({});
@@ -393,10 +497,81 @@ export default function SecurityHub() {
 
   const programTypes = [...new Set(permissionsData.map(p => p.programType))];
 
-  const filteredGroups = groupsList.filter(g =>
-    g.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    g.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredGroups = groupsList.filter(g => {
+    const searchLower = groupSearchTerm.toLowerCase();
+    const matchesSearch = groupSearchTerm === '' ||
+      g.name.toLowerCase().includes(searchLower) ||
+      g.code.toLowerCase().includes(searchLower) ||
+      g.description.toLowerCase().includes(searchLower);
+    const roleCount = g.roles?.filter(r => r.enabled).length || 0;
+    const matchesStatFilter = groupsStatFilter === 'All' ||
+      (groupsStatFilter === 'Configured' && roleCount > 0) ||
+      (groupsStatFilter === 'NoRoles' && roleCount === 0);
+    return matchesSearch && matchesStatFilter;
+  });
+
+  // Calculate pending changes by comparing current state to original
+  const pendingChanges = groupsList.map(group => {
+    const original = originalGroups.find(g => g.id === group.id);
+    if (!original) return null;
+
+    const originalRoles = original.roles || [];
+    const currentRoles = group.roles || [];
+
+    // Check if roles have changed
+    const originalEnabled = originalRoles.filter(r => r.enabled).map(r => r.roleId).sort();
+    const currentEnabled = currentRoles.filter(r => r.enabled).map(r => r.roleId).sort();
+    const rolesChanged = JSON.stringify(originalEnabled) !== JSON.stringify(currentEnabled);
+
+    // Check if default role changed
+    const originalDefault = originalRoles.find(r => r.isDefault)?.roleId;
+    const currentDefault = currentRoles.find(r => r.isDefault)?.roleId;
+    const defaultChanged = originalDefault !== currentDefault;
+
+    if (rolesChanged || defaultChanged) {
+      const addedRoles = currentEnabled.filter(id => !originalEnabled.includes(id));
+      const removedRoles = originalEnabled.filter(id => !currentEnabled.includes(id));
+      return {
+        group,
+        addedRoles: addedRoles.map(id => rolesMaster.find(r => r.id === id)?.name).filter(Boolean),
+        removedRoles: removedRoles.map(id => rolesMaster.find(r => r.id === id)?.name).filter(Boolean),
+        defaultChanged: defaultChanged ? {
+          from: rolesMaster.find(r => r.id === originalDefault)?.name || 'None',
+          to: rolesMaster.find(r => r.id === currentDefault)?.name || 'None'
+        } : null,
+        usersAffected: group.userCount
+      };
+    }
+    return null;
+  }).filter(Boolean);
+
+  const hasPendingChanges = pendingChanges.length > 0;
+  const totalUsersAffected = pendingChanges.reduce((sum, c) => sum + c.usersAffected, 0);
+
+  // Reset all changes
+  const resetAllChanges = () => {
+    setGroupsList(JSON.parse(JSON.stringify(originalGroups)));
+  };
+
+  // Calculate pending permission changes
+  const pendingPermissionChanges = permissionsList.filter((perm, idx) => {
+    const original = originalPermissions[idx];
+    return perm.enabled !== original.enabled;
+  });
+
+  // Calculate pending books changes
+  const pendingBooksChanges = booksList.filter((book, idx) => {
+    const original = originalBooks[idx];
+    return book.enabled !== original.enabled;
+  });
+
+  const hasPendingPermissionChanges = pendingPermissionChanges.length > 0 || pendingBooksChanges.length > 0;
+
+  // Reset permission changes
+  const resetPermissionChanges = () => {
+    setPermissionsList(JSON.parse(JSON.stringify(originalPermissions)));
+    setBooksList(JSON.parse(JSON.stringify(originalBooks)));
+  };
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -921,53 +1096,456 @@ export default function SecurityHub() {
             </div>
           </div>
         ) : activeTab === 'groups' ? (
-          <div className="bg-white rounded-xl border overflow-hidden">
-            {selectedGroups.length > 0 && (
-              <div className="px-4 py-3 bg-blue-50 border-b flex items-center justify-between">
-                <span className="text-sm text-blue-700 font-medium">{selectedGroups.length} group{selectedGroups.length > 1 ? 's' : ''} selected</span>
-                <div className="flex gap-2">
-                  <button onClick={() => { const selectedGroupData = securityGroups.filter(g => selectedGroups.includes(g.id)); setDrawer({ open: true, type: 'group', data: selectedGroupData }); setDrawerTab('general'); }} className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded">Open Drawer</button>
-                  <button className="px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded">Delete</button>
-                  <button onClick={() => setSelectedGroups([])} className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded">Clear Selection</button>
+          <>
+            {/* Stats Dashboard */}
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div
+                className={`bg-white border rounded-lg p-4 cursor-pointer transition-all hover:border-purple-400 ${groupsStatFilter === 'All' ? 'border-purple-600 bg-purple-50' : ''}`}
+                onClick={() => setGroupsStatFilter('All')}
+              >
+                <div className="text-3xl font-bold text-purple-600">{groupsList.length}</div>
+                <div className="text-sm text-gray-500">Total Security Groups</div>
+              </div>
+              <div
+                className={`bg-white border rounded-lg p-4 cursor-pointer transition-all hover:border-green-400 ${groupsStatFilter === 'Configured' ? 'border-green-600 bg-green-50' : ''}`}
+                onClick={() => setGroupsStatFilter('Configured')}
+              >
+                <div className="text-3xl font-bold text-green-600">{groupsList.filter(g => (g.roles?.filter(r => r.enabled).length || 0) > 0).length}</div>
+                <div className="text-sm text-gray-500">Configured</div>
+              </div>
+              <div
+                className={`bg-white border rounded-lg p-4 cursor-pointer transition-all hover:border-red-400 ${groupsStatFilter === 'NoRoles' ? 'border-red-600 bg-red-50' : ''}`}
+                onClick={() => setGroupsStatFilter('NoRoles')}
+              >
+                <div className="text-3xl font-bold text-red-600">{groupsList.filter(g => (g.roles?.filter(r => r.enabled).length || 0) === 0).length}</div>
+                <div className="text-sm text-gray-500">No Roles Assigned</div>
+              </div>
+            </div>
+
+          {/* Bulk Actions Toolbar */}
+            <div className="bg-white rounded-xl border mb-4 p-4">
+              <div className="flex items-center justify-between gap-4">
+                {/* Left side - Search and Filter */}
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search groups..."
+                      value={groupSearchTerm}
+                      onChange={(e) => setGroupSearchTerm(e.target.value)}
+                      className="pl-9 pr-4 py-2 border rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <select
+                    value={groupsStatFilter}
+                    onChange={(e) => setGroupsStatFilter(e.target.value)}
+                    className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="All">All Status</option>
+                    <option value="Configured">Configured</option>
+                    <option value="NoRoles">No Roles</option>
+                  </select>
+
+                  {/* Divider */}
+                  <div className="w-px h-8 bg-gray-300" />
+
+                  {/* Global User Search */}
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search users..."
+                      value={userSearchTerm}
+                      onChange={(e) => setUserSearchTerm(e.target.value)}
+                      onFocus={() => setUserSearchFocused(true)}
+                      onBlur={() => setTimeout(() => setUserSearchFocused(false), 200)}
+                      className="pl-9 pr-4 py-2 border rounded-lg text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    {/* User Search Results Dropdown */}
+                    {userSearchFocused && userSearchTerm.length >= 2 && (() => {
+                      const allUsers = groupsList.flatMap(g =>
+                        (users.filter(u => u.group === g.name) || []).map(u => ({ ...u, groupId: g.id, groupName: g.name }))
+                      );
+                      const matchingUsers = allUsers.filter(u =>
+                        u.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                        u.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+                      ).slice(0, 8);
+
+                      return matchingUsers.length > 0 ? (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50 max-h-80 overflow-auto">
+                          <div className="px-3 py-2 bg-gray-50 border-b text-xs font-medium text-gray-500">
+                            {matchingUsers.length} user{matchingUsers.length !== 1 ? 's' : ''} found
+                          </div>
+                          {matchingUsers.map(user => (
+                            <div
+                              key={`${user.groupId}-${user.id}`}
+                              onClick={() => {
+                                const group = groupsList.find(g => g.id === user.groupId);
+                                if (group) {
+                                  setPreviousDrawer(null);
+                                  setDrawer({ open: true, type: 'group', data: group });
+                                  setDrawerTab('users');
+                                  setUserSearchTerm('');
+                                }
+                              }}
+                              className="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
+                                  {user.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium text-gray-900 truncate">{user.name}</div>
+                                  <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                                </div>
+                                <div className="flex items-center gap-1 text-xs text-gray-400">
+                                  <Shield className="w-3 h-3" />
+                                  <span className="truncate max-w-24">{user.groupName}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50">
+                          <div className="px-3 py-4 text-center text-sm text-gray-500">
+                            No users found matching "{userSearchTerm}"
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* Right side - Bulk Actions */}
+                <div className="flex items-center gap-3">
+                  {selectedGroups.length > 0 ? (
+                    <>
+                      <span className="text-sm text-purple-700 font-medium">{selectedGroups.length} selected</span>
+                      <select
+                        value={bulkDefaultRole}
+                        onChange={(e) => setBulkDefaultRole(e.target.value)}
+                        className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 min-w-48"
+                      >
+                        <option value="">Set Default Role...</option>
+                        {rolesMaster.map(role => (
+                          <option key={role.id} value={role.id}>{role.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => {
+                          if (bulkDefaultRole) {
+                            const roleId = parseInt(bulkDefaultRole);
+                            setGroupsList(prev => prev.map(g => {
+                              if (!selectedGroups.includes(g.id)) return g;
+                              let updatedRoles = g.roles?.map(r => ({ ...r, isDefault: r.roleId === roleId })) || [];
+                              if (!updatedRoles.some(r => r.roleId === roleId)) {
+                                updatedRoles.push({ roleId, enabled: true, isDefault: true });
+                              }
+                              return { ...g, roles: updatedRoles };
+                            }));
+                            setBulkDefaultRole('');
+                          }
+                        }}
+                        disabled={!bulkDefaultRole}
+                        className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                      >
+                        Apply
+                      </button>
+                      <button
+                        onClick={() => setSelectedGroups([])}
+                        className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50"
+                      >
+                        Clear
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setSelectedGroups(filteredGroups.map(g => g.id))}
+                        className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50"
+                      >
+                        Select All
+                      </button>
+                      <button
+                        onClick={() => {
+                          const csv = [
+                            ['Security Group', 'Code', 'Users', 'New V8 Roles', 'Default Role', 'Status'].join(','),
+                            ...filteredGroups.map(g => {
+                              const enabledRoles = g.roles?.filter(r => r.enabled) || [];
+                              const defaultRoleConfig = enabledRoles.find(r => r.isDefault);
+                              const defaultRole = defaultRoleConfig ? rolesMaster.find(rm => rm.id === defaultRoleConfig.roleId) : null;
+                              return [
+                                g.name,
+                                g.code,
+                                g.userCount,
+                                enabledRoles.length,
+                                defaultRole?.name || '',
+                                enabledRoles.length > 0 ? 'Configured' : 'No Roles'
+                              ].join(',');
+                            })
+                          ].join('\n');
+                          const blob = new Blob([csv], { type: 'text/csv' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'security-groups.csv';
+                          a.click();
+                        }}
+                        className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 flex items-center gap-2"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Export CSV
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
+
+          <div className="bg-white rounded-xl border overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-4 py-3 w-10">
-                    <input type="checkbox" checked={selectedGroups.length === filteredGroups.length && filteredGroups.length > 0} onChange={(e) => { if (e.target.checked) { setSelectedGroups(filteredGroups.map(g => g.id)); } else { setSelectedGroups([]); } }} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <th className="px-3 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      checked={selectedGroups.length === filteredGroups.length && filteredGroups.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedGroups(filteredGroups.map(g => g.id));
+                        } else {
+                          setSelectedGroups([]);
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
                   </th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Group Name</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Description</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Users</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Roles</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Properties</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Last Modified</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Security Group</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Code</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Users</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">New V8 Roles</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase" style={{minWidth: '200px'}}>Default Role</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                  <th className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {filteredGroups.map(group => (
-                  <tr key={group.id} className={`hover:bg-blue-50 cursor-pointer transition-colors ${selectedGroups.includes(group.id) ? 'bg-blue-50' : ''}`}>
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <input type="checkbox" checked={selectedGroups.includes(group.id)} onChange={(e) => { if (e.target.checked) { setSelectedGroups([...selectedGroups, group.id]); } else { setSelectedGroups(selectedGroups.filter(id => id !== group.id)); } }} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                {filteredGroups.map(group => {
+                  const enabledRoles = group.roles?.filter(r => r.enabled) || [];
+                  const defaultRoleConfig = enabledRoles.find(r => r.isDefault);
+                  const defaultRole = defaultRoleConfig ? rolesMaster.find(rm => rm.id === defaultRoleConfig.roleId) : null;
+                  const hasRoles = enabledRoles.length > 0;
+
+                  return (
+                  <tr key={group.id} className={`hover:bg-purple-50 transition-colors ${selectedGroups.includes(group.id) ? 'bg-purple-50' : ''}`}>
+                    <td className="px-3 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedGroups.includes(group.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedGroups([...selectedGroups, group.id]);
+                          } else {
+                            setSelectedGroups(selectedGroups.filter(id => id !== group.id));
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      />
                     </td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><Shield className="w-4 h-4 text-blue-600" /></div>
-                        <span className="font-medium text-gray-900">{group.name}</span>
-                      </div>
+                    <td className="px-3 py-3">
+                      <span className="font-semibold text-gray-900">{group.name}</span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>{group.description}</td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}><span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium">{group.userCount} users</span></td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('roles'); }}><span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">{group.roles?.filter(r => r.enabled).length || 0} roles</span></td>
-                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>{group.properties}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500" onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}>{group.lastModified}</td>
+                    <td className="px-3 py-3">
+                      <code className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-600">{group.code}</code>
+                    </td>
+                    <td className="px-3 py-3 text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-gray-400" />
+                        {group.userCount}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3">
+                      {hasRoles ? (
+                        <span className="px-2 py-1 bg-green-100 text-green-700 border border-green-300 rounded-full text-xs font-medium">
+                          +{enabledRoles.length} roles
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">None</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                      <select
+                        value={defaultRole?.id || ''}
+                        onChange={(e) => {
+                          const newDefaultId = e.target.value ? parseInt(e.target.value) : null;
+                          setGroupsList(prev => prev.map(g => {
+                            if (g.id !== group.id) return g;
+                            let updatedRoles = g.roles?.map(r => ({ ...r, isDefault: r.roleId === newDefaultId })) || [];
+                            // If selecting a role that isn't enabled yet, enable it
+                            if (newDefaultId && !updatedRoles.some(r => r.roleId === newDefaultId)) {
+                              updatedRoles.push({ roleId: newDefaultId, enabled: true, isDefault: true });
+                            }
+                            return { ...g, roles: updatedRoles };
+                          }));
+                        }}
+                        className={`w-full px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${defaultRole ? 'border-gray-300 bg-white' : 'border-gray-200 bg-gray-50 text-gray-400'}`}
+                      >
+                        <option value="">— No default —</option>
+                        {rolesMaster.map(role => (
+                          <option key={role.id} value={role.id}>{role.name}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-3 py-3">
+                      {hasRoles ? (
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1 w-fit">
+                          <Check className="w-3 h-3" /> Configured
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium w-fit">
+                          No Roles
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      <button
+                        onClick={() => { setDrawer({ open: true, type: 'group', data: group }); setDrawerTab('general'); }}
+                        className="px-3 py-1.5 text-xs font-medium border border-purple-600 text-purple-600 rounded hover:bg-purple-50 transition-colors"
+                      >
+                        Edit Group
+                      </button>
+                    </td>
                   </tr>
-                ))}
+                );})}
               </tbody>
             </table>
           </div>
+
+          {/* Sticky Footer - Pending Changes */}
+          {hasPendingChanges && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-30">
+              <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-medium text-gray-700">
+                    {pendingChanges.length} group{pendingChanges.length > 1 ? 's' : ''} with pending changes
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    ({totalUsersAffected} user{totalUsersAffected > 1 ? 's' : ''} will be affected)
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={resetAllChanges}
+                    className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50"
+                  >
+                    Reset All
+                  </button>
+                  <button
+                    onClick={() => setSaveModalOpen(true)}
+                    className="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                  >
+                    Save All Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Save Confirmation Modal */}
+          {saveModalOpen && (
+            <>
+              <div className="fixed inset-0 bg-black/50 z-50" onClick={() => setSaveModalOpen(false)} />
+              <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-2xl z-50 w-[600px] max-h-[80vh] overflow-hidden">
+                <div className="px-6 py-4 border-b flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900">Confirm Changes</h2>
+                  <button onClick={() => setSaveModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="p-6 overflow-auto max-h-[50vh]">
+                  {/* Summary */}
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">{pendingChanges.length}</div>
+                        <div className="text-xs text-purple-600">Groups</div>
+                      </div>
+                      <div className="w-px h-10 bg-purple-200" />
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">{totalUsersAffected}</div>
+                        <div className="text-xs text-purple-600">Users Affected</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Changes List */}
+                  <div className="space-y-4">
+                    {pendingChanges.map((change, idx) => (
+                      <div key={idx} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-semibold text-gray-900">{change.group.name}</span>
+                          <span className="text-xs text-gray-500">{change.usersAffected} users</span>
+                        </div>
+                        <div className="space-y-1 text-sm">
+                          {change.addedRoles.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-green-600">+ Added:</span>
+                              <span className="text-gray-600">{change.addedRoles.join(', ')}</span>
+                            </div>
+                          )}
+                          {change.removedRoles.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-red-600">− Removed:</span>
+                              <span className="text-gray-600">{change.removedRoles.join(', ')}</span>
+                            </div>
+                          )}
+                          {change.defaultChanged && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-600">★ Default:</span>
+                              <span className="text-gray-600">{change.defaultChanged.from} → {change.defaultChanged.to}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Warning */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6 flex gap-3">
+                    <span className="text-lg">⚠️</span>
+                    <div className="text-sm text-amber-800">
+                      <strong>Warning:</strong> This will immediately update role assignments in the Elevate / Voyager 8 platform for all affected users. This action cannot be automatically undone.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-3">
+                  <button
+                    onClick={() => setSaveModalOpen(false)}
+                    className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      // In production, this would save to backend
+                      // For now, we'll just close the modal and show success
+                      setSaveModalOpen(false);
+                      alert('Changes saved successfully! (In production, this would sync to Elevate)');
+                    }}
+                    className="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700"
+                  >
+                    Confirm & Save
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+          </>
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             {selectedUsers.length > 0 && (
@@ -1038,6 +1616,21 @@ export default function SecurityHub() {
           <div className="h-full flex flex-col">
             <div className="px-6 py-4 border-b flex items-center justify-between">
               <div className="flex items-center gap-3">
+                {drawer.type === 'user' && previousDrawer && (
+                  <button
+                    onClick={() => {
+                      setDrawer(previousDrawer);
+                      if (previousDrawer.tab) setDrawerTab(previousDrawer.tab);
+                      setPreviousDrawer(null);
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-lg mr-1"
+                    title="Back to group"
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                  </button>
+                )}
                 {drawer.type === 'group' ? (
                   <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center"><Shield className="w-5 h-5 text-blue-600" /></div>
                 ) : (
@@ -1058,7 +1651,17 @@ export default function SecurityHub() {
                     isMultiUser ? (
                       <><h2 className="font-semibold text-gray-900">{drawerUsers.length} Users Selected</h2><p className="text-sm text-gray-500">{drawerUsers.map(u => u.name).join(', ')}</p></>
                     ) : (
-                      <><h2 className="font-semibold text-gray-900">{drawerUsers[0]?.name}</h2><p className="text-sm text-gray-500">{drawerUsers[0]?.email}</p></>
+                      <>
+                        {previousDrawer?.data && (
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-0.5">
+                            <Shield className="w-3 h-3" />
+                            <span>{Array.isArray(previousDrawer.data) ? previousDrawer.data[0]?.name : previousDrawer.data?.name}</span>
+                            <span className="text-gray-400">→</span>
+                          </div>
+                        )}
+                        <h2 className="font-semibold text-gray-900">{drawerUsers[0]?.name}</h2>
+                        <p className="text-sm text-gray-500">{drawerUsers[0]?.email}</p>
+                      </>
                     )
                   )}
                 </div>
@@ -1196,36 +1799,135 @@ export default function SecurityHub() {
                   )}
 
                   {/* Layer 1: Users Tab */}
-                  {drawerLayer === 1 && drawerTab === 'users' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm text-gray-500">{groupUsers.length} users in {isMultiGroup ? 'these groups' : 'this group'}</span>
+                  {drawerLayer === 1 && drawerTab === 'users' && (() => {
+                    const currentGroup = groupsList.find(g => g.id === drawerGroups[0]?.id);
+                    const existingElevateRoles = currentGroup?.existingElevateRoles || [];
+                    const newRoles = currentGroup?.roles?.filter(r => r.enabled) || [];
+                    const getRoleName = (roleId: number) => rolesMaster.find(r => r.id === roleId)?.name || '';
+                    const groupNetNewRoles = newRoles
+                      .filter(r => !existingElevateRoles.includes(getRoleName(r.roleId)))
+                      .map(r => getRoleName(r.roleId));
+
+                    return (
+                    <div className="space-y-4">
+                      {/* Header with search and stats */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                              type="text"
+                              placeholder="Search users..."
+                              className="pl-9 pr-4 py-2 border rounded-lg text-sm w-52 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+                          <span className="text-sm text-gray-500">{groupUsers.length} users in group</span>
+                          {groupNetNewRoles.length > 0 && (
+                            <span className="text-xs bg-purple-100 text-purple-700 border border-purple-300 px-2 py-1 rounded-full">
+                              {groupNetNewRoles.length} group role(s) will be added
+                            </span>
+                          )}
+                        </div>
                         <button
                           onClick={() => { setAddUserModalOpen(true); setSelectedUsersToAdd([]); setAddUserPropertyFilter('All'); setAddUserGroupFilter('All'); setAddUserSearch(''); }}
-                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-1"
-                        ><Plus className="w-3 h-3" /> Add User</button>
+                          className="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 flex items-center gap-1"
+                        >
+                          <Plus className="w-3 h-3" /> Add User
+                        </button>
                       </div>
-                      {groupUsers.map(user => (
-                        <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div 
-                            className="flex items-center gap-3 cursor-pointer hover:opacity-80"
-                            onClick={() => {
-                              setDrawer({ open: true, type: 'user', data: user });
-                              setUserDrawerTab('details');
-                            }}
-                          >
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-medium">{user.name.split(' ').map(n => n[0]).join('')}</div>
-                            <div>
-                              <div className="font-medium text-sm text-blue-600 hover:underline">{user.name}</div>
-                              <div className="text-xs text-gray-500">{user.email}</div>
-                            </div>
-                            {isMultiGroup && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">{user.group}</span>}
-                          </div>
-                          <button className="p-1.5 hover:bg-red-100 rounded text-gray-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
-                        </div>
-                      ))}
+
+                      {/* Users Table */}
+                      <div className="bg-white border rounded-lg overflow-hidden">
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-50 border-b">
+                            <tr>
+                              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Name</th>
+                              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Email</th>
+                              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Existing Elevate Roles</th>
+                              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Roles Being Added</th>
+                              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Last Login</th>
+                              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            {groupUsers.map(user => {
+                              const userExistingRoles = user.existingRoles || [];
+                              // Roles being added = group net-new roles that user doesn't already have
+                              const rolesBeingAdded = groupNetNewRoles.filter(r => !userExistingRoles.includes(r));
+                              const duplicateRoles = groupNetNewRoles.filter(r => userExistingRoles.includes(r));
+
+                              return (
+                                <tr key={user.id} className="hover:bg-gray-50">
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
+                                        {user.name.split(' ').map(n => n[0]).join('')}
+                                      </div>
+                                      <span className="font-medium text-gray-900">{user.name}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-gray-500">{user.email}</td>
+                                  <td className="px-4 py-3">
+                                    {userExistingRoles.length > 0 ? (
+                                      <div className="flex flex-wrap gap-1 max-w-xs">
+                                        {userExistingRoles.slice(0, 3).map((role, idx) => (
+                                          <span key={idx} className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">
+                                            {role}
+                                          </span>
+                                        ))}
+                                        {userExistingRoles.length > 3 && (
+                                          <span className="text-xs text-gray-400">+{userExistingRoles.length - 3} more</span>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-gray-400">None</span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex flex-wrap gap-1 max-w-xs">
+                                      {rolesBeingAdded.map((role, idx) => (
+                                        <span key={idx} className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
+                                          +{role}
+                                        </span>
+                                      ))}
+                                      {duplicateRoles.map((role, idx) => (
+                                        <span key={idx} className="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">
+                                          ✕ {role}
+                                        </span>
+                                      ))}
+                                      {rolesBeingAdded.length === 0 && duplicateRoles.length === 0 && (
+                                        <span className="text-xs text-gray-400">None</span>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-xs text-gray-500">{user.lastLogin}</td>
+                                  <td className="px-4 py-3">
+                                    <button
+                                      onClick={() => {
+                                        setPreviousDrawer({ open: true, type: 'group', data: drawer.data, tab: drawerTab });
+                                        setDrawer({ open: true, type: 'user', data: user });
+                                        setUserDrawerTab('details');
+                                      }}
+                                      className="px-3 py-1.5 text-xs font-medium border border-purple-600 text-purple-600 rounded hover:bg-purple-50"
+                                    >
+                                      View Details →
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                            {groupUsers.length === 0 && (
+                              <tr>
+                                <td colSpan={6} className="px-4 py-8 text-center text-gray-400 italic">
+                                  No users in this group.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  )}
+                  );})()}
 
                   {/* Layer 1: Voyager 7 Menus Tab */}
                   {drawerLayer === 1 && drawerTab === 'v7menus' && (
@@ -1384,77 +2086,89 @@ export default function SecurityHub() {
                     </div>
                   )}
 
-                  {/* Layer 1: Roles Tab */}
+                  {/* Layer 1: Group Roles Tab (replaces Voyager 8 Roles) */}
                   {drawerLayer === 1 && drawerTab === 'roles' && (() => {
                     // Get the current group(s) from groupsList (stateful) using IDs from drawerGroups
                     const currentGroupIds = drawerGroups.map(g => g.id);
                     const currentGroups = groupsList.filter(g => currentGroupIds.includes(g.id));
+                    const currentGroup = currentGroups[0];
 
-                    // Helper to get role config for a group
-                    const getRoleConfig = (groupId: number, roleId: number) => {
-                      const group = currentGroups.find(g => g.id === groupId);
-                      return group?.roles?.find(r => r.roleId === roleId);
+                    // Get existing Elevate roles (locked, cannot be modified)
+                    const existingElevateRoles = currentGroup?.existingElevateRoles || [];
+
+                    // Get new V8 roles being added (from roles array)
+                    const newRoles = currentGroup?.roles?.filter(r => r.enabled) || [];
+
+                    // Helper to get role name from ID
+                    const getRoleName = (roleId: number) => rolesMaster.find(r => r.id === roleId)?.name || '';
+                    const getRoleProduct = (roleId: number) => rolesMaster.find(r => r.id === roleId)?.product || '';
+
+                    // Check if a new role is a duplicate of existing Elevate role
+                    const isDuplicate = (roleId: number) => {
+                      const roleName = getRoleName(roleId);
+                      return existingElevateRoles.includes(roleName);
                     };
 
-                    // For single group: direct lookup. For multi-group: show if ANY group has it enabled
-                    const isRoleEnabled = (roleId: number) => {
-                      if (!isMultiGroup) {
-                        return getRoleConfig(currentGroups[0]?.id, roleId)?.enabled ?? false;
+                    // Calculate net-new and duplicates
+                    const netNewRoles = newRoles.filter(r => !isDuplicate(r.roleId));
+                    const duplicateRoles = newRoles.filter(r => isDuplicate(r.roleId));
+                    const defaultRole = newRoles.find(r => r.isDefault && !isDuplicate(r.roleId));
+
+                    // Add a new role
+                    const addRole = () => {
+                      const usedRoleIds = newRoles.map(r => r.roleId);
+                      const availableRole = rolesMaster.find(r => !usedRoleIds.includes(r.id));
+                      if (!availableRole) {
+                        alert('All roles already added.');
+                        return;
                       }
-                      return currentGroups.some(g => g.roles?.some(r => r.roleId === roleId && r.enabled));
-                    };
-
-                    const isRoleDefault = (roleId: number) => {
-                      if (!isMultiGroup) {
-                        return getRoleConfig(currentGroups[0]?.id, roleId)?.isDefault ?? false;
-                      }
-                      // For multi-group, show if ANY group has it as default
-                      return currentGroups.some(g => g.roles?.some(r => r.roleId === roleId && r.isDefault));
-                    };
-
-                    // Toggle role enabled for selected group(s)
-                    const toggleRoleEnabled = (roleId: number) => {
-                      setGroupsList(prev => prev.map(group => {
-                        if (!currentGroupIds.includes(group.id)) return group;
-
-                        const existingRole = group.roles?.find(r => r.roleId === roleId);
-                        if (existingRole) {
-                          // Toggle existing
-                          return {
-                            ...group,
-                            roles: group.roles.map(r =>
-                              r.roleId === roleId ? { ...r, enabled: !r.enabled } : r
-                            )
-                          };
-                        } else {
-                          // Add new role config
-                          return {
-                            ...group,
-                            roles: [...(group.roles || []), { roleId, enabled: true, isDefault: false }]
-                          };
-                        }
+                      setGroupsList(prev => prev.map(g => {
+                        if (g.id !== currentGroup?.id) return g;
+                        return {
+                          ...g,
+                          roles: [...(g.roles || []), { roleId: availableRole.id, enabled: true, isDefault: false }]
+                        };
                       }));
                     };
 
-                    // Set role as default for selected group(s)
-                    const setRoleDefault = (roleId: number) => {
-                      setGroupsList(prev => prev.map(group => {
-                        if (!currentGroupIds.includes(group.id)) return group;
-
-                        const existingRole = group.roles?.find(r => r.roleId === roleId);
-                        const updatedRoles = group.roles?.map(r => ({ ...r, isDefault: r.roleId === roleId })) || [];
-
-                        if (!existingRole) {
-                          // Add the role if it doesn't exist
-                          updatedRoles.push({ roleId, enabled: true, isDefault: true });
+                    // Remove a role
+                    const removeRole = (roleId: number) => {
+                      setGroupsList(prev => prev.map(g => {
+                        if (g.id !== currentGroup?.id) return g;
+                        const wasDefault = g.roles?.find(r => r.roleId === roleId)?.isDefault;
+                        let updatedRoles = g.roles?.filter(r => r.roleId !== roleId) || [];
+                        // If removed role was default, make first remaining role the default
+                        if (wasDefault && updatedRoles.length > 0) {
+                          updatedRoles = updatedRoles.map((r, i) => ({ ...r, isDefault: i === 0 }));
                         }
+                        return { ...g, roles: updatedRoles };
+                      }));
+                    };
 
-                        return { ...group, roles: updatedRoles };
+                    // Update role selection
+                    const updateRole = (oldRoleId: number, newRoleId: number) => {
+                      setGroupsList(prev => prev.map(g => {
+                        if (g.id !== currentGroup?.id) return g;
+                        return {
+                          ...g,
+                          roles: g.roles?.map(r => r.roleId === oldRoleId ? { ...r, roleId: newRoleId } : r) || []
+                        };
+                      }));
+                    };
+
+                    // Set default role
+                    const setDefault = (roleId: number) => {
+                      setGroupsList(prev => prev.map(g => {
+                        if (g.id !== currentGroup?.id) return g;
+                        return {
+                          ...g,
+                          roles: g.roles?.map(r => ({ ...r, isDefault: r.roleId === roleId })) || []
+                        };
                       }));
                     };
 
                     return (
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       {/* Locked State for Test/Dev DB */}
                       {!isProductionDb && (
                         <div className="bg-gray-100 border border-gray-300 rounded-lg p-8 text-center text-gray-500">
@@ -1467,51 +2181,171 @@ export default function SecurityHub() {
                       {/* Active State for Production DB */}
                       {isProductionDb && (
                         <>
-                          {/* Warning Banner */}
-                          <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mb-4 flex gap-3">
-                            <span className="text-lg">⚠️</span>
-                            <p className="text-sm text-yellow-800">
-                              <strong>Important – Elevate Multi-Tenant Update:</strong> Saving role assignments on this tab will <strong>immediately update role assignments for all users in this Security Group</strong> within the Elevate / Voyager 8 platform. This action modifies the multi-tenant database and cannot be undone automatically. Please review all selected roles carefully before saving.
-                            </p>
+                          {/* General Section (Read-only) */}
+                          <div className="bg-white border rounded-lg">
+                            <div className="px-4 py-2 border-b bg-gray-50 flex items-center justify-between">
+                              <span className="font-semibold text-sm text-gray-700">General</span>
+                              <span className="text-xs text-gray-400">Read-only</span>
+                            </div>
+                            <div className="p-4 grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Description</label>
+                                <input type="text" readOnly value={currentGroup?.name || ''} className="w-full px-3 py-2 border rounded bg-gray-50 text-sm text-gray-600" />
+                              </div>
+                              <div>
+                                <label className="block text-xs text-gray-500 mb-1">Code</label>
+                                <input type="text" readOnly value={currentGroup?.code || ''} className="w-full px-3 py-2 border rounded bg-gray-50 text-sm text-gray-600" />
+                              </div>
+                            </div>
                           </div>
 
-                          {isMultiGroup && <div className="flex items-center gap-2 text-sm text-gray-600 mb-2"><Users className="w-4 h-4" />Editing roles for <span className="font-semibold text-gray-900">{drawerGroups.length}</span> groups</div>}
-                          <p className="text-sm text-gray-500 mb-4">Assign roles to {isMultiGroup ? 'these security groups' : 'this security group'}. Click the <Star className="w-3 h-3 inline text-amber-500 fill-amber-500" /> to set the default role used upon login.</p>
-
-                      <div className="relative mb-4">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder="Search roles..."
-                          value={rolesSearch}
-                          onChange={(e) => setRolesSearch(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-
-                      {rolesMaster
-                        .filter(role => role.name.toLowerCase().includes(rolesSearch.toLowerCase()))
-                        .map(role => {
-                          const enabled = isRoleEnabled(role.id);
-                          const isDefault = isRoleDefault(role.id);
-                          return (
-                        <div key={role.id} className={`flex items-center justify-between p-3 rounded-lg ${isDefault ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50'} hover:bg-gray-100`}>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setRoleDefault(role.id)}
-                              className={`p-1 rounded transition-colors ${isDefault ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
-                              title={isDefault ? 'Default role on login' : 'Set as default role'}
-                            >
-                              <Star className={`w-4 h-4 ${isDefault ? 'fill-amber-500' : ''}`} />
-                            </button>
-                            <span className="text-sm">{role.name}</span>
-                            {isDefault && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Default</span>}
+                          {/* Existing Elevate Roles Section (Locked) */}
+                          <div className="bg-white border rounded-lg">
+                            <div className="px-4 py-2 border-b bg-blue-50 flex items-center justify-between">
+                              <span className="font-semibold text-sm text-blue-700">🔒 Existing Elevate Roles</span>
+                              <span className="text-xs text-blue-500">Will not be modified</span>
+                            </div>
+                            <div className="p-4">
+                              {existingElevateRoles.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                  {existingElevateRoles.map((role, idx) => (
+                                    <div key={idx} className="bg-blue-50 border border-blue-200 rounded px-3 py-1.5 text-xs font-medium text-blue-700 flex items-center gap-1">
+                                      🔒 {role}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-gray-400 italic">No existing Elevate roles.</p>
+                              )}
+                            </div>
                           </div>
-                          <div onClick={() => toggleRoleEnabled(role.id)} className={`w-10 h-6 rounded-full p-1 transition-colors cursor-pointer ${enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
-                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-4' : ''}`} />
+
+                          {/* Voyager 8 Roles to Add Section */}
+                          <div className="bg-white border rounded-lg">
+                            <div className="px-4 py-2 border-b flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-sm text-gray-700">Voyager 8 Roles to Add</span>
+                                <span className="text-xs bg-green-100 text-green-700 border border-green-300 rounded-full px-2 py-0.5 font-medium">
+                                  API · {connectedDbName}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-4">
+                              {/* Header with count and add button */}
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                    {newRoles.length}
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-700">Roles to Add</span>
+                                </div>
+                                <button
+                                  onClick={addRole}
+                                  className="px-3 py-1.5 text-xs font-medium bg-purple-600 text-white rounded hover:bg-purple-700"
+                                >
+                                  + Add Role
+                                </button>
+                              </div>
+
+                              {/* Roles Table */}
+                              <table className="w-full text-sm">
+                                <thead className="bg-gray-50 border-y">
+                                  <tr>
+                                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500" style={{width: '40%'}}>Elevate Role</th>
+                                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500" style={{width: '25%'}}>Product</th>
+                                    <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500" style={{width: '20%'}}>Default Role</th>
+                                    <th className="text-center px-3 py-2 text-xs font-semibold text-gray-500" style={{width: '15%'}}>Remove</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                  {newRoles.length === 0 ? (
+                                    <tr>
+                                      <td colSpan={4} className="px-3 py-6 text-center text-gray-400 italic">
+                                        No roles added yet.
+                                      </td>
+                                    </tr>
+                                  ) : (
+                                    newRoles.map(role => {
+                                      const roleName = getRoleName(role.roleId);
+                                      const roleProduct = getRoleProduct(role.roleId);
+                                      const dup = isDuplicate(role.roleId);
+                                      const isDefaultRole = role.isDefault && !dup;
+
+                                      return (
+                                        <tr key={role.roleId} className={isDefaultRole ? 'bg-purple-50' : ''}>
+                                          <td className="px-3 py-2">
+                                            <div className="flex items-center gap-2">
+                                              <select
+                                                value={role.roleId}
+                                                onChange={(e) => updateRole(role.roleId, parseInt(e.target.value))}
+                                                className="flex-1 px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                              >
+                                                {rolesMaster.map(r => (
+                                                  <option key={r.id} value={r.id}>{r.name}</option>
+                                                ))}
+                                              </select>
+                                              {isDefaultRole && (
+                                                <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full font-medium whitespace-nowrap">
+                                                  Default
+                                                </span>
+                                              )}
+                                            </div>
+                                          </td>
+                                          <td className="px-3 py-2">
+                                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${dup ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-purple-100 text-purple-700'}`}>
+                                              {dup ? '⚠ Duplicate' : roleProduct || 'Residential'}
+                                            </span>
+                                          </td>
+                                          <td className="px-3 py-2">
+                                            {dup ? (
+                                              <span className="text-xs text-gray-400">N/A</span>
+                                            ) : (
+                                              <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                  type="radio"
+                                                  name="defaultRole"
+                                                  checked={role.isDefault}
+                                                  onChange={() => setDefault(role.roleId)}
+                                                  className="w-4 h-4 text-purple-600"
+                                                />
+                                                <span className={`text-xs ${role.isDefault ? 'text-purple-600 font-medium' : 'text-gray-400'}`}>
+                                                  {role.isDefault ? 'Default' : 'Set'}
+                                                </span>
+                                              </label>
+                                            )}
+                                          </td>
+                                          <td className="px-3 py-2 text-center">
+                                            <button
+                                              onClick={() => removeRole(role.roleId)}
+                                              className="w-6 h-6 text-red-500 hover:bg-red-50 rounded flex items-center justify-center"
+                                            >
+                                              ✕
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })
+                                  )}
+                                </tbody>
+                              </table>
+
+                              {/* Info Line */}
+                              {newRoles.length > 0 && (
+                                <div className="mt-3 text-xs text-gray-500 italic">
+                                  <strong>{netNewRoles.length}</strong> net-new role(s)
+                                  {duplicateRoles.length > 0 && (
+                                    <> · <span className="text-red-600">{duplicateRoles.length} dup(s) skipped</span></>
+                                  )}
+                                  {' · '}
+                                  {defaultRole ? (
+                                    <>Default: <strong className="text-purple-600">{getRoleName(defaultRole.roleId)}</strong></>
+                                  ) : (
+                                    <span className="text-red-600">⚠ No default set</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )})}
                         </>
                       )}
                     </div>
@@ -1811,19 +2645,147 @@ export default function SecurityHub() {
                     </div>
                   )}
                 </div>
+
+                {/* Drawer Sticky Footer - Pending Changes for Open Group(s) */}
+                {(() => {
+                  // Layer 1: Role changes
+                  if (drawerLayer === 1) {
+                    const drawerGroupIds = drawerGroups.map(g => g.id);
+                    const drawerPendingChanges = pendingChanges.filter(c => drawerGroupIds.includes(c.group.id));
+                    if (drawerPendingChanges.length === 0) return null;
+                    const drawerUsersAffected = drawerPendingChanges.reduce((sum, c) => sum + c.usersAffected, 0);
+                    return (
+                      <div className="border-t bg-amber-50 px-6 py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
+                          <span className="text-sm font-medium text-amber-800">
+                            Unsaved role changes
+                          </span>
+                          <span className="text-sm text-amber-700">
+                            ({drawerUsersAffected} user{drawerUsersAffected > 1 ? 's' : ''} will be affected)
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setGroupsList(prev => prev.map(g => {
+                                if (!drawerGroupIds.includes(g.id)) return g;
+                                const original = originalGroups.find(og => og.id === g.id);
+                                return original ? JSON.parse(JSON.stringify(original)) : g;
+                              }));
+                            }}
+                            className="px-3 py-1.5 text-xs font-medium border border-amber-600 text-amber-700 rounded hover:bg-amber-100"
+                          >
+                            Reset
+                          </button>
+                          <button
+                            onClick={() => setSaveModalOpen(true)}
+                            className="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded hover:bg-amber-700"
+                          >
+                            Save Changes
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // Layer 2: Permission/Books changes
+                  if (drawerLayer === 2 && hasPendingPermissionChanges) {
+                    const permCount = pendingPermissionChanges.length;
+                    const bookCount = pendingBooksChanges.length;
+                    const totalChanges = permCount + bookCount;
+                    return (
+                      <div className="border-t bg-amber-50 px-6 py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
+                          <span className="text-sm font-medium text-amber-800">
+                            Unsaved permission changes
+                          </span>
+                          <span className="text-sm text-amber-700">
+                            ({totalChanges} setting{totalChanges > 1 ? 's' : ''} modified)
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={resetPermissionChanges}
+                            className="px-3 py-1.5 text-xs font-medium border border-amber-600 text-amber-700 rounded hover:bg-amber-100"
+                          >
+                            Reset
+                          </button>
+                          <button
+                            onClick={() => {
+                              alert('Permission changes saved! (In production, this would sync to the database)');
+                            }}
+                            className="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded hover:bg-amber-700"
+                          >
+                            Save Changes
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return null;
+                })()}
               </>
             ) : (
-              <>
-                <div className="px-6 border-b">
-                  <div className="flex gap-1">
+              <div className="flex flex-1 min-h-0">
+                {/* Left Navigation Column */}
+                <div className="w-48 bg-gray-50 border-r flex flex-col">
+                  <div className="p-3 border-b bg-gray-100">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">V7 Settings</span>
+                  </div>
+                  <nav className="flex-1 py-2">
                     {(isMultiUser ? ['settings', 'programRights'] : ['details', 'settings', 'programRights']).map(tab => (
-                      <button key={tab} onClick={() => setUserDrawerTab(tab)} className={`px-3 py-3 text-sm font-medium border-b-2 transition-colors ${userDrawerTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
+                      <button
+                        key={tab}
+                        onClick={() => setUserDrawerTab(tab)}
+                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors flex items-center gap-2 ${
+                          userDrawerTab === tab
+                            ? 'bg-purple-100 text-purple-700 border-r-2 border-purple-600'
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {tab === 'details' && <User className="w-4 h-4" />}
+                        {tab === 'settings' && <Settings className="w-4 h-4" />}
+                        {tab === 'programRights' && <Shield className="w-4 h-4" />}
                         {tab === 'programRights' ? 'Program Rights' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                       </button>
                     ))}
+                  </nav>
+                  <div className="p-3 border-t bg-gray-100">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Elevate</span>
                   </div>
+                  <nav className="py-2">
+                    {['userInfo', 'voyagerAccess', 'roles', 'pageAccess', 'elementAccess', 'changeLog'].map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => setUserDrawerTab(tab)}
+                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors flex items-center gap-2 ${
+                          userDrawerTab === tab
+                            ? 'bg-purple-100 text-purple-700 border-r-2 border-purple-600'
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {tab === 'userInfo' && <User className="w-4 h-4" />}
+                        {tab === 'voyagerAccess' && <Database className="w-4 h-4" />}
+                        {tab === 'roles' && <Shield className="w-4 h-4" />}
+                        {tab === 'pageAccess' && <FileText className="w-4 h-4" />}
+                        {tab === 'elementAccess' && <Eye className="w-4 h-4" />}
+                        {tab === 'changeLog' && <Clock className="w-4 h-4" />}
+                        {tab === 'userInfo' && 'User Information'}
+                        {tab === 'voyagerAccess' && 'Voyager Access'}
+                        {tab === 'roles' && 'Roles'}
+                        {tab === 'pageAccess' && 'Page Access'}
+                        {tab === 'elementAccess' && 'Element Access'}
+                        {tab === 'changeLog' && 'Change Log'}
+                      </button>
+                    ))}
+                  </nav>
                 </div>
 
+                {/* Right Content Area */}
+                <div className="flex-1 flex flex-col min-w-0">
                 {userDrawerTab === 'details' && !isMultiUser && drawerUsers[0] && (
                   <div className="flex-1 overflow-auto p-6 w-full min-h-0" style={{height: 'calc(100vh - 200px)'}}>
                     <div className="grid grid-cols-2 gap-6">
@@ -1900,13 +2862,13 @@ export default function SecurityHub() {
                       <div className="space-y-4">
                         <div className="grid grid-cols-3 gap-2 items-center">
                           <label className="text-sm text-gray-600">Security Group</label>
-                          <select defaultValue={drawer.data.group} className="col-span-2 px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          <select defaultValue={drawerUsers[0]?.group || ''} className="col-span-2 px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             {securityGroups.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}
                           </select>
                         </div>
                         <div className="grid grid-cols-3 gap-2 items-center">
                           <label className="text-sm text-gray-600">Status</label>
-                          <select defaultValue={drawer.data.status} className="col-span-2 px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          <select defaultValue={drawerUsers[0]?.status || 'Active'} className="col-span-2 px-2 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option>Active</option><option>Inactive</option>
                           </select>
                         </div>
@@ -2043,7 +3005,247 @@ export default function SecurityHub() {
                     </div>
                   </div>
                 )}
-              </>
+
+                {/* Elevate Tabs Content */}
+                {userDrawerTab === 'userInfo' && (
+                  <div className="flex-1 overflow-auto p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">User Information</h3>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Full Name</label>
+                          <input type="text" value={drawerUsers[0]?.name || ''} readOnly className="w-full px-3 py-2 border rounded bg-gray-50 text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                          <input type="text" value={drawerUsers[0]?.email || ''} readOnly className="w-full px-3 py-2 border rounded bg-gray-50 text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Security Group</label>
+                          <input type="text" value={drawerUsers[0]?.group || ''} readOnly className="w-full px-3 py-2 border rounded bg-gray-50 text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
+                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${drawerUsers[0]?.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {drawerUsers[0]?.status || 'Unknown'}
+                          </span>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Last Login</label>
+                          <input type="text" value={drawerUsers[0]?.lastLogin || 'Never'} readOnly className="w-full px-3 py-2 border rounded bg-gray-50 text-sm" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Created Date</label>
+                          <input type="text" value="2024-01-15" readOnly className="w-full px-3 py-2 border rounded bg-gray-50 text-sm" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {userDrawerTab === 'voyagerAccess' && (
+                  <div className="flex-1 overflow-auto p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Voyager Access</h3>
+                    <div className="space-y-4">
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-purple-600 text-white px-4 py-2 text-sm font-medium">Database Access</div>
+                        <div className="p-4 space-y-2">
+                          {['Production', 'Training', 'Development'].map(db => (
+                            <label key={db} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                              <span className="text-sm">{db}</span>
+                              <input type="checkbox" defaultChecked={db === 'Production'} className="w-4 h-4 rounded border-gray-300 text-purple-600" />
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {userDrawerTab === 'roles' && (() => {
+                  const userExistingRoles = drawerUsers[0]?.existingRoles || [];
+                  const groupData = previousDrawer?.data ? (Array.isArray(previousDrawer.data) ? previousDrawer.data[0] : previousDrawer.data) : null;
+                  const groupFromList = groupData ? groupsList.find(g => g.id === groupData.id) : null;
+                  const groupRoles = groupFromList?.roles?.filter(r => r.enabled) || [];
+                  const rolesBeingAdded = groupRoles.map(r => {
+                    const roleName = getRoleName(r.roleId);
+                    const isDuplicate = userExistingRoles.includes(roleName);
+                    const isDefault = r.isDefault;
+                    return { ...r, name: roleName, isDuplicate, isDefault };
+                  });
+                  const netNewRoles = rolesBeingAdded.filter(r => !r.isDuplicate);
+                  const duplicateRoles = rolesBeingAdded.filter(r => r.isDuplicate);
+
+                  return (
+                  <div className="flex-1 overflow-auto p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">User Roles</h3>
+
+                    {/* Summary Stats */}
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-purple-700">{userExistingRoles.length}</div>
+                        <div className="text-xs text-purple-600">Existing Roles</div>
+                      </div>
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-green-700">{netNewRoles.length}</div>
+                        <div className="text-xs text-green-600">New from Group</div>
+                      </div>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-amber-700">{duplicateRoles.length}</div>
+                        <div className="text-xs text-amber-600">Duplicates</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-purple-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between">
+                          <span>Existing Elevate Roles</span>
+                          <span className="bg-purple-500 px-2 py-0.5 rounded text-xs">{userExistingRoles.length}</span>
+                        </div>
+                        <div className="p-4">
+                          {userExistingRoles.length > 0 ? (
+                            <div className="space-y-2">
+                              {userExistingRoles.map((role: string) => (
+                                <div key={role} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                  <span className="text-gray-400">🔒</span>
+                                  <span className="text-sm">{role}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic">No existing Elevate roles</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-green-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between">
+                          <span>Roles Being Added from "{groupFromList?.name || 'Group'}"</span>
+                          <span className="bg-green-500 px-2 py-0.5 rounded text-xs">{rolesBeingAdded.length}</span>
+                        </div>
+                        <div className="p-4">
+                          {rolesBeingAdded.length > 0 ? (
+                            <div className="space-y-2">
+                              {rolesBeingAdded.map((role) => (
+                                <div key={role.roleId} className={`flex items-center justify-between p-2 rounded ${role.isDuplicate ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'}`}>
+                                  <div className="flex items-center gap-2">
+                                    {role.isDuplicate ? (
+                                      <span className="text-amber-500" title="Duplicate - user already has this role">⚠️</span>
+                                    ) : (
+                                      <span className="text-green-500">✓</span>
+                                    )}
+                                    <span className="text-sm">{role.name}</span>
+                                    {role.isDefault && (
+                                      <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">Default</span>
+                                    )}
+                                  </div>
+                                  {role.isDuplicate && (
+                                    <span className="text-xs text-amber-600">Already has role</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic">No roles configured for this group</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  );
+                })()}
+
+                {userDrawerTab === 'pageAccess' && (
+                  <div className="flex-1 overflow-auto p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Page Access</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="text-left px-4 py-2 font-medium text-gray-600">Page</th>
+                            <th className="text-center px-4 py-2 font-medium text-gray-600 w-20">View</th>
+                            <th className="text-center px-4 py-2 font-medium text-gray-600 w-20">Edit</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {['Dashboard', 'Properties', 'Tenants', 'Financials', 'Reports', 'Settings'].map((page, idx) => (
+                            <tr key={page} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <td className="px-4 py-2">{page}</td>
+                              <td className="px-4 py-2 text-center"><input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-300 text-purple-600" /></td>
+                              <td className="px-4 py-2 text-center"><input type="checkbox" defaultChecked={idx < 4} className="w-4 h-4 rounded border-gray-300 text-purple-600" /></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {userDrawerTab === 'elementAccess' && (
+                  <div className="flex-1 overflow-auto p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Element Access</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="text-left px-4 py-2 font-medium text-gray-600">Element</th>
+                            <th className="text-center px-4 py-2 font-medium text-gray-600 w-20">Visible</th>
+                            <th className="text-center px-4 py-2 font-medium text-gray-600 w-20">Enabled</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {['Delete Button', 'Export Button', 'Bulk Actions', 'Admin Panel', 'API Keys'].map((elem, idx) => (
+                            <tr key={elem} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <td className="px-4 py-2">{elem}</td>
+                              <td className="px-4 py-2 text-center"><input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-300 text-purple-600" /></td>
+                              <td className="px-4 py-2 text-center"><input type="checkbox" defaultChecked={idx < 3} className="w-4 h-4 rounded border-gray-300 text-purple-600" /></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {userDrawerTab === 'changeLog' && (
+                  <div className="flex-1 overflow-auto p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Log</h3>
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="text-left px-4 py-2 font-medium text-gray-600">Date</th>
+                            <th className="text-left px-4 py-2 font-medium text-gray-600">Changed By</th>
+                            <th className="text-left px-4 py-2 font-medium text-gray-600">Action</th>
+                            <th className="text-left px-4 py-2 font-medium text-gray-600">Details</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          <tr className="bg-white">
+                            <td className="px-4 py-2 text-gray-500">2024-01-15 09:30</td>
+                            <td className="px-4 py-2">System Admin</td>
+                            <td className="px-4 py-2"><span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">Created</span></td>
+                            <td className="px-4 py-2 text-gray-600">User account created</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="px-4 py-2 text-gray-500">2024-01-20 14:15</td>
+                            <td className="px-4 py-2">System Admin</td>
+                            <td className="px-4 py-2"><span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">Modified</span></td>
+                            <td className="px-4 py-2 text-gray-600">Added to Residential Manager group</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="px-4 py-2 text-gray-500">2024-02-01 11:00</td>
+                            <td className="px-4 py-2">System Admin</td>
+                            <td className="px-4 py-2"><span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">Modified</span></td>
+                            <td className="px-4 py-2 text-gray-600">Role added: Revenue IQ - Manager</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                </div>
+              </div>
             )}
 
             <div className="px-6 py-4 border-t flex gap-3">
