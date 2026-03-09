@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star, User, Settings, Eye, Clock, Database } from 'lucide-react';
+import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star, User, Settings, Eye, Clock, Database, Copy } from 'lucide-react';
 
 // ════ ROLE CATALOG ════════════════════════════════════════════════════
 // Mirrors the actual Elevate role table structure: role, menu, product, licensed, type
@@ -106,43 +106,44 @@ const securityGroups = [
 // ════ USERS ════════════════════════════════════════════════════
 const users = [
   // Residential Manager (group 1)
-  { id: 101, name: 'Alice Chen', email: 'achen@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/1/2026 09:12 AM', existingRoles: ['Revenue IQ - Manager', 'AR Manager'] },
-  { id: 102, name: 'Brian Torres', email: 'btorres@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/2/2026 11:30 AM', existingRoles: ['Revenue IQ - Manager', 'Forecast IQ - Admin'] },
-  { id: 103, name: 'Carol Smith', email: 'csmith@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '2/28/2026 03:45 PM', existingRoles: ['AR Manager'] },
-  { id: 104, name: 'David Kim', email: 'dkim@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/3/2026 08:00 AM', existingRoles: ['Revenue IQ - Manager', 'AR Manager', 'P2P - Accounts Payable'] },
-  { id: 105, name: 'Evelyn Park', email: 'epark@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/1/2026 02:15 PM', existingRoles: [] },
+  // roleOverrides: { addedRoles: [roleId, ...], excludedRoles: [roleId, ...] }
+  { id: 101, name: 'Alice Chen', email: 'achen@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/1/2026 09:12 AM', existingRoles: ['Revenue IQ - Manager', 'AR Manager'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 102, name: 'Brian Torres', email: 'btorres@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/2/2026 11:30 AM', existingRoles: ['Revenue IQ - Manager', 'Forecast IQ - Admin'], roleOverrides: { addedRoles: [21], excludedRoles: [] } }, // Has extra Voyager 8 Affordable role
+  { id: 103, name: 'Carol Smith', email: 'csmith@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '2/28/2026 03:45 PM', existingRoles: ['AR Manager'], roleOverrides: { addedRoles: [], excludedRoles: [12] } }, // Excluded from Voyager 8 Residential
+  { id: 104, name: 'David Kim', email: 'dkim@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/3/2026 08:00 AM', existingRoles: ['Revenue IQ - Manager', 'AR Manager', 'P2P - Accounts Payable'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 105, name: 'Evelyn Park', email: 'epark@acme.com', group: 'Residential Manager', properties: 'All', status: 'Active', lastLogin: '3/1/2026 02:15 PM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Accounting (group 2)
-  { id: 201, name: 'Frank Lee', email: 'flee@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '3/2/2026 10:00 AM', existingRoles: ['AR Manager', 'P2P - Accounts Payable'] },
-  { id: 202, name: 'Grace Huang', email: 'ghuang@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '3/1/2026 04:30 PM', existingRoles: ['P2P - Accounts Payable'] },
-  { id: 203, name: 'Henry Wu', email: 'hwu@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '2/27/2026 09:00 AM', existingRoles: ['AR Manager'] },
+  { id: 201, name: 'Frank Lee', email: 'flee@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '3/2/2026 10:00 AM', existingRoles: ['AR Manager', 'P2P - Accounts Payable'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 202, name: 'Grace Huang', email: 'ghuang@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '3/1/2026 04:30 PM', existingRoles: ['P2P - Accounts Payable'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 203, name: 'Henry Wu', email: 'hwu@acme.com', group: 'Accounting', properties: 'All', status: 'Active', lastLogin: '2/27/2026 09:00 AM', existingRoles: ['AR Manager'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Leasing Agent (group 3)
-  { id: 301, name: 'Iris Nakamura', email: 'inakamura@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/3/2026 10:45 AM', existingRoles: ['Forecast IQ - Leasing'] },
-  { id: 302, name: 'James Ortiz', email: 'jortiz@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/2/2026 01:00 PM', existingRoles: [] },
-  { id: 303, name: 'Karen Patel', email: 'kpatel@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/1/2026 11:20 AM', existingRoles: ['Forecast IQ - Leasing'] },
-  { id: 304, name: 'Liam Brown', email: 'lbrown@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/3/2026 08:30 AM', existingRoles: [] },
+  { id: 301, name: 'Iris Nakamura', email: 'inakamura@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/3/2026 10:45 AM', existingRoles: ['Forecast IQ - Leasing'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 302, name: 'James Ortiz', email: 'jortiz@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/2/2026 01:00 PM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 303, name: 'Karen Patel', email: 'kpatel@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/1/2026 11:20 AM', existingRoles: ['Forecast IQ - Leasing'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 304, name: 'Liam Brown', email: 'lbrown@acme.com', group: 'Leasing Agent', properties: '12', status: 'Active', lastLogin: '3/3/2026 08:30 AM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Maintenance Tech (group 4)
-  { id: 401, name: 'Mike Johnson', email: 'mjohnson@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Active', lastLogin: '3/2/2026 07:00 AM', existingRoles: [] },
-  { id: 402, name: 'Nancy Davis', email: 'ndavis@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Active', lastLogin: '3/1/2026 06:45 AM', existingRoles: [] },
-  { id: 403, name: 'Oscar Reyes', email: 'oreyes@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Inactive', lastLogin: '2/25/2026 08:00 AM', existingRoles: [] },
+  { id: 401, name: 'Mike Johnson', email: 'mjohnson@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Active', lastLogin: '3/2/2026 07:00 AM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 402, name: 'Nancy Davis', email: 'ndavis@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Active', lastLogin: '3/1/2026 06:45 AM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 403, name: 'Oscar Reyes', email: 'oreyes@acme.com', group: 'Maintenance Tech', properties: '15', status: 'Inactive', lastLogin: '2/25/2026 08:00 AM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Community Manager (group 5)
-  { id: 501, name: 'Paula White', email: 'pwhite@acme.com', group: 'Community Manager', properties: '8', status: 'Active', lastLogin: '3/3/2026 09:00 AM', existingRoles: ['Revenue IQ - Manager'] },
-  { id: 502, name: 'Quinn Hall', email: 'qhall@acme.com', group: 'Community Manager', properties: '8', status: 'Active', lastLogin: '3/2/2026 03:00 PM', existingRoles: ['Revenue IQ - Manager', 'Forecast IQ - Admin'] },
+  { id: 501, name: 'Paula White', email: 'pwhite@acme.com', group: 'Community Manager', properties: '8', status: 'Active', lastLogin: '3/3/2026 09:00 AM', existingRoles: ['Revenue IQ - Manager'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 502, name: 'Quinn Hall', email: 'qhall@acme.com', group: 'Community Manager', properties: '8', status: 'Active', lastLogin: '3/2/2026 03:00 PM', existingRoles: ['Revenue IQ - Manager', 'Forecast IQ - Admin'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Accounts Payable (group 6)
-  { id: 601, name: 'Rachel Green', email: 'rgreen@acme.com', group: 'Accounts Payable', properties: 'All', status: 'Active', lastLogin: '3/3/2026 10:00 AM', existingRoles: ['P2P - Accounts Payable', 'AR Manager'] },
-  { id: 602, name: 'Sam Carter', email: 'scarter@acme.com', group: 'Accounts Payable', properties: 'All', status: 'Active', lastLogin: '3/1/2026 02:00 PM', existingRoles: ['P2P - Accounts Payable'] },
+  { id: 601, name: 'Rachel Green', email: 'rgreen@acme.com', group: 'Accounts Payable', properties: 'All', status: 'Active', lastLogin: '3/3/2026 10:00 AM', existingRoles: ['P2P - Accounts Payable', 'AR Manager'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 602, name: 'Sam Carter', email: 'scarter@acme.com', group: 'Accounts Payable', properties: 'All', status: 'Active', lastLogin: '3/1/2026 02:00 PM', existingRoles: ['P2P - Accounts Payable'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // CRM Admin (group 7)
-  { id: 701, name: 'Tina Lewis', email: 'tlewis@acme.com', group: 'CRM Admin', properties: 'All', status: 'Active', lastLogin: '3/2/2026 01:30 PM', existingRoles: ['Forecast IQ - Admin'] },
-  { id: 702, name: 'Uma Singh', email: 'usingh@acme.com', group: 'CRM Admin', properties: 'All', status: 'Active', lastLogin: '3/3/2026 11:00 AM', existingRoles: ['Forecast IQ - Admin', 'Revenue IQ - Manager'] },
+  { id: 701, name: 'Tina Lewis', email: 'tlewis@acme.com', group: 'CRM Admin', properties: 'All', status: 'Active', lastLogin: '3/2/2026 01:30 PM', existingRoles: ['Forecast IQ - Admin'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 702, name: 'Uma Singh', email: 'usingh@acme.com', group: 'CRM Admin', properties: 'All', status: 'Active', lastLogin: '3/3/2026 11:00 AM', existingRoles: ['Forecast IQ - Admin', 'Revenue IQ - Manager'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Executive (group 8)
-  { id: 801, name: 'Victor Ross', email: 'vross@acme.com', group: 'Executive', properties: 'All', status: 'Active', lastLogin: '3/3/2026 12:00 PM', existingRoles: ['Revenue IQ - Executive', 'Forecast IQ - Admin'] },
-  { id: 802, name: 'Wendy Chang', email: 'wchang@acme.com', group: 'Executive', properties: 'All', status: 'Active', lastLogin: '3/2/2026 09:45 AM', existingRoles: ['Revenue IQ - Executive'] },
+  { id: 801, name: 'Victor Ross', email: 'vross@acme.com', group: 'Executive', properties: 'All', status: 'Active', lastLogin: '3/3/2026 12:00 PM', existingRoles: ['Revenue IQ - Executive', 'Forecast IQ - Admin'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 802, name: 'Wendy Chang', email: 'wchang@acme.com', group: 'Executive', properties: 'All', status: 'Active', lastLogin: '3/2/2026 09:45 AM', existingRoles: ['Revenue IQ - Executive'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Read Only (group 9)
-  { id: 901, name: 'Xander Reed', email: 'xreed@acme.com', group: 'Read Only', properties: '3', status: 'Active', lastLogin: '3/1/2026 10:00 AM', existingRoles: [] },
-  { id: 902, name: 'Yara Pinto', email: 'ypinto@acme.com', group: 'Read Only', properties: '3', status: 'Active', lastLogin: '3/2/2026 08:00 AM', existingRoles: [] },
-  { id: 903, name: 'Zoe Adams', email: 'zadams@acme.com', group: 'Read Only', properties: '3', status: 'Inactive', lastLogin: '2/28/2026 04:00 PM', existingRoles: [] },
+  { id: 901, name: 'Xander Reed', email: 'xreed@acme.com', group: 'Read Only', properties: '3', status: 'Active', lastLogin: '3/1/2026 10:00 AM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 902, name: 'Yara Pinto', email: 'ypinto@acme.com', group: 'Read Only', properties: '3', status: 'Active', lastLogin: '3/2/2026 08:00 AM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 903, name: 'Zoe Adams', email: 'zadams@acme.com', group: 'Read Only', properties: '3', status: 'Inactive', lastLogin: '2/28/2026 04:00 PM', existingRoles: [], roleOverrides: { addedRoles: [], excludedRoles: [] } },
   // Commercial Manager (group 10)
-  { id: 1001, name: 'Aaron Hill', email: 'ahill@acme.com', group: 'Commercial Manager', properties: '5', status: 'Active', lastLogin: '3/3/2026 07:30 AM', existingRoles: ['Voyager 8 Commercial'] },
-  { id: 1002, name: 'Beth Moore', email: 'bmoore@acme.com', group: 'Commercial Manager', properties: '5', status: 'Active', lastLogin: '3/2/2026 10:30 AM', existingRoles: ['Voyager 8 Commercial'] },
+  { id: 1001, name: 'Aaron Hill', email: 'ahill@acme.com', group: 'Commercial Manager', properties: '5', status: 'Active', lastLogin: '3/3/2026 07:30 AM', existingRoles: ['Voyager 8 Commercial'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
+  { id: 1002, name: 'Beth Moore', email: 'bmoore@acme.com', group: 'Commercial Manager', properties: '5', status: 'Active', lastLogin: '3/2/2026 10:30 AM', existingRoles: ['Voyager 8 Commercial'], roleOverrides: { addedRoles: [], excludedRoles: [] } },
 ];
 
 // Use ROLE_CATALOG as the master list (replacing old rolesMaster)
@@ -388,6 +389,17 @@ export default function SecurityHub() {
   const [cloneType, setCloneType] = useState('New Group');
   const [cloneTargetGroup, setCloneTargetGroup] = useState('');
 
+  // Clone User Modal state
+  const [cloneUserModalOpen, setCloneUserModalOpen] = useState(false);
+  const [cloneUserSource, setCloneUserSource] = useState<any>(null);
+  const [cloneUserTargets, setCloneUserTargets] = useState<number[]>([]);
+  const [cloneUserOptions, setCloneUserOptions] = useState({
+    elevateRoles: true,
+    v7Settings: true,
+    programRights: true,
+    propertyAccess: true
+  });
+
   // Add User Modal state
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [addUserPropertyFilter, setAddUserPropertyFilter] = useState('All');
@@ -421,6 +433,8 @@ export default function SecurityHub() {
   const [originalPermissions] = useState(() => JSON.parse(JSON.stringify(permissionsData))); // Deep copy for change tracking
   const [groupsList, setGroupsList] = useState(securityGroups);
   const [originalGroups] = useState(() => JSON.parse(JSON.stringify(securityGroups))); // Deep copy for change tracking
+  const [usersList, setUsersList] = useState(users);
+  const [originalUsers] = useState(() => JSON.parse(JSON.stringify(users))); // Deep copy for change tracking
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [rolesSearch, setRolesSearch] = useState('');
   const initialBooks = [
@@ -1583,6 +1597,7 @@ export default function SecurityHub() {
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Properties</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Last Login</th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -1591,16 +1606,30 @@ export default function SecurityHub() {
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <input type="checkbox" checked={selectedUsers.includes(user.id)} onChange={(e) => { if (e.target.checked) { setSelectedUsers([...selectedUsers, user.id]); } else { setSelectedUsers(selectedUsers.filter(id => id !== user.id)); } }} className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                     </td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('details'); }}>
+                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('userInfo'); }}>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-medium">{user.name.split(' ').map(n => n[0]).join('')}</div>
                         <div><div className="font-medium text-gray-900">{user.name}</div><div className="text-xs text-gray-500">{user.email}</div></div>
                       </div>
                     </td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('details'); }}><span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{user.group}</span></td>
-                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('details'); }}>{user.properties}</td>
-                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('details'); }}><span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{user.status}</span></td>
-                    <td className="px-4 py-3 text-sm text-gray-500" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('details'); }}>{user.lastLogin}</td>
+                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('userInfo'); }}><span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{user.group}</span></td>
+                    <td className="px-4 py-3 text-sm text-gray-600" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('userInfo'); }}>{user.properties}</td>
+                    <td className="px-4 py-3" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('userInfo'); }}><span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{user.status}</span></td>
+                    <td className="px-4 py-3 text-sm text-gray-500" onClick={() => { setDrawer({ open: true, type: 'user', data: user }); setUserDrawerTab('userInfo'); }}>{user.lastLogin}</td>
+                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => {
+                          setCloneUserSource(user);
+                          setCloneUserTargets([]);
+                          setCloneUserOptions({ elevateRoles: true, v7Settings: true, programRights: true, propertyAccess: true });
+                          setCloneUserModalOpen(true);
+                        }}
+                        className="p-1.5 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                        title="Clone user security settings"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -1851,9 +1880,19 @@ export default function SecurityHub() {
                           </thead>
                           <tbody className="divide-y">
                             {groupUsers.map(user => {
-                              const userExistingRoles = user.existingRoles || [];
-                              // Roles being added = group net-new roles that user doesn't already have
-                              const rolesBeingAdded = groupNetNewRoles.filter(r => !userExistingRoles.includes(r));
+                              // Get the current user from usersList to include any overrides
+                              const currentUser = usersList.find(u => u.id === user.id) || user;
+                              const userExistingRoles = currentUser.existingRoles || [];
+                              const userOverrides = currentUser.roleOverrides || { addedRoles: [], excludedRoles: [] };
+                              const hasOverrides = userOverrides.addedRoles.length > 0 || userOverrides.excludedRoles.length > 0;
+
+                              // Roles being added = group net-new roles that user doesn't already have (minus excluded)
+                              const rolesBeingAdded = groupNetNewRoles.filter(r => {
+                                const roleId = ROLE_CATALOG.find(rc => rc.name === r)?.id;
+                                return !userExistingRoles.includes(r) && !userOverrides.excludedRoles.includes(roleId);
+                              });
+                              // Add user-specific roles
+                              const userSpecificRoles = userOverrides.addedRoles.map(id => getRoleName(id));
                               const duplicateRoles = groupNetNewRoles.filter(r => userExistingRoles.includes(r));
 
                               return (
@@ -1864,6 +1903,11 @@ export default function SecurityHub() {
                                         {user.name.split(' ').map(n => n[0]).join('')}
                                       </div>
                                       <span className="font-medium text-gray-900">{user.name}</span>
+                                      {hasOverrides && (
+                                        <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium" title="This user has role overrides">
+                                          ★
+                                        </span>
+                                      )}
                                     </div>
                                   </td>
                                   <td className="px-4 py-3 text-gray-500">{user.email}</td>
@@ -1890,28 +1934,47 @@ export default function SecurityHub() {
                                           +{role}
                                         </span>
                                       ))}
+                                      {userSpecificRoles.map((role, idx) => (
+                                        <span key={`user-${idx}`} className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">
+                                          ★{role}
+                                        </span>
+                                      ))}
                                       {duplicateRoles.map((role, idx) => (
                                         <span key={idx} className="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">
                                           ✕ {role}
                                         </span>
                                       ))}
-                                      {rolesBeingAdded.length === 0 && duplicateRoles.length === 0 && (
+                                      {rolesBeingAdded.length === 0 && userSpecificRoles.length === 0 && duplicateRoles.length === 0 && (
                                         <span className="text-xs text-gray-400">None</span>
                                       )}
                                     </div>
                                   </td>
                                   <td className="px-4 py-3 text-xs text-gray-500">{user.lastLogin}</td>
                                   <td className="px-4 py-3">
-                                    <button
-                                      onClick={() => {
-                                        setPreviousDrawer({ open: true, type: 'group', data: drawer.data, tab: drawerTab });
-                                        setDrawer({ open: true, type: 'user', data: user });
-                                        setUserDrawerTab('details');
-                                      }}
-                                      className="px-3 py-1.5 text-xs font-medium border border-purple-600 text-purple-600 rounded hover:bg-purple-50"
-                                    >
-                                      View Details →
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => {
+                                          setPreviousDrawer({ open: true, type: 'group', data: drawer.data, tab: drawerTab });
+                                          setDrawer({ open: true, type: 'user', data: user });
+                                          setUserDrawerTab('userInfo');
+                                        }}
+                                        className="px-3 py-1.5 text-xs font-medium border border-purple-600 text-purple-600 rounded hover:bg-purple-50"
+                                      >
+                                        View Details →
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setCloneUserSource(user);
+                                          setCloneUserTargets([]);
+                                          setCloneUserOptions({ elevateRoles: true, v7Settings: true, programRights: true, propertyAccess: true });
+                                          setCloneUserModalOpen(true);
+                                        }}
+                                        className="p-1.5 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded border border-gray-300 transition-colors"
+                                        title="Clone user security settings"
+                                      >
+                                        <Copy className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
                                   </td>
                                 </tr>
                               );
@@ -2733,30 +2796,9 @@ export default function SecurityHub() {
                 {/* Left Navigation Column */}
                 <div className="w-48 bg-gray-50 border-r flex flex-col">
                   <div className="p-3 border-b bg-gray-100">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">V7 Settings</span>
-                  </div>
-                  <nav className="flex-1 py-2">
-                    {(isMultiUser ? ['settings', 'programRights'] : ['details', 'settings', 'programRights']).map(tab => (
-                      <button
-                        key={tab}
-                        onClick={() => setUserDrawerTab(tab)}
-                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors flex items-center gap-2 ${
-                          userDrawerTab === tab
-                            ? 'bg-purple-100 text-purple-700 border-r-2 border-purple-600'
-                            : 'text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        {tab === 'details' && <User className="w-4 h-4" />}
-                        {tab === 'settings' && <Settings className="w-4 h-4" />}
-                        {tab === 'programRights' && <Shield className="w-4 h-4" />}
-                        {tab === 'programRights' ? 'Program Rights' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-                      </button>
-                    ))}
-                  </nav>
-                  <div className="p-3 border-t bg-gray-100">
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Elevate</span>
                   </div>
-                  <nav className="py-2">
+                  <nav className="flex-1 py-2">
                     {['userInfo', 'voyagerAccess', 'roles', 'pageAccess', 'elementAccess', 'changeLog'].map(tab => (
                       <button
                         key={tab}
@@ -2779,6 +2821,27 @@ export default function SecurityHub() {
                         {tab === 'pageAccess' && 'Page Access'}
                         {tab === 'elementAccess' && 'Element Access'}
                         {tab === 'changeLog' && 'Change Log'}
+                      </button>
+                    ))}
+                  </nav>
+                  <div className="p-3 border-t bg-gray-100">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">V7 Settings</span>
+                  </div>
+                  <nav className="py-2">
+                    {(isMultiUser ? ['settings', 'programRights'] : ['details', 'settings', 'programRights']).map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => setUserDrawerTab(tab)}
+                        className={`w-full px-4 py-2.5 text-left text-sm font-medium transition-colors flex items-center gap-2 ${
+                          userDrawerTab === tab
+                            ? 'bg-purple-100 text-purple-700 border-r-2 border-purple-600'
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {tab === 'details' && <User className="w-4 h-4" />}
+                        {tab === 'settings' && <Settings className="w-4 h-4" />}
+                        {tab === 'programRights' && <Shield className="w-4 h-4" />}
+                        {tab === 'programRights' ? 'Program Rights' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                       </button>
                     ))}
                   </nav>
@@ -3063,40 +3126,123 @@ export default function SecurityHub() {
                 )}
 
                 {userDrawerTab === 'roles' && (() => {
-                  const userExistingRoles = drawerUsers[0]?.existingRoles || [];
+                  const currentUser = usersList.find(u => u.id === drawerUsers[0]?.id) || drawerUsers[0];
+                  if (!currentUser) return <div className="flex-1 p-6 text-gray-500">No user selected</div>;
+
+                  // Helper function to get role name from ID
+                  const getRoleName = (roleId: number) => rolesMaster.find(r => r.id === roleId)?.name || '';
+
+                  const userExistingRoles = currentUser?.existingRoles || [];
+                  const userOverrides = currentUser?.roleOverrides || { addedRoles: [], excludedRoles: [] };
+
+                  // Try to get group from previousDrawer, or fall back to finding it by user's group name
                   const groupData = previousDrawer?.data ? (Array.isArray(previousDrawer.data) ? previousDrawer.data[0] : previousDrawer.data) : null;
-                  const groupFromList = groupData ? groupsList.find(g => g.id === groupData.id) : null;
-                  const groupRoles = groupFromList?.roles?.filter(r => r.enabled) || [];
-                  const rolesBeingAdded = groupRoles.map(r => {
+                  const groupFromList = groupData
+                    ? groupsList.find(g => g.id === groupData.id)
+                    : groupsList.find(g => g.name === currentUser?.group);
+                  const groupRoles = groupFromList?.roles?.filter((r: any) => r.enabled) || [];
+
+                  // Ensure overrides arrays exist
+                  const excludedRoles = Array.isArray(userOverrides?.excludedRoles) ? userOverrides.excludedRoles : [];
+                  const addedRoles = Array.isArray(userOverrides?.addedRoles) ? userOverrides.addedRoles : [];
+
+                  // Roles from group (can be excluded per-user)
+                  const inheritedRoles = groupRoles.map(r => {
                     const roleName = getRoleName(r.roleId);
                     const isDuplicate = userExistingRoles.includes(roleName);
+                    const isExcluded = excludedRoles.includes(r.roleId);
                     const isDefault = r.isDefault;
-                    return { ...r, name: roleName, isDuplicate, isDefault };
+                    return { ...r, name: roleName, isDuplicate, isExcluded, isDefault };
                   });
-                  const netNewRoles = rolesBeingAdded.filter(r => !r.isDuplicate);
-                  const duplicateRoles = rolesBeingAdded.filter(r => r.isDuplicate);
+
+                  // User-specific added roles
+                  const userAddedRoles = addedRoles.map(roleId => {
+                    const roleName = getRoleName(roleId);
+                    return { roleId, name: roleName };
+                  });
+
+                  // Available roles to add (not already in group or user-added)
+                  const usedRoleIds = [...groupRoles.map(r => r.roleId), ...addedRoles];
+                  const availableRoles = ROLE_CATALOG.filter(r => !usedRoleIds.includes(r.id));
+
+                  const activeInheritedCount = inheritedRoles.filter(r => !r.isExcluded && !r.isDuplicate).length;
+                  const excludedCount = inheritedRoles.filter(r => r.isExcluded).length;
+
+                  const toggleExcludeRole = (roleId: number) => {
+                    setUsersList(prev => prev.map(u => {
+                      if (u.id !== currentUser?.id) return u;
+                      const current = u.roleOverrides || { addedRoles: [], excludedRoles: [] };
+                      const currentExcluded = current.excludedRoles || [];
+                      const isExcluded = currentExcluded.includes(roleId);
+                      return {
+                        ...u,
+                        roleOverrides: {
+                          addedRoles: current.addedRoles || [],
+                          excludedRoles: isExcluded
+                            ? currentExcluded.filter(id => id !== roleId)
+                            : [...currentExcluded, roleId]
+                        }
+                      };
+                    }));
+                  };
+
+                  const addUserRole = (roleId: number) => {
+                    setUsersList(prev => prev.map(u => {
+                      if (u.id !== currentUser?.id) return u;
+                      const current = u.roleOverrides || { addedRoles: [], excludedRoles: [] };
+                      const currentAdded = current.addedRoles || [];
+                      if (currentAdded.includes(roleId)) return u;
+                      return {
+                        ...u,
+                        roleOverrides: {
+                          excludedRoles: current.excludedRoles || [],
+                          addedRoles: [...currentAdded, roleId]
+                        }
+                      };
+                    }));
+                  };
+
+                  const removeUserRole = (roleId: number) => {
+                    setUsersList(prev => prev.map(u => {
+                      if (u.id !== currentUser?.id) return u;
+                      const current = u.roleOverrides || { addedRoles: [], excludedRoles: [] };
+                      const currentAdded = current.addedRoles || [];
+                      return {
+                        ...u,
+                        roleOverrides: {
+                          excludedRoles: current.excludedRoles || [],
+                          addedRoles: currentAdded.filter(id => id !== roleId)
+                        }
+                      };
+                    }));
+                  };
 
                   return (
                   <div className="flex-1 overflow-auto p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">User Roles</h3>
 
                     {/* Summary Stats */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-4 gap-3 mb-4">
                       <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
                         <div className="text-2xl font-bold text-purple-700">{userExistingRoles.length}</div>
-                        <div className="text-xs text-purple-600">Existing Roles</div>
+                        <div className="text-xs text-purple-600">Existing Elevate</div>
                       </div>
                       <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                        <div className="text-2xl font-bold text-green-700">{netNewRoles.length}</div>
-                        <div className="text-xs text-green-600">New from Group</div>
+                        <div className="text-2xl font-bold text-green-700">{activeInheritedCount}</div>
+                        <div className="text-xs text-green-600">From Group</div>
                       </div>
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-                        <div className="text-2xl font-bold text-amber-700">{duplicateRoles.length}</div>
-                        <div className="text-xs text-amber-600">Duplicates</div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-blue-700">{userAddedRoles.length}</div>
+                        <div className="text-xs text-blue-600">User-Specific</div>
+                      </div>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-gray-500">{excludedCount}</div>
+                        <div className="text-xs text-gray-500">Excluded</div>
                       </div>
                     </div>
 
                     <div className="space-y-4">
+                      {/* Existing Elevate Roles (Locked) */}
                       <div className="border rounded-lg overflow-hidden">
                         <div className="bg-purple-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between">
                           <span>Existing Elevate Roles</span>
@@ -3118,35 +3264,111 @@ export default function SecurityHub() {
                         </div>
                       </div>
 
+                      {/* Inherited from Group (with exclude toggle) */}
                       <div className="border rounded-lg overflow-hidden">
                         <div className="bg-green-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between">
-                          <span>Roles Being Added from "{groupFromList?.name || 'Group'}"</span>
-                          <span className="bg-green-500 px-2 py-0.5 rounded text-xs">{rolesBeingAdded.length}</span>
+                          <span>Inherited from "{groupFromList?.name || 'Group'}"</span>
+                          <span className="bg-green-500 px-2 py-0.5 rounded text-xs">{inheritedRoles.length}</span>
                         </div>
                         <div className="p-4">
-                          {rolesBeingAdded.length > 0 ? (
+                          {inheritedRoles.length > 0 ? (
                             <div className="space-y-2">
-                              {rolesBeingAdded.map((role) => (
-                                <div key={role.roleId} className={`flex items-center justify-between p-2 rounded ${role.isDuplicate ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'}`}>
+                              {inheritedRoles.map((role) => (
+                                <div key={role.roleId} className={`flex items-center justify-between p-2 rounded border ${
+                                  role.isExcluded ? 'bg-gray-100 border-gray-300 opacity-60' :
+                                  role.isDuplicate ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'
+                                }`}>
                                   <div className="flex items-center gap-2">
-                                    {role.isDuplicate ? (
-                                      <span className="text-amber-500" title="Duplicate - user already has this role">⚠️</span>
+                                    {role.isExcluded ? (
+                                      <span className="text-gray-400">⊘</span>
+                                    ) : role.isDuplicate ? (
+                                      <span className="text-amber-500">⚠️</span>
                                     ) : (
                                       <span className="text-green-500">✓</span>
                                     )}
-                                    <span className="text-sm">{role.name}</span>
-                                    {role.isDefault && (
+                                    <span className={`text-sm ${role.isExcluded ? 'line-through text-gray-500' : ''}`}>{role.name}</span>
+                                    {role.isDefault && !role.isExcluded && (
                                       <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">Default</span>
                                     )}
+                                    {role.isDuplicate && !role.isExcluded && (
+                                      <span className="text-xs text-amber-600">(duplicate)</span>
+                                    )}
                                   </div>
-                                  {role.isDuplicate && (
-                                    <span className="text-xs text-amber-600">Already has role</span>
-                                  )}
+                                  <button
+                                    onClick={() => toggleExcludeRole(role.roleId)}
+                                    className={`px-2 py-1 text-xs font-medium rounded ${
+                                      role.isExcluded
+                                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-700'
+                                    }`}
+                                  >
+                                    {role.isExcluded ? 'Include' : 'Exclude'}
+                                  </button>
                                 </div>
                               ))}
                             </div>
                           ) : (
                             <p className="text-sm text-gray-500 italic">No roles configured for this group</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* User-Specific Roles (can add/remove) */}
+                      <div className="border rounded-lg overflow-hidden">
+                        <div className="bg-blue-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between">
+                          <span>User-Specific Roles</span>
+                          <span className="bg-blue-500 px-2 py-0.5 rounded text-xs">{userAddedRoles.length}</span>
+                        </div>
+                        <div className="p-4 space-y-3">
+                          {userAddedRoles.length > 0 && (
+                            <div className="space-y-2">
+                              {userAddedRoles.map((role) => (
+                                <div key={role.roleId} className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-blue-500">★</span>
+                                    <span className="text-sm">{role.name}</span>
+                                    <span className="text-xs text-blue-600">(user-specific)</span>
+                                  </div>
+                                  <button
+                                    onClick={() => removeUserRole(role.roleId)}
+                                    className="p-1 text-red-500 hover:bg-red-100 rounded"
+                                    title="Remove role"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Add Role Dropdown */}
+                          <div className="flex gap-2">
+                            <select
+                              id="addUserRole"
+                              className="flex-1 px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              defaultValue=""
+                            >
+                              <option value="" disabled>Add a role for this user only...</option>
+                              {availableRoles.map(role => (
+                                <option key={role.id} value={role.id}>{role.name}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => {
+                                const select = document.getElementById('addUserRole') as HTMLSelectElement;
+                                if (select.value) {
+                                  addUserRole(parseInt(select.value));
+                                  select.value = '';
+                                }
+                              }}
+                              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {userAddedRoles.length === 0 && (
+                            <p className="text-sm text-gray-500 italic">No user-specific roles added. Use dropdown above to add roles just for this user.</p>
                           )}
                         </div>
                       </div>
@@ -3361,6 +3583,158 @@ export default function SecurityHub() {
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Clone
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clone User Modal */}
+      {cloneUserModalOpen && cloneUserSource && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-xl shadow-2xl w-[600px] max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b bg-gradient-to-r from-purple-600 to-blue-600">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <Copy className="w-5 h-5" />
+                Clone User Security Settings
+              </h2>
+            </div>
+
+            <div className="flex-1 overflow-auto p-6 space-y-6">
+              {/* Source User */}
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-2">Cloning From</div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-medium">
+                    {cloneUserSource.name.split(' ').map((n: string) => n[0]).join('')}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">{cloneUserSource.name}</div>
+                    <div className="text-sm text-gray-500">{cloneUserSource.email} • {cloneUserSource.group}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* What to Clone */}
+              <div>
+                <div className="text-sm font-semibold text-gray-700 mb-3">What to Clone</div>
+                <div className="space-y-2">
+                  {[
+                    { key: 'elevateRoles', label: 'Elevate Roles', desc: 'Role assignments and user-specific overrides' },
+                    { key: 'v7Settings', label: 'V7 Settings', desc: 'User settings and preferences' },
+                    { key: 'programRights', label: 'Program Rights', desc: 'Module access permissions' },
+                    { key: 'propertyAccess', label: 'Property Access', desc: 'Property-level permissions' }
+                  ].map(item => (
+                    <label key={item.key} className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={cloneUserOptions[item.key as keyof typeof cloneUserOptions]}
+                        onChange={(e) => setCloneUserOptions(prev => ({ ...prev, [item.key]: e.target.checked }))}
+                        className="w-4 h-4 mt-0.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{item.label}</div>
+                        <div className="text-xs text-gray-500">{item.desc}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Target Users */}
+              <div>
+                <div className="text-sm font-semibold text-gray-700 mb-3">Apply To</div>
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="bg-gray-50 px-3 py-2 border-b">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search users..."
+                        className="w-full pl-9 pr-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="max-h-48 overflow-auto divide-y">
+                    {users.filter(u => u.id !== cloneUserSource.id).map(user => (
+                      <label
+                        key={user.id}
+                        className={`flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer ${
+                          cloneUserTargets.includes(user.id) ? 'bg-purple-50' : ''
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={cloneUserTargets.includes(user.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setCloneUserTargets(prev => [...prev, user.id]);
+                            } else {
+                              setCloneUserTargets(prev => prev.filter(id => id !== user.id));
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white text-xs font-medium">
+                          {user.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">{user.name}</div>
+                          <div className="text-xs text-gray-500">{user.group}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                {cloneUserTargets.length > 0 && (
+                  <div className="mt-2 text-sm text-purple-600">
+                    {cloneUserTargets.length} user{cloneUserTargets.length !== 1 ? 's' : ''} selected
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t bg-gray-50 flex justify-between">
+              <button
+                onClick={() => {
+                  setCloneUserModalOpen(false);
+                  setCloneUserSource(null);
+                  setCloneUserTargets([]);
+                }}
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Clone the settings to target users
+                  setUsersList(prev => prev.map(user => {
+                    if (!cloneUserTargets.includes(user.id)) return user;
+
+                    const updates: any = {};
+
+                    if (cloneUserOptions.elevateRoles) {
+                      updates.existingRoles = [...cloneUserSource.existingRoles];
+                      updates.roleOverrides = JSON.parse(JSON.stringify(cloneUserSource.roleOverrides || { addedRoles: [], excludedRoles: [] }));
+                    }
+
+                    // V7 Settings, Program Rights, Property Access would be cloned here
+                    // (Currently visual-only in the prototype)
+
+                    return { ...user, ...updates };
+                  }));
+
+                  setCloneUserModalOpen(false);
+                  setCloneUserSource(null);
+                  setCloneUserTargets([]);
+
+                  alert(`Security settings cloned to ${cloneUserTargets.length} user${cloneUserTargets.length !== 1 ? 's' : ''} successfully!`);
+                }}
+                disabled={cloneUserTargets.length === 0 || !Object.values(cloneUserOptions).some(v => v)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <Copy className="w-4 h-4" />
+                Clone to {cloneUserTargets.length || 0} User{cloneUserTargets.length !== 1 ? 's' : ''}
               </button>
             </div>
           </div>
