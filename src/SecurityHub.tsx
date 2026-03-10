@@ -400,6 +400,16 @@ export default function SecurityHub() {
     propertyAccess: true
   });
 
+  // Toast notifications state
+  const [toasts, setToasts] = useState<{id: number; message: string; type: 'success' | 'error' | 'warning' | 'info'}[]>([]);
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 4000);
+  };
+
   // Add User Modal state
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [addUserPropertyFilter, setAddUserPropertyFilter] = useState('All');
@@ -565,6 +575,35 @@ export default function SecurityHub() {
   // Reset all changes
   const resetAllChanges = () => {
     setGroupsList(JSON.parse(JSON.stringify(originalGroups)));
+  };
+
+  // Confirm close dialog state
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+
+  // Check if current drawer has unsaved changes
+  const drawerHasUnsavedChanges = () => {
+    if (drawer.type === 'group') {
+      const groupIds = Array.isArray(drawer.data) ? drawer.data.map(g => g.id) : [drawer.data?.id];
+      return pendingChanges.some(c => groupIds.includes(c.group.id));
+    }
+    return false;
+  };
+
+  // Handle drawer close request
+  const handleDrawerClose = () => {
+    if (drawerHasUnsavedChanges()) {
+      setConfirmCloseOpen(true);
+    } else {
+      setDrawer({ open: false, type: null, data: null });
+      setDrawerLayer(1);
+    }
+  };
+
+  // Force close drawer (after confirmation)
+  const forceCloseDrawer = () => {
+    setConfirmCloseOpen(false);
+    setDrawer({ open: false, type: null, data: null });
+    setDrawerLayer(1);
   };
 
   // Calculate pending permission changes
@@ -1352,9 +1391,10 @@ export default function SecurityHub() {
                   const defaultRoleConfig = enabledRoles.find(r => r.isDefault);
                   const defaultRole = defaultRoleConfig ? rolesMaster.find(rm => rm.id === defaultRoleConfig.roleId) : null;
                   const hasRoles = enabledRoles.length > 0;
+                  const groupHasChanges = pendingChanges.some(c => c.group.id === group.id);
 
                   return (
-                  <tr key={group.id} className={`hover:bg-purple-50 transition-colors ${selectedGroups.includes(group.id) ? 'bg-purple-50' : ''}`}>
+                  <tr key={group.id} className={`hover:bg-purple-50 transition-colors ${selectedGroups.includes(group.id) ? 'bg-purple-50' : ''} ${groupHasChanges ? 'bg-amber-50/50' : ''}`}>
                     <td className="px-3 py-3">
                       <input
                         type="checkbox"
@@ -1370,7 +1410,15 @@ export default function SecurityHub() {
                       />
                     </td>
                     <td className="px-3 py-3">
-                      <span className="font-semibold text-gray-900">{group.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-gray-900">{group.name}</span>
+                        {groupHasChanges && (
+                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full" title="This group has unsaved changes">
+                            <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+                            Modified
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-3">
                       <code className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-600">{group.code}</code>
@@ -1552,7 +1600,7 @@ export default function SecurityHub() {
                       // In production, this would save to backend
                       // For now, we'll just close the modal and show success
                       setSaveModalOpen(false);
-                      alert('Changes saved successfully! (In production, this would sync to Elevate)');
+                      showToast('Changes saved successfully!', 'success');
                     }}
                     className="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700"
                   >
@@ -1641,7 +1689,7 @@ export default function SecurityHub() {
         )}
       </div>
 
-      {drawer.open && <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setDrawer({ open: false, type: null, data: null })} />}
+      {drawer.open && <div className="fixed inset-0 bg-black/30 z-40" onClick={handleDrawerClose} />}
 
       <div className={`fixed right-0 top-0 h-full w-[1400px] min-w-[1400px] max-w-[1400px] bg-white shadow-2xl z-50 transform transition-transform duration-300 overflow-hidden ${drawer.open ? 'translate-x-0' : 'translate-x-full'}`}>
         {drawer.data && (
@@ -1698,7 +1746,7 @@ export default function SecurityHub() {
                   )}
                 </div>
               </div>
-              <button onClick={() => { setDrawer({ open: false, type: null, data: null }); setDrawerLayer(1); }} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+              <button onClick={handleDrawerClose} className="p-2 hover:bg-gray-100 rounded-lg" title="Close drawer"><X className="w-5 h-5" /></button>
             </div>
 
             {drawer.type === 'group' ? (
@@ -2185,7 +2233,7 @@ export default function SecurityHub() {
                       const usedRoleIds = newRoles.map(r => r.roleId);
                       const availableRole = rolesMaster.find(r => !usedRoleIds.includes(r.id));
                       if (!availableRole) {
-                        alert('All roles already added.');
+                        showToast('All roles already added.', 'warning');
                         return;
                       }
                       setGroupsList(prev => prev.map(g => {
@@ -2780,7 +2828,7 @@ export default function SecurityHub() {
                           </button>
                           <button
                             onClick={() => {
-                              alert('Permission changes saved! (In production, this would sync to the database)');
+                              showToast('Permission changes saved!', 'success');
                             }}
                             className="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded hover:bg-amber-700"
                           >
@@ -3593,6 +3641,39 @@ export default function SecurityHub() {
         </div>
       )}
 
+      {/* Confirm Close Dialog */}
+      {confirmCloseOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]">
+          <div className="bg-white rounded-xl shadow-2xl w-[400px] overflow-hidden">
+            <div className="px-6 py-4 border-b bg-amber-50">
+              <h2 className="text-lg font-semibold text-amber-800 flex items-center gap-2">
+                <span>⚠️</span>
+                Unsaved Changes
+              </h2>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600 mb-4">
+                You have unsaved changes that will be lost if you close this drawer. Are you sure you want to continue?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setConfirmCloseOpen(false)}
+                  className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-50"
+                >
+                  Keep Editing
+                </button>
+                <button
+                  onClick={forceCloseDrawer}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                >
+                  Discard Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Clone User Modal */}
       {cloneUserModalOpen && cloneUserSource && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
@@ -3732,7 +3813,7 @@ export default function SecurityHub() {
                   setCloneUserSource(null);
                   setCloneUserTargets([]);
 
-                  alert(`Security settings cloned to ${cloneUserTargets.length} user${cloneUserTargets.length !== 1 ? 's' : ''} successfully!`);
+                  showToast(`Security settings cloned to ${cloneUserTargets.length} user${cloneUserTargets.length !== 1 ? 's' : ''}!`, 'success');
                 }}
                 disabled={cloneUserTargets.length === 0 || !Object.values(cloneUserOptions).some(v => v)}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -3917,6 +3998,33 @@ export default function SecurityHub() {
           </div>
         </div>
       )}
+
+      {/* Toast Notifications */}
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in ${
+              toast.type === 'success' ? 'bg-green-600 text-white' :
+              toast.type === 'error' ? 'bg-red-600 text-white' :
+              toast.type === 'warning' ? 'bg-amber-500 text-white' :
+              'bg-blue-600 text-white'
+            }`}
+          >
+            {toast.type === 'success' && <Check className="w-5 h-5" />}
+            {toast.type === 'error' && <X className="w-5 h-5" />}
+            {toast.type === 'warning' && <span>⚠️</span>}
+            {toast.type === 'info' && <span>ℹ️</span>}
+            <span className="text-sm font-medium">{toast.message}</span>
+            <button
+              onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
+              className="ml-2 p-1 hover:bg-white/20 rounded"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
