@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star, User, Settings, Eye, Clock, Database, Copy } from 'lucide-react';
+import { Search, X, Users, Shield, Plus, Trash2, Check, FileText, BarChart3, Star, User, Settings, Eye, Clock, Database, Copy, Loader2 } from 'lucide-react';
 
 // ════ ROLE CATALOG ════════════════════════════════════════════════════
 // Mirrors the actual Elevate role table structure: role, menu, product, licensed, type
@@ -409,6 +409,13 @@ export default function SecurityHub() {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4000);
   };
+
+  // Loading states
+  const [isSaving, setIsSaving] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
+  const [isSavingPermissions, setIsSavingPermissions] = useState(false);
+  const [isSavingDrawer, setIsSavingDrawer] = useState(false);
+  const [isCloningGroup, setIsCloningGroup] = useState(false);
 
   // Add User Modal state
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
@@ -1591,20 +1598,32 @@ export default function SecurityHub() {
                 <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-3">
                   <button
                     onClick={() => setSaveModalOpen(false)}
-                    className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-100"
+                    disabled={isSaving}
+                    className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-100 disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => {
-                      // In production, this would save to backend
-                      // For now, we'll just close the modal and show success
-                      setSaveModalOpen(false);
-                      showToast('Changes saved successfully!', 'success');
+                      setIsSaving(true);
+                      // Simulate API call
+                      setTimeout(() => {
+                        setIsSaving(false);
+                        setSaveModalOpen(false);
+                        showToast('Changes saved successfully!', 'success');
+                      }, 1500);
                     }}
-                    className="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700"
+                    disabled={isSaving}
+                    className="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-70 flex items-center gap-2"
                   >
-                    Confirm & Save
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      'Confirm & Save'
+                    )}
                   </button>
                 </div>
               </div>
@@ -2828,11 +2847,23 @@ export default function SecurityHub() {
                           </button>
                           <button
                             onClick={() => {
-                              showToast('Permission changes saved!', 'success');
+                              setIsSavingPermissions(true);
+                              setTimeout(() => {
+                                setIsSavingPermissions(false);
+                                showToast('Permission changes saved!', 'success');
+                              }, 1500);
                             }}
-                            className="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded hover:bg-amber-700"
+                            disabled={isSavingPermissions}
+                            className="px-3 py-1.5 text-xs font-medium bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-70 flex items-center gap-1.5"
                           >
-                            Save Changes
+                            {isSavingPermissions ? (
+                              <>
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              'Save Changes'
+                            )}
                           </button>
                         </div>
                       </div>
@@ -3524,7 +3555,27 @@ export default function SecurityHub() {
 
             <div className="px-6 py-4 border-t flex gap-3">
               <button onClick={() => setDrawer({ open: false, type: null, data: null })} className="flex-1 px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-50">Cancel</button>
-              <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Save Changes</button>
+              <button
+                onClick={() => {
+                  setIsSavingDrawer(true);
+                  setTimeout(() => {
+                    setIsSavingDrawer(false);
+                    setDrawer({ open: false, type: null, data: null });
+                    showToast('Group changes saved!', 'success');
+                  }, 1500);
+                }}
+                disabled={isSavingDrawer}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-70 flex items-center justify-center gap-2"
+              >
+                {isSavingDrawer ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
             </div>
           </div>
         )}
@@ -3630,11 +3681,28 @@ export default function SecurityHub() {
                 Help
               </button>
               <button
-                onClick={() => { setCloneModalOpen(false); setCloneSourceGroup(''); setCloneTargetGroup(''); setCloneType('New Group'); }}
-                disabled={!cloneSourceGroup || !cloneTargetGroup}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  setIsCloningGroup(true);
+                  setTimeout(() => {
+                    setIsCloningGroup(false);
+                    setCloneModalOpen(false);
+                    setCloneSourceGroup('');
+                    setCloneTargetGroup('');
+                    setCloneType('New Group');
+                    showToast('Group cloned successfully!', 'success');
+                  }, 1500);
+                }}
+                disabled={!cloneSourceGroup || !cloneTargetGroup || isCloningGroup}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Clone
+                {isCloningGroup ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Cloning...
+                  </>
+                ) : (
+                  'Clone'
+                )}
               </button>
             </div>
           </div>
@@ -3786,40 +3854,56 @@ export default function SecurityHub() {
                   setCloneUserSource(null);
                   setCloneUserTargets([]);
                 }}
-                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-100"
+                disabled={isCloning}
+                className="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-gray-100 disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  // Clone the settings to target users
-                  setUsersList(prev => prev.map(user => {
-                    if (!cloneUserTargets.includes(user.id)) return user;
+                  setIsCloning(true);
+                  const targetCount = cloneUserTargets.length;
+                  // Simulate API call
+                  setTimeout(() => {
+                    // Clone the settings to target users
+                    setUsersList(prev => prev.map(user => {
+                      if (!cloneUserTargets.includes(user.id)) return user;
 
-                    const updates: any = {};
+                      const updates: any = {};
 
-                    if (cloneUserOptions.elevateRoles) {
-                      updates.existingRoles = [...cloneUserSource.existingRoles];
-                      updates.roleOverrides = JSON.parse(JSON.stringify(cloneUserSource.roleOverrides || { addedRoles: [], excludedRoles: [] }));
-                    }
+                      if (cloneUserOptions.elevateRoles) {
+                        updates.existingRoles = [...cloneUserSource.existingRoles];
+                        updates.roleOverrides = JSON.parse(JSON.stringify(cloneUserSource.roleOverrides || { addedRoles: [], excludedRoles: [] }));
+                      }
 
-                    // V7 Settings, Program Rights, Property Access would be cloned here
-                    // (Currently visual-only in the prototype)
+                      // V7 Settings, Program Rights, Property Access would be cloned here
+                      // (Currently visual-only in the prototype)
 
-                    return { ...user, ...updates };
-                  }));
+                      return { ...user, ...updates };
+                    }));
 
-                  setCloneUserModalOpen(false);
-                  setCloneUserSource(null);
-                  setCloneUserTargets([]);
+                    setIsCloning(false);
+                    setCloneUserModalOpen(false);
+                    setCloneUserSource(null);
+                    setCloneUserTargets([]);
 
-                  showToast(`Security settings cloned to ${cloneUserTargets.length} user${cloneUserTargets.length !== 1 ? 's' : ''}!`, 'success');
+                    showToast(`Security settings cloned to ${targetCount} user${targetCount !== 1 ? 's' : ''}!`, 'success');
+                  }, 1200);
                 }}
-                disabled={cloneUserTargets.length === 0 || !Object.values(cloneUserOptions).some(v => v)}
+                disabled={cloneUserTargets.length === 0 || !Object.values(cloneUserOptions).some(v => v) || isCloning}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                <Copy className="w-4 h-4" />
-                Clone to {cloneUserTargets.length || 0} User{cloneUserTargets.length !== 1 ? 's' : ''}
+                {isCloning ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Cloning...
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Clone to {cloneUserTargets.length || 0} User{cloneUserTargets.length !== 1 ? 's' : ''}
+                  </>
+                )}
               </button>
             </div>
           </div>
