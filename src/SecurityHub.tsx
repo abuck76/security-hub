@@ -619,16 +619,16 @@ export default function SecurityHub() {
 
       <div className="bg-white border-b px-6">
         <div className="flex gap-1">
-          <button onClick={() => { setActiveTab('groups'); setSearchTerm(''); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'groups' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => { setActiveTab('groups'); setSearchTerm(''); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'groups' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`} title="Manage security groups and their role assignments">
             <div className="flex items-center gap-2"><Shield className="w-4 h-4" />Security Groups</div>
           </button>
-          <button onClick={() => { setActiveTab('users'); setSearchTerm(''); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'users' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => { setActiveTab('users'); setSearchTerm(''); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'users' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`} title="View and manage individual user permissions">
             <div className="flex items-center gap-2"><Users className="w-4 h-4" />Users</div>
           </button>
-          <button onClick={() => { setActiveTab('audit'); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'audit' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => { setActiveTab('audit'); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'audit' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`} title="View audit table access and analytics">
             <div className="flex items-center gap-2"><FileText className="w-4 h-4" />Audit Analytics</div>
           </button>
-          <button onClick={() => { setActiveTab('securityAnalytics'); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'securityAnalytics' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => { setActiveTab('securityAnalytics'); }} className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'securityAnalytics' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`} title="Security metrics and compliance dashboards">
             <div className="flex items-center gap-2"><BarChart3 className="w-4 h-4" />Security Analytics</div>
           </button>
         </div>
@@ -642,24 +642,25 @@ export default function SecurityHub() {
           </div>
           {activeTab === 'users' && (
             <>
-              <select value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)} className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)} className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" title="Filter users by security group">
                 <option value="All">All Groups</option>
                 {securityGroups.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}
               </select>
-              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" title="Filter users by active/inactive status">
                 <option value="All">All Statuses</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
             </>
           )}
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2" title={activeTab === 'groups' ? 'Create a new security group' : 'Add a new user to the system'}>
             <Plus className="w-4 h-4" />{activeTab === 'groups' ? 'Add Group' : 'Add User'}
           </button>
           {activeTab === 'groups' && (
             <button
               onClick={() => setCloneModalOpen(true)}
               className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 flex items-center gap-2"
+              title="Clone an existing security group with all its settings"
             >
               <Shield className="w-4 h-4" />Clone Group
             </button>
@@ -1441,8 +1442,8 @@ export default function SecurityHub() {
           {hasPendingChanges && (
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-30">
               <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse" />
+                <div className="flex items-center gap-3" title="You have unsaved changes that need to be saved or discarded">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse" title="Unsaved changes indicator" />
                   <span className="text-sm font-medium text-gray-700">
                     {pendingChanges.length} group{pendingChanges.length > 1 ? 's' : ''} with pending changes
                   </span>
@@ -1454,12 +1455,14 @@ export default function SecurityHub() {
                   <button
                     onClick={resetAllChanges}
                     className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50"
+                    title="Discard all pending changes and revert to original state"
                   >
                     Reset All
                   </button>
                   <button
                     onClick={() => setSaveModalOpen(true)}
                     className="px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                    title="Review and save all pending changes to Elevate"
                   >
                     Save All Changes
                   </button>
@@ -1930,17 +1933,17 @@ export default function SecurityHub() {
                                   <td className="px-4 py-3">
                                     <div className="flex flex-wrap gap-1 max-w-xs">
                                       {rolesBeingAdded.map((role, idx) => (
-                                        <span key={idx} className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full">
+                                        <span key={idx} className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full" title="Role being added from security group">
                                           +{role}
                                         </span>
                                       ))}
                                       {userSpecificRoles.map((role, idx) => (
-                                        <span key={`user-${idx}`} className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">
+                                        <span key={`user-${idx}`} className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full" title="User-specific role (not inherited from group)">
                                           ★{role}
                                         </span>
                                       ))}
                                       {duplicateRoles.map((role, idx) => (
-                                        <span key={idx} className="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">
+                                        <span key={idx} className="text-xs bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full" title="Duplicate: Role already exists in Elevate - will be skipped">
                                           ✕ {role}
                                         </span>
                                       ))}
@@ -2263,16 +2266,16 @@ export default function SecurityHub() {
                           </div>
 
                           {/* Existing Elevate Roles Section (Locked) */}
-                          <div className="bg-white border rounded-lg">
+                          <div className="bg-white border rounded-lg" title="These roles are managed in the Elevate platform and cannot be modified here">
                             <div className="px-4 py-2 border-b bg-blue-50 flex items-center justify-between">
-                              <span className="font-semibold text-sm text-blue-700">🔒 Existing Elevate Roles</span>
+                              <span className="font-semibold text-sm text-blue-700" title="Locked: Existing roles from Elevate platform">🔒 Existing Elevate Roles</span>
                               <span className="text-xs text-blue-500">Will not be modified</span>
                             </div>
                             <div className="p-4">
                               {existingElevateRoles.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                   {existingElevateRoles.map((role, idx) => (
-                                    <div key={idx} className="bg-blue-50 border border-blue-200 rounded px-3 py-1.5 text-xs font-medium text-blue-700 flex items-center gap-1">
+                                    <div key={idx} className="bg-blue-50 border border-blue-200 rounded px-3 py-1.5 text-xs font-medium text-blue-700 flex items-center gap-1" title="Existing role - managed in Elevate platform">
                                       🔒 {role}
                                     </div>
                                   ))}
@@ -3223,19 +3226,19 @@ export default function SecurityHub() {
 
                     {/* Summary Stats */}
                     <div className="grid grid-cols-4 gap-3 mb-4">
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center cursor-help" title="Roles already assigned to this user in Elevate (locked, cannot be modified here)">
                         <div className="text-2xl font-bold text-purple-700">{userExistingRoles.length}</div>
                         <div className="text-xs text-purple-600">Existing Elevate</div>
                       </div>
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center cursor-help" title="Active roles inherited from the user's security group">
                         <div className="text-2xl font-bold text-green-700">{activeInheritedCount}</div>
                         <div className="text-xs text-green-600">From Group</div>
                       </div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center cursor-help" title="Roles added specifically for this user (not from group)">
                         <div className="text-2xl font-bold text-blue-700">{userAddedRoles.length}</div>
                         <div className="text-xs text-blue-600">User-Specific</div>
                       </div>
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center cursor-help" title="Group roles excluded for this specific user">
                         <div className="text-2xl font-bold text-gray-500">{excludedCount}</div>
                         <div className="text-xs text-gray-500">Excluded</div>
                       </div>
@@ -3252,8 +3255,8 @@ export default function SecurityHub() {
                           {userExistingRoles.length > 0 ? (
                             <div className="space-y-2">
                               {userExistingRoles.map((role: string) => (
-                                <div key={role} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                                  <span className="text-gray-400">🔒</span>
+                                <div key={role} className="flex items-center gap-2 p-2 bg-gray-50 rounded" title="Existing Elevate role - cannot be modified here">
+                                  <span className="text-gray-400" title="Locked: Managed in Elevate platform">🔒</span>
                                   <span className="text-sm">{role}</span>
                                 </div>
                               ))}
@@ -3288,10 +3291,10 @@ export default function SecurityHub() {
                                     )}
                                     <span className={`text-sm ${role.isExcluded ? 'line-through text-gray-500' : ''}`}>{role.name}</span>
                                     {role.isDefault && !role.isExcluded && (
-                                      <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">Default</span>
+                                      <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded" title="Default role assigned to all members of this group">Default</span>
                                     )}
                                     {role.isDuplicate && !role.isExcluded && (
-                                      <span className="text-xs text-amber-600">(duplicate)</span>
+                                      <span className="text-xs text-amber-600" title="This role already exists in Elevate and will be skipped">(duplicate)</span>
                                     )}
                                   </div>
                                   <button
@@ -3301,6 +3304,7 @@ export default function SecurityHub() {
                                         ? 'bg-green-100 text-green-700 hover:bg-green-200'
                                         : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-700'
                                     }`}
+                                    title={role.isExcluded ? 'Restore this inherited role for this user' : 'Remove this inherited role for this user only'}
                                   >
                                     {role.isExcluded ? 'Include' : 'Exclude'}
                                   </button>
@@ -3323,9 +3327,9 @@ export default function SecurityHub() {
                           {userAddedRoles.length > 0 && (
                             <div className="space-y-2">
                               {userAddedRoles.map((role) => (
-                                <div key={role.roleId} className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded">
+                                <div key={role.roleId} className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded" title="User-specific role - only assigned to this user">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-blue-500">★</span>
+                                    <span className="text-blue-500" title="User-specific role">★</span>
                                     <span className="text-sm">{role.name}</span>
                                     <span className="text-xs text-blue-600">(user-specific)</span>
                                   </div>
