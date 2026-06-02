@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Voyager 8 Bulk Role Assignment</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;font-size:13px;}
+body{background:#f0f0f0;min-height:100vh;overflow-x:hidden;}
+/* NAV */
+.nav{background:#6b21a8;display:flex;align-items:center;padding:0 16px;height:44px;gap:20px;position:sticky;top:0;z-index:50;}
+.nav-brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:15px;}
+.nav-item{color:#e9d5ff;font-size:12px;cursor:pointer;} .nav-item:hover{color:#fff;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:14px;color:#e9d5ff;}
+.avatar{background:#fff;color:#6b21a8;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;}
+/* PAGE */
+.page-header{background:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd;}
+.page-title{font-size:17px;font-weight:700;color:#111;}
+.breadcrumb{font-size:11px;color:#9ca3af;margin-top:2px;} .breadcrumb span{color:#6b21a8;cursor:pointer;}
+.content{padding:12px 20px;display:flex;flex-direction:column;gap:10px;}
+/* DB BAR */
+.db-bar{background:#fff;border:1px solid #ddd;border-radius:4px;padding:7px 14px;display:flex;align-items:center;gap:10px;}
+.db-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.db-dot.prod{background:#16a34a;} .db-dot.test{background:#f59e0b;}
+.db-toggle{margin-left:auto;display:flex;gap:6px;}
+.db-btn{border:1px solid #ccc;background:#f9f9f9;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:11px;color:#444;}
+.db-btn.active{border-color:#6b21a8;background:#f3e8ff;color:#6b21a8;font-weight:600;}
+/* BANNERS */
+.add-banner{background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:8px 14px;display:flex;gap:9px;align-items:flex-start;font-size:12px;color:#166534;line-height:1.6;}
+.warn-banner{background:#fef9c3;border:1px solid #facc15;border-radius:4px;padding:8px 14px;display:flex;gap:9px;align-items:flex-start;font-size:12px;color:#713f12;line-height:1.6;}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stat-card{background:#fff;border:1px solid #ddd;border-radius:4px;padding:10px 14px;cursor:pointer;transition:border-color .15s;}
+.stat-card:hover{border-color:#a78bfa;} .stat-card.active-filter{border-color:#6b21a8;background:#fdfaff;}
+.stat-val{font-size:22px;font-weight:700;color:#6b21a8;}
+.stat-card.green .stat-val{color:#16a34a;} .stat-card.red .stat-val{color:#dc2626;}
+.stat-label{font-size:11px;color:#6b7280;margin-top:2px;}
+/* TOOLBAR */
+.toolbar{background:#fff;border:1px solid #ddd;border-radius:4px;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.search-box{border:1px solid #ccc;border-radius:16px;padding:4px 10px;display:flex;align-items:center;gap:5px;width:180px;}
+.search-box input{border:none;outline:none;font-size:12px;width:130px;}
+.tdiv{width:1px;height:24px;background:#e5e7eb;margin:0 2px;}
+select.fsel{border:1px solid #ccc;border-radius:3px;padding:4px 7px;font-size:12px;background:#fff;color:#333;}
+.btn{border:1px solid #ccc;background:#fff;padding:4px 9px;border-radius:3px;cursor:pointer;font-size:12px;color:#444;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.btn:hover{background:#f3f4f6;}
+.btn-primary{background:#6b21a8;color:#fff;border-color:#6b21a8;} .btn-primary:hover{background:#581c87;}
+.btn-po{border-color:#6b21a8;color:#6b21a8;} .btn-po:hover{background:#f3e8ff;}
+.btn-danger{border-color:#dc2626;color:#dc2626;} .btn-danger:hover{background:#fee2e2;}
+/* MAIN TABLE */
+.table-card{background:#fff;border:1px solid #ddd;border-radius:4px;overflow:hidden;}
+.table-card table{width:100%;border-collapse:collapse;}
+.table-card thead tr{background:#fafafa;border-bottom:2px solid #e5e7eb;}
+.table-card th{text-align:left;padding:8px 10px;font-size:11px;color:#6b7280;font-weight:600;white-space:nowrap;}
+.table-card td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.table-card tr:last-child td{border-bottom:none;} .table-card tr:hover td{background:#fdfaff;}
+.table-card tr.sel td{background:#f5f3ff;}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;}
+.pill.configured{background:#dcfce7;color:#166534;} .pill.none{background:#fee2e2;color:#991b1b;}
+.rsel{width:100%;border:1px solid #ccc;border-radius:3px;padding:4px 6px;font-size:12px;background:#fff;}
+.rsel.changed{border-color:#6b21a8;background:#fdfaff;} .rsel.unset{color:#9ca3af;}
+.chg-dot{width:7px;height:7px;border-radius:50%;background:#6b21a8;display:inline-block;margin-right:4px;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+/* FOOTER */
+.footer{background:#fff;border-top:1px solid #ddd;padding:8px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;bottom:0;z-index:40;}
+.btn-save-all{background:#2563eb;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;}
+.btn-save-all:hover{background:#1d4ed8;} .btn-save-all:disabled{background:#93c5fd;cursor:not-allowed;}
+/* ══ OUTER PANEL ══ */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:none;}
+.panel-overlay.open{display:block;}
+.panel{position:fixed;top:0;right:-860px;width:860px;height:100%;background:#fff;z-index:201;display:flex;flex-direction:column;box-shadow:-6px 0 24px rgba(0,0,0,.18);transition:right .25s ease;}
+.panel.open{right:0;}
+.panel-nav{background:#6b21a8;height:44px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
+.panel-nav-title{color:#fff;font-size:14px;font-weight:600;}
+.panel-close{margin-left:auto;background:none;border:none;color:#e9d5ff;font-size:20px;cursor:pointer;padding:2px 6px;border-radius:3px;}
+.panel-close:hover{background:rgba(255,255,255,.15);color:#fff;}
+.panel-subheader{background:#fff;border-bottom:1px solid #e5e7eb;padding:9px 16px;flex-shrink:0;}
+.panel-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.panel-group-name{font-size:15px;font-weight:700;color:#111;}
+.meta-pill{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500;}
+/* PANEL TABS */
+.panel-tabs{display:flex;border-bottom:2px solid #e5e7eb;background:#fafafa;flex-shrink:0;}
+.panel-tab{padding:9px 18px;font-size:12px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:6px;}
+.panel-tab:hover{color:#6b21a8;background:#f3e8ff;} .panel-tab.active{color:#6b21a8;border-bottom-color:#6b21a8;font-weight:700;}
+.tab-badge{background:#6b21a8;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;}
+.panel-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.p-card{background:#fff;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;}
+.p-card-header{background:#fafafa;border-bottom:1px solid #e5e7eb;padding:8px 12px;font-weight:600;font-size:12px;color:#374151;display:flex;align-items:center;justify-content:space-between;}
+.p-card-body{padding:12px;}
+.p-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.p-field label{display:block;font-size:11px;color:#6b7280;margin-bottom:3px;}
+.p-field input{width:100%;border:1px solid #d1d5db;border-radius:3px;padding:5px 8px;font-size:12px;color:#374151;background:#f9fafb;}
+.roles-tbl{width:100%;border-collapse:collapse;}
+.roles-tbl th{text-align:left;padding:7px 8px;font-size:11px;color:#6b7280;font-weight:600;border-bottom:2px solid #e5e7eb;background:#fafafa;}
+.roles-tbl td{padding:5px 8px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+.btn-rm{background:none;border:none;color:#dc2626;cursor:pointer;font-size:14px;padding:2px 5px;border-radius:3px;}
+.btn-rm:hover{background:#fee2e2;}
+.panel-footer{border-top:1px solid #e5e7eb;padding:9px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#fff;}
+.panel-footer-note{font-size:11px;color:#6b7280;}
+.btn-panel-save{background:#6b21a8;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;}
+.btn-panel-save:hover{background:#581c87;}
+/* ══ USER DETAIL SUB-PANEL ══ */
+.ud-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:none;align-items:flex-start;justify-content:flex-end;}
+.ud-overlay.open{display:flex;}
+.ud-panel{width:920px;height:100vh;background:#fff;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.22);overflow:hidden;}
+/* Elevate-style header */
+.ud-header{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ud-title{font-size:17px;font-weight:700;color:#111;}
+.ud-header-actions{display:flex;align-items:center;gap:8px;}
+.ud-save-btn{background:#17a2b8;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;}
+.ud-save-btn:hover{background:#138496;}
+/* Left nav */
+.ud-body{display:flex;flex:1;overflow:hidden;}
+.ud-sidenav{width:160px;border-right:1px solid #e5e7eb;background:#fff;padding-top:8px;flex-shrink:0;}
+.ud-sidenav-item{padding:9px 16px;font-size:12px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:3px solid transparent;}
+.ud-sidenav-item:hover{background:#f3f4f6;color:#6b21a8;}
+.ud-sidenav-item.active{background:#f3e8ff;color:#6b21a8;border-left-color:#6b21a8;font-weight:600;}
+.ud-sidenav-icon{font-size:14px;width:18px;text-align:center;}
+/* Content area */
+.ud-content{flex:1;overflow-y:auto;padding:20px 24px;}
+/* User info tab */
+.ui-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.ui-row{display:contents;}
+.ui-label{text-align:right;padding:10px 16px 10px 0;font-size:12px;color:#6b7280;display:flex;align-items:center;justify-content:flex-end;gap:3px;}
+.ui-req{color:#dc2626;}
+.ui-val{padding:10px 0 10px 0;font-size:12px;color:#111;display:flex;align-items:center;}
+.ui-input{border:1px solid #d1d5db;border-radius:3px;padding:5px 9px;font-size:12px;width:280px;color:#111;}
+.ui-checkbox{width:15px;height:15px;}
+/* Roles tab — Elevate style */
+.roles-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.roles-title{font-size:15px;font-weight:600;color:#111;}
+.roles-actions{display:flex;align-items:center;gap:8px;}
+.prod-sel{border:1px solid #d1d5db;border-radius:4px;padding:5px 10px;font-size:12px;color:#374151;background:#fff;min-width:160px;}
+.elevate-save{background:#17a2b8;color:#fff;border:none;padding:5px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;}
+.elevate-save:hover{background:#138496;}
+/* Access / No Access tabs */
+.access-tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid #e5e7eb;}
+.access-tab{padding:7px 16px;font-size:12px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;}
+.access-tab:hover{color:#17a2b8;}
+.access-tab.active{color:#17a2b8;border-bottom-color:#17a2b8;font-weight:700;}
+.access-count{background:#17a2b8;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;}
+.access-count.gray{background:#9ca3af;}
+/* V8 search box */
+.v8-search{border:1px solid #d1d5db;border-radius:3px;padding:4px 10px;font-size:12px;width:120px;float:right;margin-bottom:8px;}
+/* Role table — mirrors Elevate exactly */
+.elevate-tbl{width:100%;border-collapse:collapse;}
+.elevate-tbl th{text-align:left;padding:8px 10px;font-size:12px;color:#6b7280;font-weight:400;border-bottom:1px solid #e5e7eb;}
+.elevate-tbl td{padding:8px 10px;border-bottom:1px solid #f3f4f6;vertical-align:middle;font-size:12px;color:#374151;}
+.elevate-tbl tr:hover td{background:#f9fafb;}
+/* Access / Default checkboxes */
+.e-check{width:15px;height:15px;cursor:pointer;accent-color:#6b21a8;}
+.e-check:disabled{accent-color:#9ca3af;cursor:not-allowed;}
+/* Role source badges */
+.src-lock{font-size:11px;color:#1d4ed8;margin-left:4px;cursor:help;}
+.src-group{font-size:10px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:1px 6px;border-radius:8px;margin-left:5px;font-weight:500;}
+.src-pending{font-size:10px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:1px 6px;border-radius:8px;margin-left:5px;font-weight:500;}
+.licensed-check{color:#16a34a;font-size:14px;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:6px;width:540px;max-height:88vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.25);}
+.modal-hdr{background:#6b21a8;color:#fff;padding:11px 16px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;position:sticky;top:0;}
+.modal-body{padding:16px;font-size:12px;color:#333;line-height:1.7;}
+.chg-row{padding:8px 0;border-bottom:1px solid #f3f4f6;} .chg-row:last-child{border-bottom:none;}
+.impact-box{background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:9px 12px;font-size:12px;color:#166534;margin-top:10px;}
+.modal-ftr{padding:9px 16px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #eee;position:sticky;bottom:0;background:#fff;}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;color:#fff;padding:9px 16px;border-radius:5px;font-size:12px;display:none;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:700;}
+.toast.show{display:flex;}
+.locked-overlay{background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:24px;text-align:center;color:#6b7280;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Voyager 8
+  </div>
+  <div class="nav-item">Home</div><div class="nav-item">Setup ▾</div><div class="nav-item">Admin ▾</div>
+  <div class="nav-item">System ▾</div><div class="nav-item">Security ▾</div><div class="nav-item">Toolbox ▾</div><div class="nav-item">Reports ▾</div>
+  <div class="nav-right"><span>⊞</span><span>★</span><span>?</span><div class="avatar">BO</div></div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div>
+    <div class="page-title">Voyager 8 Bulk Role Assignment</div>
+    <div class="breadcrumb">Security ▸ <span>Security Groups</span> ▸ Voyager 8 Bulk Role Assignment</div>
+  </div>
+  <span style="font-size:11px;background:#f3e8ff;color:#6b21a8;border:1px solid #c4b5fd;padding:3px 10px;border-radius:10px;font-weight:600;">🚀 Voyager 8 Rollout Tool</span>
+</div>
+
+<div class="content">
+  <div class="db-bar">
+    <div class="db-dot prod" id="dbDot"></div>
+    <span style="color:#555;font-size:12px;">Connected Database:</span>
+    <strong id="dbName" style="font-size:12px;">PROD_NORTHEAST_01</strong>
+    <span id="dbBadge" style="font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;font-weight:600;">Production</span>
+    <div class="db-toggle">
+      <button class="db-btn active" id="btnProd" onclick="switchDb('prod')">Production</button>
+      <button class="db-btn" id="btnTest" onclick="switchDb('test')">Test / Dev</button>
+    </div>
+  </div>
+
+  <div class="add-banner">
+    <span style="font-size:15px;flex-shrink:0;">➕</span>
+    <div>Roles are <strong>added</strong> to existing Elevate user configurations — existing roles are never removed. Duplicates are auto-skipped. Click <strong>Edit Group → Users → View in Elevate</strong> to see each user's full role configuration mirroring Elevate System Administration.</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card" onclick="filterByStat('all')" id="sc-all"><div class="stat-val" id="stTotal">10</div><div class="stat-label">Total Security Groups</div></div>
+    <div class="stat-card green" onclick="filterByStat('configured')" id="sc-configured"><div class="stat-val" id="stConf">0</div><div class="stat-label">Configured</div></div>
+    <div class="stat-card red" onclick="filterByStat('none')" id="sc-none"><div class="stat-val" id="stNone">0</div><div class="stat-label">No Roles Assigned</div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">🔍<input type="text" id="searchInput" placeholder="Search groups…" oninput="renderTable()"/></div>
+    <div class="tdiv"></div>
+    <span style="color:#555;font-size:12px;">Filter:</span>
+    <select class="fsel" id="statusFilter" onchange="renderTable()">
+      <option value="all">All Groups</option>
+      <option value="configured">Configured</option>
+      <option value="none">No Roles</option>
+    </select>
+    <div class="tdiv"></div>
+    <div id="bulkSection" style="display:none;align-items:center;gap:7px;flex-wrap:wrap;">
+      <strong style="color:#5b21b6;font-size:12px;" id="selCount">0 selected</strong>
+      <select class="fsel" id="bulkRoleSel" style="width:210px;"></select>
+      <button class="btn btn-po" onclick="applyBulkDefault()">Apply Default</button>
+      <button class="btn btn-danger" onclick="clearBulkDefault()">Clear</button>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:6px;">
+      <button class="btn" onclick="selectAll()">☑ All</button>
+      <button class="btn" onclick="clearSel()">✕ Clear</button>
+      <button class="btn btn-primary" onclick="exportCSV()">⬇ Export</button>
+    </div>
+  </div>
+
+  <div class="locked-overlay" id="lockedOverlay" style="display:none;">
+    <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+    <p style="font-size:13px;font-weight:600;color:#374151;margin-bottom:5px;">Production Database Required</p>
+    <p style="font-size:12px;">Switch to your Production database to manage Voyager 8 role assignments.</p>
+  </div>
+
+  <div class="table-card" id="tableCard">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px;"><input type="checkbox" id="hdrCheck" onchange="toggleAllVis(this)"/></th>
+          <th>Security Group</th><th>Code</th><th>Users</th>
+          <th>New V8 Roles</th><th>Default Role</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+
+  <div class="warn-banner" id="warnBanner" style="display:none;">
+    <span style="font-size:15px;flex-shrink:0;">⚠️</span>
+    <div>Unsaved changes for <strong id="pendCount">0</strong> group(s) / <strong id="pendUserCount">0</strong> individual user override(s). Roles will be <strong>added only</strong>. Click <strong>Save All Changes</strong> to commit to Elevate.</div>
+  </div>
+</div>
+
+<div class="footer">
+  <span style="font-size:12px;color:#6b7280;" id="footerMsg">No pending changes.</span>
+  <div style="display:flex;gap:8px;">
+    <button class="btn" onclick="resetAll()">Reset Changes</button>
+    <button class="btn-save-all" id="btnSaveAll" onclick="openSaveModal()" disabled>Save All Changes</button>
+  </div>
+</div>
+
+<!-- ══ GROUP EDIT PANEL ══ -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+<div class="panel" id="editPanel">
+  <div class="panel-nav">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="panel-nav-title" id="panelTitle">Edit Security Group</span>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-subheader"><div class="panel-meta" id="panelMeta"></div></div>
+  <div class="panel-tabs">
+    <div class="panel-tab active" id="tabGroupBtn" onclick="switchPanelTab('group')">📋 Group Roles</div>
+    <div class="panel-tab" id="tabUsersBtn" onclick="switchPanelTab('users')">👤 Users <span class="tab-badge" id="userTabBadge">0</span></div>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+  <div class="panel-footer">
+    <span class="panel-footer-note" id="panelFooterNote"></span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="closePanel()">Cancel</button>
+      <button class="btn-panel-save" onclick="savePanelGroup()">Save Group</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ELEVATE USER DETAIL SUB-PANEL ══ -->
+<div class="ud-overlay" id="udOverlay">
+  <div class="ud-panel" id="udPanel">
+    <div class="ud-header">
+      <div class="ud-title" id="udTitle">User Detail</div>
+      <div class="ud-header-actions">
+        <button class="btn" onclick="closeUserDetail()" style="font-size:12px;">← Back to Group</button>
+        <button class="elevate-save" onclick="saveUserDetail()">Save</button>
+      </div>
+    </div>
+    <div class="ud-body">
+      <!-- Left nav mirrors Elevate System Admin -->
+      <div class="ud-sidenav">
+        <div class="ud-sidenav-item active" id="udNav-info" onclick="switchUdTab('info')"><span class="ud-sidenav-icon">ℹ</span>User Information</div>
+        <div class="ud-sidenav-item" id="udNav-voyager" onclick="switchUdTab('voyager')"><span class="ud-sidenav-icon">🔑</span>Voyager Access</div>
+        <div class="ud-sidenav-item" id="udNav-roles" onclick="switchUdTab('roles')"><span class="ud-sidenav-icon">👤</span>Roles</div>
+        <div class="ud-sidenav-item" id="udNav-page" onclick="switchUdTab('page')"><span class="ud-sidenav-icon">📄</span>Page Access</div>
+        <div class="ud-sidenav-item" id="udNav-element" onclick="switchUdTab('element')"><span class="ud-sidenav-icon">⚡</span>Element Access</div>
+        <div class="ud-sidenav-item" id="udNav-log" onclick="switchUdTab('log')"><span class="ud-sidenav-icon">📋</span>Change Log</div>
+      </div>
+      <div class="ud-content" id="udContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal">
+    <div class="modal-hdr">➕ Confirm Additive Elevate Role Update</div>
+    <div class="modal-body">
+      <p>The following new roles will be <strong>added</strong> to existing Elevate configurations. No existing roles will be removed or overwritten.</p>
+      <div id="modalChangeList" style="margin-top:10px;"></div>
+      <div class="impact-box"><strong>✓ Safe to apply:</strong> <span id="modalImpact"></span></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeSaveModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBulkSave()">Confirm &amp; Add Roles to Elevate</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+// ════ ROLE CATALOG ════════════════════════════════════════════════════
+// Mirrors the actual Elevate role table structure: role, menu, product, licensed, type
+const ROLE_CATALOG = [
+  {name:"Condo Board Member",           menu:"Voyager 8 Board Member",           product:"Voyager 8 Condo",        licensed:true,  type:"Global"},
+  {name:"Voyager 8 Commercial",         menu:"Voyager 8 Commercial",             product:"Voyager 8 Commercial",   licensed:true,  type:"Global"},
+  {name:"Voyager 8 Commercial - Accounting", menu:"Voyager 8 Commercial",        product:"Voyager 8 Commercial",   licensed:true,  type:"Global"},
+  {name:"Voyager 8 Commercial - Lease Admin",menu:"Voyager 8 Commercial",        product:"Voyager 8 Commercial",   licensed:true,  type:"Global"},
+  {name:"Voyager 8 Condo",              menu:"Voyager 8 Condo new",              product:"Voyager 8 Condo",        licensed:true,  type:"Global"},
+  {name:"Voyager 8 CRM IQ - Admin",     menu:"Voyager 8 CRM IQ - Admin",         product:"CRM IQ NET",             licensed:true,  type:"Global"},
+  {name:"Voyager 8 CRM IQ - Community Manager",menu:"Voyager 8 CRM IQ - Community Manager",product:"CRM IQ NET",  licensed:true,  type:"Global"},
+  {name:"Voyager 8 CRM IQ - Leasing",   menu:"Voyager 8 CRM IQ - Leasing",       product:"CRM IQ NET",             licensed:true,  type:"Global"},
+  {name:"Voyager 8 CRM IQ - Prospecting",menu:"Voyager 8 CRM IQ - Prospecting",  product:"CRM IQ NET",             licensed:true,  type:"Global"},
+  {name:"Voyager 8 CRM IQ - Renewal Manager",menu:"Voyager 8 CRM IQ - Renewal Manager",product:"CRM IQ NET",      licensed:true,  type:"Global"},
+  {name:"Voyager 8 New York",           menu:"Voyager 8 New York",               product:"CRM IQ New York Net",    licensed:true,  type:"Global"},
+  {name:"Voyager 8 Residential",        menu:"Voyager 8 Residential",            product:"Res Manager",            licensed:true,  type:"Global"},
+  {name:"Voyager 8 Residential - Accounting",menu:"Voyager 8 Residential - Accounting",product:"Res Manager",     licensed:true,  type:"Global"},
+  {name:"Voyager 8 Residential - Accounts Payable",menu:"Voyager 8 Res - AP",    product:"Res Manager",            licensed:true,  type:"Global"},
+  {name:"Voyager 8 Residential - Community Manager",menu:"Voyager 8 Res - CM",   product:"Res Manager",            licensed:true,  type:"Global"},
+  {name:"Voyager 8 Residential - Leasing",menu:"Voyager 8 Res - Leasing",        product:"Res Manager",            licensed:true,  type:"Global"},
+  {name:"Voyager 8 Residential - Maintenance",menu:"Voyager 8 Res - Maintenance",product:"Res Manager",            licensed:true,  type:"Global"},
+  {name:"Voyager 8 - Finance",          menu:"Voyager 8 Finance",                product:"Voyager 8 Finance",      licensed:true,  type:"Global"},
+  {name:"Voyager 8 - Reporting Only",   menu:"Voyager 8 Reporting",              product:"Voyager 8 Base",         licensed:false, type:"Global"},
+  {name:"Voyager 8 Affordable Housing", menu:"Voyager 8 Affordable Housing",     product:"Affordable Housing",     licensed:false, type:"Global"},
+  {name:"crmiqnet",                     menu:"CRM IQ Net",                       product:"CRM IQ NET",             licensed:true,  type:"Global"},
+  {name:"Revenue IQ - Manager",         menu:"Revenue IQ Manager",               product:"Revenue IQ",             licensed:true,  type:"Global"},
+  {name:"Revenue IQ - Executive",       menu:"Revenue IQ Executive",             product:"Revenue IQ",             licensed:true,  type:"Global"},
+  {name:"Forecast IQ - Admin",          menu:"Forecast IQ Admin",                product:"Forecast IQ",            licensed:true,  type:"Global"},
+  {name:"Forecast IQ - Leasing",        menu:"Forecast IQ Leasing",              product:"Forecast IQ",            licensed:true,  type:"Global"},
+  {name:"AR Manager",                   menu:"AR Manager",                       product:"AR IQ",                  licensed:true,  type:"Global"},
+  {name:"P2P - Accounts Payable",       menu:"P2P AP",                           product:"P2P",                    licensed:true,  type:"Global"},
+];
+
+const ALL_ROLES = ROLE_CATALOG.map(r=>r.name);
+const UNIQUE_PRODUCTS = [...new Set(ROLE_CATALOG.map(r=>r.product))].sort();
+
+// ════ USER DATA ═══════════════════════════════════════════════════════
+function mkUser(id,fn,ln,email,lastLogin,accessRoles,defaultRole){
+  return {id,fn,ln,email,lastLogin,culture:'English (United States)',language:'English (United States)',mobile:'',inactive:false,
+    accessRoles:new Set(accessRoles), defaultRole, pendingAccess:null, pendingDefault:null};
+}
+
+const USER_POOL = {
+  1:[
+    mkUser(101,"Alice","Chen","achen@acme.com","3/1/2026 09:12 AM",["Revenue IQ - Manager","AR Manager"],"Revenue IQ - Manager"),
+    mkUser(102,"Brian","Torres","btorres@acme.com","3/2/2026 11:30 AM",["Revenue IQ - Manager","Forecast IQ - Admin"],"Revenue IQ - Manager"),
+    mkUser(103,"Carol","Smith","csmith@acme.com","2/28/2026 03:45 PM",["AR Manager"],"AR Manager"),
+    mkUser(104,"David","Kim","dkim@acme.com","3/3/2026 08:00 AM",["Revenue IQ - Manager","AR Manager","P2P - Accounts Payable"],"Revenue IQ - Manager"),
+    mkUser(105,"Evelyn","Park","epark@acme.com","3/1/2026 02:15 PM",[],""),
+  ],
+  2:[
+    mkUser(201,"Frank","Lee","flee@acme.com","3/2/2026 10:00 AM",["AR Manager","P2P - Accounts Payable"],"AR Manager"),
+    mkUser(202,"Grace","Huang","ghuang@acme.com","3/1/2026 04:30 PM",["P2P - Accounts Payable"],"P2P - Accounts Payable"),
+    mkUser(203,"Henry","Wu","hwu@acme.com","2/27/2026 09:00 AM",["AR Manager"],"AR Manager"),
+  ],
+  3:[
+    mkUser(301,"Iris","Nakamura","inakamura@acme.com","3/3/2026 10:45 AM",["Forecast IQ - Leasing"],"Forecast IQ - Leasing"),
+    mkUser(302,"James","Ortiz","jortiz@acme.com","3/2/2026 01:00 PM",[],""),
+    mkUser(303,"Karen","Patel","kpatel@acme.com","3/1/2026 11:20 AM",["Forecast IQ - Leasing"],"Forecast IQ - Leasing"),
+    mkUser(304,"Liam","Brown","lbrown@acme.com","3/3/2026 08:30 AM",[],""),
+  ],
+  4:[
+    mkUser(401,"Mike","Johnson","mjohnson@acme.com","3/2/2026 07:00 AM",[],""),
+    mkUser(402,"Nancy","Davis","ndavis@acme.com","3/1/2026 06:45 AM",[],""),
+    mkUser(403,"Oscar","Reyes","oreyes@acme.com","2/25/2026 08:00 AM",[],""),
+  ],
+  5:[
+    mkUser(501,"Paula","White","pwhite@acme.com","3/3/2026 09:00 AM",["Revenue IQ - Manager"],"Revenue IQ - Manager"),
+    mkUser(502,"Quinn","Hall","qhall@acme.com","3/2/2026 03:00 PM",["Revenue IQ - Manager","Forecast IQ - Admin"],"Revenue IQ - Manager"),
+  ],
+  6:[
+    mkUser(601,"Rachel","Green","rgreen@acme.com","3/3/2026 10:00 AM",["P2P - Accounts Payable","AR Manager"],"AR Manager"),
+    mkUser(602,"Sam","Carter","scarter@acme.com","3/1/2026 02:00 PM",["P2P - Accounts Payable"],"P2P - Accounts Payable"),
+  ],
+  7:[
+    mkUser(701,"Tina","Lewis","tlewis@acme.com","3/2/2026 01:30 PM",["Forecast IQ - Admin"],"Forecast IQ - Admin"),
+    mkUser(702,"Uma","Singh","usingh@acme.com","3/3/2026 11:00 AM",["Forecast IQ - Admin","Revenue IQ - Manager"],"Forecast IQ - Admin"),
+  ],
+  8:[
+    mkUser(801,"Victor","Ross","vross@acme.com","3/3/2026 12:00 PM",["Revenue IQ - Executive","Forecast IQ - Admin"],"Revenue IQ - Executive"),
+    mkUser(802,"Wendy","Chang","wchang@acme.com","3/2/2026 09:45 AM",["Revenue IQ - Executive"],"Revenue IQ - Executive"),
+  ],
+  9:[mkUser(901,"Xander","Reed","xreed@acme.com","3/1/2026 10:00 AM",[],""),mkUser(902,"Yara","Pinto","ypinto@acme.com","3/2/2026 08:00 AM",[],""),mkUser(903,"Zoe","Adams","zadams@acme.com","2/28/2026 04:00 PM",[],"")] ,
+  10:[mkUser(1001,"Aaron","Hill","ahill@acme.com","3/3/2026 07:30 AM",["Voyager 8 Commercial"],"Voyager 8 Commercial"),mkUser(1002,"Beth","Moore","bmoore@acme.com","3/2/2026 10:30 AM",["Voyager 8 Commercial"],"Voyager 8 Commercial")],
+};
+
+const GROUPS=[
+  {id:1,name:"Residential Manager",code:"resmgr",users:42,status:"configured",existingElevateRoles:["Revenue IQ - Manager","Forecast IQ - Admin","AR Manager"],newRoles:[{name:"Voyager 8 Residential",isDefault:true},{name:"Voyager 8 Residential - Accounting",isDefault:false},{name:"Voyager 8 CRM IQ - Admin",isDefault:false},{name:"Voyager 8 CRM IQ - Leasing",isDefault:false}]},
+  {id:2,name:"Accounting",code:"acctg",users:18,status:"configured",existingElevateRoles:["AR Manager","P2P - Accounts Payable"],newRoles:[{name:"Voyager 8 Residential - Accounting",isDefault:true},{name:"Voyager 8 Residential - Accounts Payable",isDefault:false},{name:"Voyager 8 - Finance",isDefault:false}]},
+  {id:3,name:"Leasing Agent",code:"lease",users:35,status:"configured",existingElevateRoles:["Forecast IQ - Leasing"],newRoles:[{name:"Voyager 8 Residential - Leasing",isDefault:true},{name:"Voyager 8 CRM IQ - Leasing",isDefault:false},{name:"Voyager 8 CRM IQ - Prospecting",isDefault:false}]},
+  {id:4,name:"Maintenance Tech",code:"maint",users:27,status:"configured",existingElevateRoles:[],newRoles:[{name:"Voyager 8 Residential - Maintenance",isDefault:true}]},
+  {id:5,name:"Community Manager",code:"comgr",users:14,status:"configured",existingElevateRoles:["Revenue IQ - Manager"],newRoles:[{name:"Voyager 8 Residential - Community Manager",isDefault:true},{name:"Voyager 8 CRM IQ - Community Manager",isDefault:false}]},
+  {id:6,name:"Accounts Payable",code:"ap",users:9,status:"configured",existingElevateRoles:["P2P - Accounts Payable","AR Manager"],newRoles:[{name:"Voyager 8 Residential - Accounts Payable",isDefault:true}]},
+  {id:7,name:"CRM Admin",code:"crmadm",users:6,status:"configured",existingElevateRoles:["Forecast IQ - Admin"],newRoles:[{name:"Voyager 8 CRM IQ - Admin",isDefault:true},{name:"Voyager 8 CRM IQ - Renewal Manager",isDefault:false}]},
+  {id:8,name:"Executive",code:"exec",users:5,status:"none",existingElevateRoles:["Revenue IQ - Executive","Forecast IQ - Admin"],newRoles:[]},
+  {id:9,name:"Read Only",code:"readonly",users:21,status:"none",existingElevateRoles:[],newRoles:[]},
+  {id:10,name:"Commercial Manager",code:"comml",users:11,status:"none",existingElevateRoles:["Voyager 8 Commercial"],newRoles:[]},
+];
+
+let savedState=GROUPS.map(g=>({id:g.id,newRoles:g.newRoles.map(r=>({...r}))}));
+let panelGroupId=null,panelRoles=[],panelTab='group';
+let currentUdUser=null,udTab='info',udProductFilter='',udAccessTab='access';
+let selected=new Set(),isProd=true,visibleIds=GROUPS.map(g=>g.id);
+
+// ════ DB SWITCH ═══════════════════════════════════════════════════════
+function switchDb(mode){
+  isProd=mode==='prod';
+  document.getElementById('dbDot').className='db-dot '+(isProd?'prod':'test');
+  document.getElementById('dbName').textContent=isProd?'PROD_NORTHEAST_01':'TEST_NORTHEAST_01';
+  const b=document.getElementById('dbBadge');
+  b.textContent=isProd?'Production':'Test / Dev';
+  b.style.cssText=isProd?'font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;font-weight:600;':'font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;padding:2px 8px;border-radius:10px;font-weight:600;';
+  document.getElementById('btnProd').className='db-btn'+(isProd?' active':'');
+  document.getElementById('btnTest').className='db-btn'+(!isProd?' active':'');
+  document.getElementById('lockedOverlay').style.display=isProd?'none':'block';
+  document.getElementById('tableCard').style.display=isProd?'block':'none';
+  updateFooter();
+}
+
+// ════ HELPERS ═════════════════════════════════════════════════════════
+function getDefault(roles){const r=roles.find(x=>x.isDefault);return r?r.name:'';}
+function calcStatus(g){return g.newRoles.length?'configured':'none';}
+function getNetNew(g){return g.newRoles.filter(r=>!g.existingElevateRoles.includes(r.name));}
+
+// Get effective access set for a user (existing + group net-new + pending overrides)
+function getEffectiveAccess(gid,user){
+  const g=GROUPS.find(x=>x.id===gid);
+  const groupAdds=getNetNew(g).map(r=>r.name);
+  const base=new Set([...user.accessRoles,...groupAdds]);
+  if(user.pendingAccess!==null){
+    return {roles:new Set(user.pendingAccess), groupAdds, isOverridden:true};
+  }
+  return {roles:base, groupAdds, isOverridden:false};
+}
+function getEffectiveDefault(gid,user){
+  if(user.pendingDefault!==null) return user.pendingDefault;
+  if(user.defaultRole) return user.defaultRole;
+  const g=GROUPS.find(x=>x.id===gid);
+  return getDefault(g.newRoles);
+}
+function userHasChanges(u){return u.pendingAccess!==null||u.pendingDefault!==null;}
+function getTotalUserOverrides(){return Object.values(USER_POOL).flat().filter(u=>userHasChanges(u)).length;}
+
+// ════ MAIN TABLE ══════════════════════════════════════════════════════
+function renderTable(){
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const filter=document.getElementById('statusFilter').value;
+  const tbody=document.getElementById('tBody');
+  tbody.innerHTML=''; visibleIds=[];
+
+  GROUPS.forEach(g=>{
+    if(!g.name.toLowerCase().includes(search)&&!g.code.toLowerCase().includes(search)) return;
+    if(filter!=='all'&&g.status!==filter) return;
+    visibleIds.push(g.id);
+    const defRole=getDefault(g.newRoles);
+    const savedG=savedState.find(s=>s.id===g.id);
+    const changed=JSON.stringify(g.newRoles)!==JSON.stringify(savedG.newRoles);
+    const netNew=getNetNew(g);
+    const dupCount=g.newRoles.length-netNew.length;
+    const uc=Object.values(USER_POOL[g.id]||[]).filter(u=>userHasChanges(u)).length;
+    const existChips=g.existingElevateRoles.length?g.existingElevateRoles.map(r=>`<span style="font-size:10px;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;padding:2px 6px;border-radius:10px;display:inline-block;margin:1px 2px 1px 0;">${r}</span>`).join(''):`<span style="font-size:11px;color:#9ca3af;">None</span>`;
+    const tr=document.createElement('tr');
+    if(selected.has(g.id)) tr.className='sel';
+    tr.innerHTML=`
+      <td><input type="checkbox" ${selected.has(g.id)?'checked':''} onchange="toggleRow(${g.id},this)"/></td>
+      <td><div style="display:flex;align-items:center;gap:5px;">${changed||uc>0?'<span class="chg-dot"></span>':''}<strong>${g.name}</strong>${uc>0?`<span style="font-size:10px;background:#f3e8ff;color:#6b21a8;border:1px solid #c4b5fd;padding:1px 6px;border-radius:10px;">${uc} user override(s)</span>`:''}</div></td>
+      <td><code style="background:#f3f4f6;padding:2px 6px;border-radius:3px;font-size:11px;">${g.code}</code></td>
+      <td style="font-size:12px;">👤 ${g.users}</td>
+      <td>${netNew.length?`<span style="font-size:11px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;">+${netNew.length} new</span>`:''}${dupCount>0?`<span style="font-size:10px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;padding:2px 6px;border-radius:10px;margin-left:3px;">${dupCount} dup</span>`:''}${!netNew.length&&!g.newRoles.length?`<span style="font-size:11px;color:#9ca3af;">None</span>`:''}</td>
+      <td style="min-width:185px;"><select class="rsel ${changed?'changed':''} ${!defRole?'unset':''}" onchange="setDefaultFromTable(${g.id},this.value)"><option value="">— No default —</option>${ALL_ROLES.map(r=>`<option value="${r}" ${r===defRole?'selected':''}>${r}</option>`).join('')}</select></td>
+      <td><span class="pill ${g.status}">${g.status==='configured'?'✓ Configured':'✕ No Roles'}</span></td>
+      <td><button class="btn btn-po" style="padding:3px 9px;font-size:11px;" onclick="openPanel(${g.id})">✎ Edit Group</button></td>`;
+    tbody.appendChild(tr);
+  });
+  updateStats(); updateFooter(); updateBulkSection();
+}
+
+function filterByStat(val){document.getElementById('statusFilter').value=val;['all','configured','none'].forEach(v=>document.getElementById('sc-'+v).classList.toggle('active-filter',v===val));renderTable();}
+function setDefaultFromTable(id,val){const g=GROUPS.find(x=>x.id===id);g.newRoles.forEach(r=>r.isDefault=false);if(val){let r=g.newRoles.find(x=>x.name===val);if(!r){r={name:val,isDefault:false};g.newRoles.push(r);}r.isDefault=true;}g.status=calcStatus(g);renderTable();}
+function updateStats(){document.getElementById('stTotal').textContent=GROUPS.length;document.getElementById('stConf').textContent=GROUPS.filter(g=>g.status==='configured').length;document.getElementById('stNone').textContent=GROUPS.filter(g=>g.status==='none').length;}
+function toggleRow(id,el){if(el.checked)selected.add(id);else selected.delete(id);updateBulkSection();renderTable();}
+function toggleAllVis(el){visibleIds.forEach(id=>{if(el.checked)selected.add(id);else selected.delete(id);});updateBulkSection();renderTable();}
+function selectAll(){visibleIds.forEach(id=>selected.add(id));updateBulkSection();renderTable();}
+function clearSel(){selected.clear();updateBulkSection();renderTable();}
+function updateBulkSection(){document.getElementById('selCount').textContent=`${selected.size} selected`;document.getElementById('bulkSection').style.display=selected.size>0?'flex':'none';}
+function applyBulkDefault(){const role=document.getElementById('bulkRoleSel').value;if(!role){showToast('Select a role.','amber');return;}selected.forEach(id=>{const g=GROUPS.find(x=>x.id===id);g.newRoles.forEach(r=>r.isDefault=false);let r=g.newRoles.find(x=>x.name===role);if(!r){r={name:role,isDefault:false};g.newRoles.push(r);}r.isDefault=true;g.status='configured';});renderTable();showToast(`Default applied to ${selected.size} group(s).`);}
+function clearBulkDefault(){selected.forEach(id=>{const g=GROUPS.find(x=>x.id===id);g.newRoles.forEach(r=>r.isDefault=false);});renderTable();}
+function groupChanged(g){const s=savedState.find(x=>x.id===g.id);return JSON.stringify(g.newRoles)!==JSON.stringify(s.newRoles);}
+function getPendingGroups(){return GROUPS.filter(g=>groupChanged(g));}
+function updateFooter(){
+  const pg=getPendingGroups();const uo=getTotalUserOverrides();
+  document.getElementById('btnSaveAll').disabled=!isProd||(pg.length===0&&uo===0);
+  document.getElementById('warnBanner').style.display=(pg.length||uo)?'flex':'none';
+  if(pg.length||uo){document.getElementById('pendCount').textContent=pg.length;document.getElementById('pendUserCount').textContent=uo;}
+  document.getElementById('footerMsg').textContent=(pg.length||uo)?`${pg.length} group change(s) · ${uo} user override(s) pending.`:'No pending changes.';
+}
+function resetAll(){savedState.forEach(s=>{const g=GROUPS.find(x=>x.id===s.id);g.newRoles=s.newRoles.map(r=>({...r}));g.status=calcStatus(g);});Object.values(USER_POOL).flat().forEach(u=>{u.pendingAccess=null;u.pendingDefault=null;});renderTable();showToast('All changes reset.','amber');}
+
+// ════ PANEL ════════════════════════════════════════════════════════════
+function openPanel(id){
+  const g=GROUPS.find(x=>x.id===id);
+  panelGroupId=id; panelRoles=g.newRoles.map(r=>({...r})); panelTab='group';
+  document.getElementById('panelTitle').textContent=`Edit Security Group — ${g.name}`;
+  document.getElementById('panelOverlay').classList.add('open');
+  document.getElementById('editPanel').classList.add('open');
+  const users=USER_POOL[id]||[];
+  document.getElementById('userTabBadge').textContent=users.length;
+  const sStyle={configured:'background:#dcfce7;color:#166534;',none:'background:#fee2e2;color:#991b1b;'};
+  document.getElementById('panelMeta').innerHTML=`<span class="panel-group-name">${g.name}</span><span class="meta-pill" style="background:#f3f4f6;color:#374151;">${g.code}</span><span class="meta-pill" style="background:#f3e8ff;color:#6b21a8;">👤 ${users.length} users</span><span class="meta-pill" style="${sStyle[g.status]}">${g.status==='configured'?'✓ Configured':'✕ No Roles'}</span>${g.existingElevateRoles.length?`<span class="meta-pill" style="background:#dbeafe;color:#1e40af;">${g.existingElevateRoles.length} existing Elevate role(s)</span>`:''}`;
+  switchPanelTab('group');
+}
+function closePanel(){document.getElementById('panelOverlay').classList.remove('open');document.getElementById('editPanel').classList.remove('open');panelGroupId=null;}
+function switchPanelTab(tab){panelTab=tab;document.getElementById('tabGroupBtn').className='panel-tab'+(tab==='group'?' active':'');document.getElementById('tabUsersBtn').className='panel-tab'+(tab==='users'?' active':'');tab==='group'?renderGroupTab():renderUsersTab();}
+
+// ════ GROUP TAB ════════════════════════════════════════════════════════
+function renderGroupTab(){
+  const g=GROUPS.find(x=>x.id===panelGroupId);
+  document.getElementById('panelBody').innerHTML=`
+    <div class="p-card"><div class="p-card-header">General <span style="font-size:11px;font-weight:400;color:#9ca3af;">Read-only</span></div><div class="p-card-body"><div class="p-fields"><div class="p-field"><label>Description</label><input readonly value="${g.name}"/></div><div class="p-field"><label>Code</label><input readonly value="${g.code}"/></div></div></div></div>
+    <div class="p-card"><div class="p-card-header" style="background:#eff6ff;border-bottom-color:#bfdbfe;">🔒 Existing Elevate Roles <span style="font-size:11px;font-weight:400;color:#3b82f6;">Will not be modified</span></div><div class="p-card-body">${g.existingElevateRoles.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;">${g.existingElevateRoles.map(r=>`<div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:4px;padding:5px 10px;font-size:12px;color:#1e40af;font-weight:500;">🔒 ${r}</div>`).join('')}</div>`:`<p style="font-size:12px;color:#9ca3af;font-style:italic;">No existing Elevate roles.</p>`}</div></div>
+    <div class="p-card"><div class="p-card-header">Voyager 8 Roles to Add <span style="font-size:10px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:10px;padding:2px 8px;font-weight:500;">API · ACME_RES_01</span></div><div class="p-card-body"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:7px;"><div style="background:#6b21a8;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;" id="pRoleBadge">${panelRoles.length}</div><span style="font-weight:600;font-size:12px;">Roles to Add</span></div><button class="btn btn-primary" style="font-size:11px;padding:4px 10px;" onclick="panelAddRole()">+ Add Role</button></div>        <table class="roles-tbl"><thead><tr><th style="width:42%;">Elevate Role</th><th style="width:22%;">Product</th><th style="width:22%;">Default Role</th><th>Remove</th></tr></thead><tbody id="panelRolesTbody"></tbody></table><div class="info-line" id="panelInfoLine" style="margin-top:8px;font-size:11px;color:#6b7280;font-style:italic;"></div></div></div>`;
+  renderPanelRolesBody();
+}
+
+function renderPanelRolesBody(){
+  const tbody=document.getElementById('panelRolesTbody');if(!tbody)return;
+  const g=GROUPS.find(x=>x.id===panelGroupId);
+  tbody.innerHTML='';
+  if(!panelRoles.length){tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:14px;font-style:italic;">No roles added yet.</td></tr>`;}
+  else{panelRoles.forEach((role,idx)=>{const dup=g.existingElevateRoles.includes(role.name);const cat=roleCat(role.name);const tr=document.createElement('tr');if(role.isDefault&&!dup)tr.className='default-row';  tr.innerHTML=`<td><div style="display:flex;align-items:center;gap:4px;"><select class="rsel" style="flex:1;" onchange="panelUpdateRole(${idx},this.value)">${ALL_ROLES.map(r=>`<option ${r===role.name?'selected':''}>${r}</option>`).join('')}</select>${role.isDefault&&!dup?'<span style="font-size:10px;background:#6b21a8;color:#fff;padding:2px 7px;border-radius:10px;white-space:nowrap;font-weight:600;">Default</span>':''}</div></td><td><span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;${dup?'background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;':'background:#f3e8ff;color:#6b21a8;'}">${dup?'⚠ Duplicate':cat}</span></td><td>${dup?`<span style="font-size:11px;color:#9ca3af;">N/A</span>`:`<div style="display:flex;align-items:center;gap:5px;padding-left:4px;"><input type="radio" name="pDefault" ${role.isDefault?'checked':''} onchange="panelSetDefault(${idx})" style="accent-color:#6b21a8;width:14px;height:14px;cursor:pointer;"/><span style="font-size:11px;color:${role.isDefault?'#6b21a8':'#9ca3af'};">${role.isDefault?'Default':'Set'}</span></div>`}</td><td><button class="btn-rm" onclick="panelRemoveRole(${idx})">✕</button></td>`;tbody.appendChild(tr);});}
+  const b=document.getElementById('pRoleBadge');if(b)b.textContent=panelRoles.length;
+  const g2=GROUPS.find(x=>x.id===panelGroupId);const netNew=panelRoles.filter(r=>!g2.existingElevateRoles.includes(r.name));const dups=panelRoles.filter(r=>g2.existingElevateRoles.includes(r.name));const defRole=panelRoles.find(r=>r.isDefault&&!g2.existingElevateRoles.includes(r.name));
+  const il=document.getElementById('panelInfoLine');if(il)il.innerHTML=`<strong>${netNew.length}</strong> net-new role(s) · `+(dups.length?`<span style="color:#dc2626;">${dups.length} dup(s) skipped</span> · `:'')+( defRole?`Default: <strong style="color:#6b21a8;">${defRole.name}</strong>`:`<span style="color:#dc2626;">⚠ No default set</span>`);
+  const fn=document.getElementById('panelFooterNote');if(fn)fn.textContent=`${netNew.length} net-new · ${dups.length} dup(s) · ${(USER_POOL[panelGroupId]||[]).length} users`;
+}
+function roleCat(r){if(r.toLowerCase().includes('crm')||r==='crmiqnet')return 'CRM IQ';if(r.toLowerCase().includes('commercial'))return 'Commercial';if(r.toLowerCase().includes('affordable'))return 'Affordable';if(r.toLowerCase().includes('finance')||r.toLowerCase().includes('reporting'))return 'Finance';return 'Residential';}
+function panelAddRole(){const used=panelRoles.map(r=>r.name);const avail=ALL_ROLES.find(r=>!used.includes(r));if(!avail){showToast('All roles already added.','amber');return;}panelRoles.push({name:avail,isDefault:false});renderPanelRolesBody();}
+function panelUpdateRole(idx,val){panelRoles[idx].name=val;renderPanelRolesBody();}
+function panelRemoveRole(idx){const wd=panelRoles[idx].isDefault;panelRoles.splice(idx,1);if(wd&&panelRoles.length)panelRoles[0].isDefault=true;renderPanelRolesBody();}
+function panelSetDefault(idx){panelRoles.forEach((r,i)=>r.isDefault=i===idx);renderPanelRolesBody();}
+function savePanelGroup(){const g=GROUPS.find(x=>x.id===panelGroupId);g.newRoles=panelRoles.map(r=>({...r}));g.status=g.newRoles.length?'configured':'none';closePanel();renderTable();showToast(`"${g.name}" saved.`);}
+
+// ════ USERS TAB ════════════════════════════════════════════════════════
+function renderUsersTab(){
+  const g=GROUPS.find(x=>x.id===panelGroupId);
+  const users=USER_POOL[panelGroupId]||[];
+  const groupNetNew=getNetNew(g).map(r=>r.name);
+  document.getElementById('panelBody').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="search-box" style="width:200px;">🔍<input type="text" id="userSearchInput" placeholder="Search users…" oninput="renderUserList()" style="width:150px;"/></div>
+        <span style="font-size:12px;color:#6b7280;">${users.length} users in group</span>
+        ${groupNetNew.length?`<span style="font-size:11px;background:#f3e8ff;color:#6b21a8;border:1px solid #c4b5fd;padding:2px 9px;border-radius:10px;">${groupNetNew.length} group role(s) will be added</span>`:''}
+      </div>
+    </div>
+    <div class="table-card"><table><thead><tr><th>Name</th><th>Email</th><th>Existing Elevate Roles</th><th>Roles Being Added</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="userListTbody"></tbody></table></div>`;
+  renderUserList();
+}
+
+function renderUserList(){
+  const g=GROUPS.find(x=>x.id===panelGroupId);
+  const groupNetNew=getNetNew(g).map(r=>r.name);
+  const users=USER_POOL[panelGroupId]||[];
+  const search=(document.getElementById('userSearchInput')||{}).value||'';
+  const filtered=users.filter(u=>!search||`${u.fn} ${u.ln}`.toLowerCase().includes(search.toLowerCase())||u.email.toLowerCase().includes(search.toLowerCase()));
+  const tbody=document.getElementById('userListTbody');if(!tbody)return;
+  tbody.innerHTML='';
+  filtered.forEach(u=>{
+    const {roles,groupAdds}=getEffectiveAccess(panelGroupId,u);
+    const nonDupGroupAdds=groupNetNew.filter(r=>!u.accessRoles.has(r));
+    const dupGroupAdds=groupNetNew.filter(r=>u.accessRoles.has(r));
+    const hasOverride=userHasChanges(u);
+    const existChips=[...u.accessRoles].map(r=>`<span style="font-size:10px;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;padding:2px 6px;border-radius:10px;display:inline-block;margin:1px 2px 1px 0;">${r}</span>`).join('')||`<span style="font-size:11px;color:#9ca3af;">None</span>`;
+    const addChips=[...nonDupGroupAdds.map(r=>`<span style="font-size:10px;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 6px;border-radius:10px;display:inline-block;margin:1px 2px 1px 0;">+${r}</span>`),...dupGroupAdds.map(r=>`<span style="font-size:10px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;padding:2px 6px;border-radius:10px;display:inline-block;margin:1px 2px 1px 0;">✕ ${r}</span>`)].join('')||`<span style="font-size:11px;color:#9ca3af;">None</span>`;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong style="font-size:12px;">${u.fn} ${u.ln}</strong>${hasOverride?'<br/><span style="font-size:10px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:1px 6px;border-radius:8px;">Overridden</span>':''}</td><td style="font-size:11px;color:#6b7280;">${u.email}</td><td style="max-width:160px;">${existChips}</td><td style="max-width:160px;">${addChips}</td><td style="font-size:11px;color:#6b7280;">${u.lastLogin}</td><td><button class="btn btn-po" style="padding:3px 8px;font-size:11px;" onclick="openUserDetail(${u.id},${panelGroupId})">View in Elevate →</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ════ USER DETAIL — ELEVATE SYSTEM ADMIN VIEW ════════════════════════
+function openUserDetail(userId, gid){
+  currentUdUser=Object.values(USER_POOL).flat().find(u=>u.id===userId);
+  udTab='info'; udProductFilter=''; udAccessTab='access';
+  document.getElementById('udTitle').textContent=`User Detail - ${currentUdUser.fn} ${currentUdUser.ln}`;
+  document.getElementById('udOverlay').classList.add('open');
+  switchUdTab('info');
+}
+function closeUserDetail(){document.getElementById('udOverlay').classList.remove('open');currentUdUser=null;renderUserList();}
+
+function switchUdTab(tab){
+  udTab=tab;
+  ['info','voyager','roles','page','element','log'].forEach(t=>{
+    const el=document.getElementById(`udNav-${t}`);
+    if(el) el.className='ud-sidenav-item'+(t===tab?' active':'');
+  });
+  const c=document.getElementById('udContent');
+  if(tab==='info') renderUdInfo(c);
+  else if(tab==='roles') renderUdRoles(c);
+  else c.innerHTML=`<div style="padding:40px;text-align:center;color:#9ca3af;"><div style="font-size:28px;margin-bottom:8px;">📋</div><p style="font-size:13px;">This section is managed directly in Elevate System Administration.</p></div>`;
+}
+
+function renderUdInfo(c){
+  const u=currentUdUser;
+  c.innerHTML=`
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:4px;padding:24px 32px;max-width:800px;">
+      <div style="font-size:15px;font-weight:600;color:#111;margin-bottom:20px;">User Information</div>
+      <div class="ui-grid" style="max-width:700px;">
+        <div class="ui-label">First Name <span class="ui-req">*</span></div><div class="ui-val"><input class="ui-input" value="${u.fn}" oninput="currentUdUser.fn=this.value"/></div>
+        <div class="ui-label">Last Name <span class="ui-req">*</span></div><div class="ui-val"><input class="ui-input" value="${u.ln}" oninput="currentUdUser.ln=this.value"/></div>
+        <div class="ui-label">Email</div><div class="ui-val"><input class="ui-input" value="${u.email}"/></div>
+        <div class="ui-label">Culture <span class="ui-req">*</span></div><div class="ui-val" style="color:#374151;">${u.culture}</div>
+        <div class="ui-label">Inactive</div><div class="ui-val"><input type="checkbox" class="ui-checkbox" ${u.inactive?'checked':''}/></div>
+        <div class="ui-label">Language <span class="ui-req">*</span></div><div class="ui-val" style="color:#374151;">${u.language}</div>
+        <div class="ui-label">Last Login Date</div><div class="ui-val" style="color:#374151;">${u.lastLogin}</div>
+        <div class="ui-label">Mobile Phone</div><div class="ui-val"><input class="ui-input" value="${u.mobile||''}"/></div>
+      </div>
+    </div>`;
+}
+
+function renderUdRoles(c){
+  const u=currentUdUser;
+  const g=GROUPS.find(x=>x.id===panelGroupId);
+  const groupNetNew=getNetNew(g).map(r=>r.name);
+  const {roles:effectiveAccess, isOverridden}=getEffectiveAccess(panelGroupId,u);
+  const effectiveDefault=getEffectiveDefault(panelGroupId,u);
+
+  // Filter by product
+  let filteredCatalog=ROLE_CATALOG;
+  if(udProductFilter) filteredCatalog=ROLE_CATALOG.filter(r=>r.product===udProductFilter);
+
+  const accessRoles=filteredCatalog.filter(r=>effectiveAccess.has(r.name));
+  const noAccessRoles=filteredCatalog.filter(r=>!effectiveAccess.has(r.name));
+  const displayRoles=udAccessTab==='access'?accessRoles:noAccessRoles;
+
+  c.innerHTML=`
+    <div class="roles-header">
+      <span class="roles-title">Role</span>
+      <div class="roles-actions">
+        <select class="prod-sel" onchange="udProductFilter=this.value;renderUdRoles(document.getElementById('udContent'))">
+          <option value="">Select Product</option>
+          ${UNIQUE_PRODUCTS.map(p=>`<option value="${p}" ${p===udProductFilter?'selected':''}>${p}</option>`).join('')}
+        </select>
+        <button class="elevate-save" onclick="saveUserDetail()">Save</button>
+      </div>
+    </div>
+    <div class="access-tabs">
+      <div class="access-tab ${udAccessTab==='access'?'active':''}" onclick="udAccessTab='access';renderUdRoles(document.getElementById('udContent'))">
+        Access <span class="access-count">${filteredCatalog.filter(r=>effectiveAccess.has(r.name)).length}</span>
+      </div>
+      <div class="access-tab ${udAccessTab==='noaccess'?'active':''}" onclick="udAccessTab='noaccess';renderUdRoles(document.getElementById('udContent'))">
+        No Access <span class="access-count gray">${filteredCatalog.filter(r=>!effectiveAccess.has(r.name)).length}</span>
+      </div>
+    </div>
+    ${isOverridden?`<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:4px;padding:7px 12px;font-size:12px;color:#92400e;margin-bottom:10px;">⚠ This user has individual role overrides. Changes here apply to this user only and will not affect the group.</div>`:`<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:4px;padding:7px 12px;font-size:12px;color:#166534;margin-bottom:10px;">ℹ Using group defaults. Toggle Access to override roles for this user individually.</div>`}
+    <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+      <input class="v8-search" placeholder="Voyager 8" style="float:none;" type="text" id="roleSearchInput" oninput="renderUdRoles(document.getElementById('udContent'))" value=""/>
+    </div>
+    <table class="elevate-tbl">
+      <thead><tr><th>Role</th><th>Menu</th><th>Product</th><th>Licensed</th><th>Type</th><th style="text-align:center;">Access</th><th style="text-align:center;">Default</th></tr></thead>
+      <tbody id="udRolesTbody"></tbody>
+    </table>`;
+
+  // Render rows
+  const tbody=document.getElementById('udRolesTbody');
+  const rsearch=(document.getElementById('roleSearchInput')||{}).value||'';
+  const toShow=displayRoles.filter(r=>!rsearch||r.name.toLowerCase().includes(rsearch.toLowerCase()));
+
+  toShow.forEach(r=>{
+    const isExisting=u.accessRoles.has(r.name);
+    const isGroupAdded=groupNetNew.includes(r.name)&&!isExisting;
+    const isPendingOverride=isOverridden&&effectiveAccess.has(r.name)&&!isExisting&&!isGroupAdded;
+    const isDefault=effectiveDefault===r.name;
+    const hasAccess=effectiveAccess.has(r.name);
+
+    let srcBadge='';
+    if(isExisting) srcBadge=`<span class="src-lock" title="Existing Elevate role — cannot be removed">🔒</span>`;
+    else if(isGroupAdded) srcBadge=`<span class="src-group">Group</span>`;
+    else if(isPendingOverride) srcBadge=`<span class="src-pending">Override</span>`;
+
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${r.name}${srcBadge}</td>
+      <td style="color:#6b7280;">${r.menu}</td>
+      <td style="color:#6b7280;">${r.product}</td>
+      <td style="text-align:center;">${r.licensed?'<span class="licensed-check">✓</span>':''}</td>
+      <td style="color:#6b7280;">${r.type}</td>
+      <td style="text-align:center;">
+        <input type="checkbox" class="e-check"
+          ${hasAccess?'checked':''}
+          ${isExisting?'disabled title="Existing Elevate role — cannot be removed here"':''}
+          onchange="toggleUserRoleAccess(${currentUdUser.id},'${r.name}',this.checked)"/>
+      </td>
+      <td style="text-align:center;">
+        <input type="checkbox" class="e-check"
+          ${isDefault?'checked':''}
+          ${!hasAccess?'disabled':''}
+          onchange="setUserDefaultRole(${currentUdUser.id},'${r.name}',this.checked)"/>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  if(!toShow.length) tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:20px;font-style:italic;">No roles found.</td></tr>`;
+}
+
+function toggleUserRoleAccess(userId,roleName,checked){
+  const u=Object.values(USER_POOL).flat().find(x=>x.id===userId);
+  const g=GROUPS.find(x=>x.id===panelGroupId);
+  const groupNetNew=getNetNew(g).map(r=>r.name);
+  const {roles:currentEffective}=getEffectiveAccess(panelGroupId,u);
+  const newSet=new Set(currentEffective);
+  if(checked) newSet.add(roleName); else newSet.delete(roleName);
+  u.pendingAccess=[...newSet];
+  updateFooter();
+  renderUdRoles(document.getElementById('udContent'));
+}
+function setUserDefaultRole(userId,roleName,checked){
+  const u=Object.values(USER_POOL).flat().find(x=>x.id===userId);
+  u.pendingDefault=checked?roleName:'';
+  updateFooter();
+  renderUdRoles(document.getElementById('udContent'));
+}
+function saveUserDetail(){
+  const u=currentUdUser;
+  if(u.pendingAccess!==null){u.accessRoles=new Set(u.pendingAccess.filter(r=>ROLE_CATALOG.some(rc=>rc.name===r)));u.pendingAccess=null;}
+  if(u.pendingDefault!==null){u.defaultRole=u.pendingDefault;u.pendingDefault=null;}
+  updateFooter();renderUserList();
+  showToast(`User "${u.fn} ${u.ln}" updated in Elevate.`);
+  closeUserDetail();
+}
+
+// ════ SAVE MODAL ══════════════════════════════════════════════════════
+function openSaveModal(){
+  const pg=getPendingGroups();
+  const userOverrides=Object.values(USER_POOL).flat().filter(u=>userHasChanges(u));
+  document.getElementById('modalChangeList').innerHTML=`
+    ${pg.length?`<div style="font-weight:600;font-size:12px;color:#374151;margin-bottom:6px;">Group-Level Changes (${pg.length})</div>`:''}
+    ${pg.map(g=>{const nn=getNetNew(g);const dc=g.newRoles.length-nn.length;const dr=getDefault(g.newRoles)||'None';return `<div class="chg-row"><div style="display:flex;justify-content:space-between;"><div><strong>${g.name}</strong> <code style="font-size:10px;background:#f3f4f6;padding:1px 5px;border-radius:3px;">${g.code}</code><div style="font-size:11px;color:#6b7280;">👤 ${g.users} users · Default: <strong style="color:#6b21a8;">${dr}</strong></div></div><div style="text-align:right;"><span style="background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">+${nn.length} roles</span>${dc>0?`<br/><span style="background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:10px;font-size:10px;">${dc} dup(s) skipped</span>`:''}</div></div><div style="margin-top:5px;">${nn.map(r=>`<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:1px 7px;border-radius:10px;font-size:11px;margin:2px 2px 0 0;">${r.name}</span>`).join('')||'<span style="color:#9ca3af;font-size:11px;">No net-new roles.</span>'}</div></div>`;}).join('')}
+    ${userOverrides.length?`<div style="font-weight:600;font-size:12px;color:#374151;margin:12px 0 6px;">Individual User Overrides (${userOverrides.length})</div>${userOverrides.map(u=>`<div class="chg-row"><div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>${u.fn} ${u.ln}</strong> <span style="font-size:11px;color:#6b7280;">${u.email}</span></div><span style="font-size:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:2px 8px;border-radius:10px;">Pending override</span></div></div>`).join('')}`:''}`;
+  const totalNew=pg.reduce((a,g)=>a+getNetNew(g).length,0);
+  document.getElementById('modalImpact').innerHTML=`<strong>${pg.reduce((a,g)=>a+g.users,0)} users</strong> across <strong>${pg.length} group(s)</strong> will receive <strong>${totalNew} new role(s)</strong>.${userOverrides.length?` <strong>${userOverrides.length}</strong> individual user override(s) also applied.`:''}`;
+  document.getElementById('saveModal').classList.add('show');
+}
+function closeSaveModal(){document.getElementById('saveModal').classList.remove('show');}
+function confirmBulkSave(){
+  getPendingGroups().forEach(g=>{const s=savedState.find(x=>x.id===g.id);s.newRoles=g.newRoles.map(r=>({...r}));});
+  Object.values(USER_POOL).flat().filter(u=>userHasChanges(u)).forEach(u=>{if(u.pendingAccess!==null){u.accessRoles=new Set(u.pendingAccess);u.pendingAccess=null;}if(u.pendingDefault!==null){u.defaultRole=u.pendingDefault;u.pendingDefault=null;}});
+  closeSaveModal();renderTable();showToast('Roles saved to Elevate. All changes applied.');
+}
+
+// ════ MISC ════════════════════════════════════════════════════════════
+function exportCSV(){const rows=[['Group','Code','Users','Existing Elevate Roles','New Roles','Net New','Default Role','Status'],...GROUPS.map(g=>[g.name,g.code,g.users,g.existingElevateRoles.join('|'),g.newRoles.map(r=>r.name).join('|'),getNetNew(g).length,getDefault(g.newRoles)||'None',g.status])];const a=document.createElement('a');a.href='data:text/csv,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));a.download='v8_role_assignments.csv';a.click();}
+function showToast(msg,type='green'){const t=document.getElementById('toast');t.style.background=type==='amber'?'#d97706':'#166534';t.innerHTML=(type==='green'?'✅ ':'⚠️ ')+`<span>${msg}</span>`;t.className='toast show';setTimeout(()=>t.className='toast',3500);}
+
+// INIT
+const brs=document.getElementById('bulkRoleSel');ALL_ROLES.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;brs.appendChild(o);});
+renderTable();
+</script>
+</body>
+</html>
