@@ -1,4 +1,4 @@
-import SecurityHub from '../security-hub-2026-05-29.jsx'
+import SecurityHub from '../security-hub-v6.jsx'
 
 function App() {
   return <SecurityHub />
