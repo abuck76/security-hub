@@ -171,6 +171,16 @@ function TransferList({ label, items, selected, onSelect }) {
   );
 }
 
+// ─── Toggle ───────────────────────────────────────────────────────────────────
+function Toggle({ defaultChecked = false }) {
+  const [on, setOn] = useState(defaultChecked);
+  return (
+    <div onClick={() => setOn(!on)} style={{ width: 36, height: 20, borderRadius: 10, background: on ? c.success : "#d1d5db", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+      <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: on ? 18 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+    </div>
+  );
+}
+
 // ─── Permissions Drawer Tab ───────────────────────────────────────────────────
 function PermissionsDrawerTab({ permRows, userCount }) {
   const accessLevels = ["Access", "Read & Write", "Read", "No Access"];
@@ -457,7 +467,8 @@ function UserDrawer({ user, onClose }) {
   const [tab, setTab] = useState("Roles");
   const [roleSubTab, setRoleSubTab] = useState("Access");
   const [vpTab, setVpTab] = useState("Login Setup");
-  const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Voyager Plus"];
+  const [seniorTab, setSeniorTab] = useState("Login Setup");
+  const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Voyager Plus", "Senior"];
 
   const accessRoles = ["Administrator", "Accounting Manager", "Leasing Agent", "Property Manager"];
   const noAccessRoles = ["Maintenance Tech", "Read Only", "Vendor Portal"];
@@ -603,6 +614,133 @@ function UserDrawer({ user, onClose }) {
                 ))}
               </div>
               <div style={{ color: c.textMuted, fontSize: 13 }}>{vpTab} configuration for Voyager Plus.</div>
+            </div>
+          )}
+          {tab === "Senior" && (
+            <div>
+              <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: `1px solid ${c.border}`, flexWrap: "wrap" }}>
+                {["Login Setup", "Discipline", "Shift", "Zone", "Wage", "Coverage Area", "Availability"].map(s => (
+                  <div key={s} style={{ ...st.drawerTab, ...(seniorTab === s ? st.drawerTabActive : {}), fontSize: 11 }} onClick={() => setSeniorTab(s)}>{s}</div>
+                ))}
+              </div>
+
+              {seniorTab === "Login Setup" && (
+                <div style={{ display: "flex", gap: 24 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={st.formRow}>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>Group <span style={{ color: c.textLight, fontWeight: 400 }}>(set under Details)</span></label>
+                        <input style={{ ...st.inputFull, background: "#f3f4f6", color: c.textMuted, cursor: "not-allowed" }} value={user.group} readOnly />
+                      </div>
+                    </div>
+                    <div style={st.formRow}>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>Property <span style={{ color: c.textLight, fontWeight: 400 }}>(set under Details)</span></label>
+                        <input style={{ ...st.inputFull, background: "#f3f4f6", color: c.textMuted, cursor: "not-allowed" }} value={user.property || ""} placeholder="No property assigned" readOnly />
+                      </div>
+                    </div>
+                    <div style={st.formRow}>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>Global Contact</label>
+                        <select style={st.inputFull}><option>choose...</option></select>
+                      </div>
+                    </div>
+                    <div style={st.formRow}>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>Initials <span style={{ color: c.danger }}>*</span></label>
+                        <input style={st.inputFull} placeholder="e.g. KAB" maxLength={3} />
+                      </div>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>4 Character PIN <span style={{ color: c.danger }}>*</span></label>
+                        <input style={st.inputFull} type="password" placeholder="••••" maxLength={4} />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                      <Toggle defaultChecked={true} />
+                      <span style={{ fontSize: 13 }}>Allow EHR Login</span>
+                    </div>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: c.text }}>Login</div>
+                    <div style={st.formRow}>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>Username <span style={{ color: c.danger }}>*</span></label>
+                        <input style={st.inputFull} placeholder="user@example.com" />
+                      </div>
+                    </div>
+                    <div style={st.formRow}>
+                      <div style={st.formGroup}>
+                        <label style={st.label}>Password <span style={{ color: c.danger }}>*</span></label>
+                        <input style={st.inputFull} type="password" placeholder="••••••••" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {seniorTab === "Shift" && (
+                <div>
+                  <div style={{ background: c.primaryLight, border: `1px solid #bfdbfe`, borderRadius: 6, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#1e40af" }}>
+                    Shifts must be selected in order for the user to view residents. For ySupport, set this to <strong>All Shifts</strong>. The client sets this based on the user's work schedule.
+                  </div>
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 8 }}>Allow access to</div>
+                    <div style={{ display: "flex", gap: 20 }}>
+                      {["All shifts", "Specified shifts"].map(opt => (
+                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                          <input type="radio" name="shiftAccess" defaultChecked={opt === "All shifts"} /> {opt}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <table style={st.table}>
+                    <thead><tr><th style={st.th}>Name</th><th style={st.th}>Selected</th><th style={st.th}>Primary</th></tr></thead>
+                    <tbody>
+                      {[["Day Shift (7–12)", true, false], ["Morning", true, false], ["Evening (3–9)", true, false]].map(([name, sel, primary]) => (
+                        <tr key={name}>
+                          <td style={st.td}>{name}</td>
+                          <td style={st.td}><Toggle defaultChecked={sel} /></td>
+                          <td style={st.td}><Toggle defaultChecked={primary} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {seniorTab === "Zone" && (
+                <div>
+                  <div style={{ background: c.primaryLight, border: `1px solid #bfdbfe`, borderRadius: 6, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#1e40af" }}>
+                    Zones must be selected in order for the user to view residents. For ySupport, set this to <strong>All Zones</strong>. The client sets this based on the user's responsibility area.
+                  </div>
+                  <div style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 8 }}>Allow access to</div>
+                    <div style={{ display: "flex", gap: 20 }}>
+                      {["All zones", "Specified zones"].map(opt => (
+                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                          <input type="radio" name="zoneAccess" defaultChecked={opt === "All zones"} /> {opt}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <table style={st.table}>
+                    <thead><tr><th style={st.th}>Name</th><th style={st.th}>Community</th><th style={st.th}>Selected</th></tr></thead>
+                    <tbody>
+                      {[["Zone A", "Sunrise Gardens", true], ["Zone B", "Sunrise Gardens", true], ["Zone C", "Maple Creek", true]].map(([name, community, sel]) => (
+                        <tr key={name}>
+                          <td style={st.td}>{name}</td>
+                          <td style={st.td}>{community}</td>
+                          <td style={st.td}><Toggle defaultChecked={sel} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {!["Login Setup", "Shift", "Zone"].includes(seniorTab) && (
+                <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>{seniorTab} configuration for Senior EHR.</div>
+              )}
             </div>
           )}
         </div>
