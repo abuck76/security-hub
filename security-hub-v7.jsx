@@ -466,7 +466,6 @@ function SecurityGroupDrawer({ group, onClose }) {
 function UserDrawer({ user, onClose }) {
   const [tab, setTab] = useState("Roles");
   const [roleSubTab, setRoleSubTab] = useState("Access");
-  const [vpTab, setVpTab] = useState("Login Setup");
   const [seniorTab, setSeniorTab] = useState("Login Setup");
   const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Voyager Plus", "Senior"];
 
@@ -595,27 +594,34 @@ function UserDrawer({ user, onClose }) {
               ))}
             </div>
           )}
-          {tab === "Voyager Plus" && (
-            <div>
-              <div style={st.formRow}>
-                <div style={st.formGroup}><label style={st.label}>Certification</label><input style={st.inputFull} placeholder="Certification code" /></div>
-                <div style={st.formGroup}><label style={st.label}>Message Carrier</label><select style={st.inputFull}><option>None</option><option>SMS</option><option>Email</option></select></div>
-              </div>
-              <div style={st.formRow}>
-                <div style={st.formGroup}><label style={st.label}>Time Zone</label><select style={st.inputFull}><option>Eastern</option><option>Central</option><option>Mountain</option><option>Pacific</option></select></div>
-              </div>
-              <div style={{ display: "flex", gap: 20, marginBottom: 16 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}><input type="checkbox" defaultChecked /> Active</label>
-                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}><input type="checkbox" /> Secure Docs</label>
-              </div>
-              <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: `1px solid ${c.border}`, flexWrap: "wrap" }}>
-                {["Login Setup", "Discipline", "Shift", "Zone", "Wage", "Coverage Area", "Availability"].map(s => (
-                  <div key={s} style={{ ...st.drawerTab, ...(vpTab === s ? st.drawerTabActive : {}), fontSize: 11 }} onClick={() => setVpTab(s)}>{s}</div>
+          {tab === "Voyager Plus" && (() => {
+            const vpRights = [
+              "Residential Leasing Pad", "SFH Leasing Pad", "Cash Management",
+              "Commercial Leasing Pad", "Concierge Plus", "Energy",
+              "Orion BI", "LOBOS FDD", "Condo CRM Plus",
+              "EHRX", "P2P Plus", "RENTCafe CRM (International)",
+              "Investor Plus", "Facilities Manager", "EnergyTStat",
+              "Data Aggregation Services", "Student Leasing Pad", "RentCafe EDocs",
+              "Senior CRM", "Yes Plus", "Unit Sales CRM",
+              "Compliance Manager", "Orion Document Management", "Claims Manager",
+              "Construction Management", "Admin Utilities",
+            ];
+            const cols = [vpRights.filter((_, i) => i % 3 === 0), vpRights.filter((_, i) => i % 3 === 1), vpRights.filter((_, i) => i % 3 === 2)];
+            return (
+              <div style={{ display: "flex", gap: 0 }}>
+                {cols.map((col, ci) => (
+                  <div key={ci} style={{ flex: 1 }}>
+                    {col.map(name => (
+                      <div key={name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 }}>
+                        <span>{name}</span>
+                        <input type="checkbox" />
+                      </div>
+                    ))}
+                  </div>
                 ))}
               </div>
-              <div style={{ color: c.textMuted, fontSize: 13 }}>{vpTab} configuration for Voyager Plus.</div>
-            </div>
-          )}
+            );
+          })()}
           {tab === "Senior" && (
             <div>
               <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: `1px solid ${c.border}`, flexWrap: "wrap" }}>
