@@ -1,62 +1,64 @@
 import React, { useState } from "react";
+import { Shield } from "lucide-react";
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const c = {
-  bg: "#f5f5f5", surface: "#ffffff", border: "#e0e0e0", borderLight: "#ebebeb",
-  text: "#1a1a1a", textMuted: "#6b7280", textLight: "#9ca3af",
-  primary: "#0066cc", primaryHover: "#0052a3", primaryLight: "#e8f0fb",
+  bg: "#f9fafb", surface: "#ffffff", border: "#e5e7eb", borderLight: "#f3f4f6",
+  text: "#111827", textMuted: "#6b7280", textLight: "#9ca3af",
+  primary: "#2563eb", primaryHover: "#1d4ed8", primaryLight: "#eff6ff",
+  navBg: "#1e3a5f", navText: "#ffffff",
   success: "#16a34a", successBg: "#f0fdf4", successBorder: "#bbf7d0",
   danger: "#dc2626", dangerBg: "#fef2f2", dangerBorder: "#fecaca",
   warning: "#d97706", warningBg: "#fffbeb",
   amber: "#b45309", amberBg: "#fef3c7",
-  navBg: "#1e3a5f", navText: "#ffffff",
 };
 
 const st = {
-  page: { fontFamily: "'Segoe UI', system-ui, sans-serif", background: c.bg, minHeight: "100vh", fontSize: 14, color: c.text },
+  page: { background: c.bg, minHeight: "100vh", color: c.text },
   nav: { background: c.navBg, color: c.navText, padding: "0 20px", display: "flex", alignItems: "center", height: 44, gap: 24, fontSize: 13 },
   navLogo: { fontWeight: 700, fontSize: 15, color: "#fff", marginRight: 8 },
   navItem: { color: "rgba(255,255,255,0.75)", cursor: "pointer", padding: "12px 0", borderBottom: "2px solid transparent" },
   navItemActive: { color: "#fff", borderBottom: "2px solid #5b9bd5" },
-  pageHeader: { background: c.surface, borderBottom: `1px solid ${c.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  pageTitle: { fontSize: 18, fontWeight: 600 },
-  pageSubtitle: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+  pageHeader: { background: c.surface, borderBottom: `1px solid ${c.border}`, padding: "16px 24px", display: "flex", alignItems: "center", gap: 12 },
+  pageTitle: { fontSize: 24, fontWeight: 600, color: c.text },
+  pageSubtitle: { fontSize: 14, color: c.textMuted, marginTop: 2 },
   tabBar: { background: c.surface, borderBottom: `1px solid ${c.border}`, display: "flex", padding: "0 24px" },
-  tab: { padding: "10px 18px", cursor: "pointer", fontSize: 13, fontWeight: 500, color: c.textMuted, borderBottom: "2px solid transparent", marginBottom: -1 },
+  tab: { padding: "12px 16px", cursor: "pointer", fontSize: 14, fontWeight: 500, color: c.textMuted, borderBottom: "2px solid transparent", marginBottom: -1 },
   tabActive: { color: c.primary, borderBottom: `2px solid ${c.primary}` },
   content: { padding: 24 },
+  toolbarStrip: { background: c.surface, borderBottom: `1px solid ${c.border}`, padding: "16px 24px", margin: "-24px -24px 24px -24px", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" },
   toolbar: { display: "flex", gap: 10, marginBottom: 16, alignItems: "center", flexWrap: "wrap" },
-  input: { border: `1px solid ${c.border}`, borderRadius: 4, padding: "6px 10px", fontSize: 13, outline: "none", background: c.surface },
-  select: { border: `1px solid ${c.border}`, borderRadius: 4, padding: "6px 10px", fontSize: 13, background: c.surface },
-  btn: { background: c.primary, color: "#fff", border: "none", borderRadius: 4, padding: "7px 14px", fontSize: 13, cursor: "pointer", fontWeight: 500 },
-  btnOutline: { background: c.surface, color: c.primary, border: `1px solid ${c.primary}`, borderRadius: 4, padding: "6px 14px", fontSize: 13, cursor: "pointer" },
-  btnSmall: { background: c.surface, color: c.primary, border: `1px solid ${c.border}`, borderRadius: 4, padding: "4px 10px", fontSize: 12, cursor: "pointer" },
-  btnDanger: { background: c.danger, color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px", fontSize: 13, cursor: "pointer" },
-  btnSuccess: { background: c.success, color: "#fff", border: "none", borderRadius: 4, padding: "6px 14px", fontSize: 13, cursor: "pointer" },
-  table: { width: "100%", borderCollapse: "collapse", background: c.surface, borderRadius: 6, overflow: "hidden", border: `1px solid ${c.border}` },
-  th: { background: "#f9fafb", borderBottom: `1px solid ${c.border}`, padding: "9px 14px", textAlign: "left", fontSize: 12, fontWeight: 600, color: c.textMuted, textTransform: "uppercase", letterSpacing: "0.04em" },
-  td: { padding: "10px 14px", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 },
-  pill: { background: "#f3f4f6", color: c.textMuted, borderRadius: 12, padding: "2px 9px", fontSize: 12, display: "inline-block" },
-  drawer: { position: "fixed", right: 0, top: 0, bottom: 0, width: 780, background: c.surface, boxShadow: "-4px 0 20px rgba(0,0,0,0.15)", zIndex: 100, display: "flex", flexDirection: "column" },
-  drawerHeader: { padding: "16px 20px", borderBottom: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
+  input: { border: `1px solid ${c.border}`, borderRadius: 8, padding: "8px 12px", fontSize: 14, outline: "none", background: c.surface },
+  select: { border: `1px solid ${c.border}`, borderRadius: 8, padding: "8px 12px", fontSize: 14, background: c.surface },
+  btn: { background: c.primary, color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 14, cursor: "pointer", fontWeight: 500 },
+  btnOutline: { background: c.surface, color: c.primary, border: `1px solid ${c.primary}`, borderRadius: 8, padding: "6px 16px", fontSize: 14, cursor: "pointer" },
+  btnSmall: { background: c.surface, color: c.primary, border: `1px solid ${c.border}`, borderRadius: 6, padding: "4px 10px", fontSize: 12, cursor: "pointer" },
+  btnDanger: { background: c.danger, color: "#fff", border: "none", borderRadius: 8, padding: "6px 16px", fontSize: 14, cursor: "pointer" },
+  btnSuccess: { background: c.success, color: "#fff", border: "none", borderRadius: 8, padding: "6px 16px", fontSize: 14, cursor: "pointer" },
+  table: { width: "100%", borderCollapse: "collapse", background: c.surface, borderRadius: 12, overflow: "hidden", border: `1px solid ${c.border}` },
+  th: { background: "#f9fafb", borderBottom: `1px solid ${c.border}`, padding: "10px 16px", textAlign: "left", fontSize: 12, fontWeight: 600, color: c.textMuted, textTransform: "uppercase", letterSpacing: "0.04em" },
+  td: { padding: "12px 16px", borderBottom: `1px solid ${c.borderLight}`, fontSize: 14 },
+  pill: { background: "#f3f4f6", color: c.textMuted, borderRadius: 9999, padding: "2px 10px", fontSize: 12, display: "inline-block" },
+  drawer: { position: "fixed", right: 0, top: 0, bottom: 0, width: 800, background: c.surface, boxShadow: "-4px 0 24px rgba(0,0,0,0.15)", zIndex: 100, display: "flex", flexDirection: "column" },
+  drawerHeader: { padding: "16px 24px", borderBottom: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
   drawerTitle: { fontSize: 16, fontWeight: 600 },
-  drawerTabBar: { borderBottom: `1px solid ${c.border}`, display: "flex", padding: "0 20px", flexWrap: "wrap", background: "#fafafa" },
-  drawerTab: { padding: "8px 14px", cursor: "pointer", fontSize: 12, fontWeight: 500, color: c.textMuted, borderBottom: "2px solid transparent", marginBottom: -1 },
+  drawerTabBar: { borderBottom: `1px solid ${c.border}`, display: "flex", padding: "0 24px", flexWrap: "wrap", background: c.surface },
+  drawerTab: { padding: "10px 14px", cursor: "pointer", fontSize: 12, fontWeight: 500, color: c.textMuted, borderBottom: "2px solid transparent", marginBottom: -1 },
   drawerTabActive: { color: c.primary, borderBottom: `2px solid ${c.primary}` },
-  drawerContent: { flex: 1, overflowY: "auto", padding: 20 },
+  drawerContent: { flex: 1, overflowY: "auto", padding: 24 },
   formRow: { display: "flex", gap: 16, marginBottom: 14 },
   formGroup: { flex: 1 },
   label: { display: "block", fontSize: 12, fontWeight: 500, color: c.textMuted, marginBottom: 4 },
-  inputFull: { width: "100%", border: `1px solid ${c.border}`, borderRadius: 4, padding: "7px 10px", fontSize: 13, boxSizing: "border-box" },
-  overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 90 },
-  modal: { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: c.surface, borderRadius: 8, zIndex: 110, width: 560, maxHeight: "80vh", display: "flex", flexDirection: "column", boxShadow: "0 8px 40px rgba(0,0,0,0.2)" },
-  modalHeader: { padding: "16px 20px", borderBottom: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" },
-  modalBody: { padding: 20, overflowY: "auto", flex: 1 },
-  modalFooter: { padding: "14px 20px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "flex-end", gap: 10 },
-  badge: (color, bg) => ({ background: bg, color, borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: 600, display: "inline-block" }),
+  inputFull: { width: "100%", border: `1px solid ${c.border}`, borderRadius: 8, padding: "8px 12px", fontSize: 14, boxSizing: "border-box" },
+  overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", zIndex: 90 },
+  modal: { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: c.surface, borderRadius: 12, zIndex: 110, width: 560, maxHeight: "80vh", display: "flex", flexDirection: "column", boxShadow: "0 8px 40px rgba(0,0,0,0.2)" },
+  modalHeader: { padding: "16px 24px", borderBottom: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" },
+  modalBody: { padding: 24, overflowY: "auto", flex: 1 },
+  modalFooter: { padding: "14px 24px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "flex-end", gap: 10 },
+  badge: (color, bg) => ({ background: bg, color, borderRadius: 9999, padding: "2px 10px", fontSize: 12, fontWeight: 600, display: "inline-block" }),
   sectionTitle: { fontSize: 13, fontWeight: 600, marginBottom: 10, marginTop: 16, color: c.text },
-  transferBox: { border: `1px solid ${c.border}`, borderRadius: 4, height: 200, overflowY: "auto", padding: 4 },
-  transferItem: { padding: "5px 8px", fontSize: 12, cursor: "pointer", borderRadius: 3 },
+  transferBox: { border: `1px solid ${c.border}`, borderRadius: "0 0 8px 8px", height: 208, overflowY: "auto", padding: 4 },
+  transferItem: { padding: "6px 8px", fontSize: 12, cursor: "pointer", borderRadius: 4 },
 };
 
 // ─── Sample Data ─────────────────────────────────────────────────────────────
@@ -96,6 +98,21 @@ const permissionCategories = [
 const glAccounts = Array.from({ length: 40 }, (_, i) => `${5000 + i * 10} - Account ${i + 1}`);
 const acctTrees = Array.from({ length: 12 }, (_, i) => `Tree ${i + 1}`);
 const chargeCodes = Array.from({ length: 18 }, (_, i) => `CC-${100 + i} Charge Code ${i + 1}`);
+
+const archivedProperties = [
+  { id: 1,  name: "[Archived] Alaska Trails Assisted Living & Memory Care", code: "bv0020" },
+  { id: 2,  name: "[Archived] Barclay House of Carrollton",                 code: "cv0000c" },
+  { id: 3,  name: "[Archived] Bay Pointe Assisted Living & Marine Courte Memory Care", code: "dln0040" },
+  { id: 4,  name: "[Archived] Bayside Terrace",                             code: "ca0000c" },
+  { id: 5,  name: "[Archived] Brandywine Branded Estates",                  code: "nv0000" },
+  { id: 6,  name: "[Archived] Brandywine Haverford Terrace Island",         code: "pe0000c" },
+  { id: 7,  name: "[Archived] Brandywine Governors Crossing",               code: "lang0060" },
+  { id: 8,  name: "[Archived] Brandywine Haddonfield",                      code: "nf0020" },
+  { id: 9,  name: "[Archived] Brandywine Haverford Terrace",                code: "pe0040" },
+  { id: 10, name: "[Archived] Brandywine Huntington Terrace",               code: "lh0000" },
+  { id: 11, name: "[Archived] Brandywine Litchfield",                       code: "fh0001" },
+  { id: 12, name: "[Archived] Brandywine Senior Living at Dresher Estate",  code: "dr0000" },
+];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
@@ -139,7 +156,7 @@ function TransferList({ label, items, selected, onSelect }) {
     <div>
       <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, color: c.textMuted, marginBottom: 4 }}>No Access ({available.length})</div>
+          <div style={{ fontSize: 12, fontWeight: 500, background: "#0d9488", color: "#fff", padding: "6px 10px", borderRadius: "6px 6px 0 0" }}>No Access ({available.length})</div>
           <div style={st.transferBox}>
             {available.map(item => (
               <div key={item} style={{ ...st.transferItem, background: selAvail.includes(item) ? c.primaryLight : "transparent" }}
@@ -156,7 +173,7 @@ function TransferList({ label, items, selected, onSelect }) {
           <button style={st.btnSmall} onClick={() => { onSelect([]); setSelRight([]); }}>ALL →</button>
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, color: c.textMuted, marginBottom: 4 }}>Access ({selected.length})</div>
+          <div style={{ fontSize: 12, fontWeight: 500, background: "#0d9488", color: "#fff", padding: "6px 10px", borderRadius: "6px 6px 0 0" }}>Access ({selected.length})</div>
           <div style={st.transferBox}>
             {selected.map(item => (
               <div key={item} style={{ ...st.transferItem, background: selRight.includes(item) ? c.primaryLight : "transparent" }}
@@ -172,11 +189,12 @@ function TransferList({ label, items, selected, onSelect }) {
 }
 
 // ─── Toggle ───────────────────────────────────────────────────────────────────
-function Toggle({ defaultChecked = false }) {
+function Toggle({ defaultChecked = false, onChange }) {
   const [on, setOn] = useState(defaultChecked);
+  const handleClick = () => { const next = !on; setOn(next); if (onChange) onChange(next); };
   return (
-    <div onClick={() => setOn(!on)} style={{ width: 36, height: 20, borderRadius: 10, background: on ? c.success : "#d1d5db", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
-      <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: on ? 18 : 2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+    <div onClick={handleClick} style={{ width: 40, height: 24, borderRadius: 9999, background: on ? c.primary : "#d1d5db", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+      <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 4, left: on ? 20 : 4, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
     </div>
   );
 }
@@ -466,8 +484,15 @@ function SecurityGroupDrawer({ group, onClose }) {
 function UserDrawer({ user, onClose }) {
   const [tab, setTab] = useState("Roles");
   const [roleSubTab, setRoleSubTab] = useState("Access");
-  const [seniorTab, setSeniorTab] = useState("Login Setup");
-  const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Voyager Plus", "Senior"];
+  const [ehrOpen, setEhrOpen] = useState(true);
+  const [ehrTab, setEhrTab] = useState("Login Setup");
+  const [crmOpen, setCrmOpen] = useState(false);
+  const [crmTab, setCrmTab] = useState("Roles");
+  const [isSalesCounselor, setIsSalesCounselor] = useState(false);
+  const [roleSearch, setRoleSearch] = useState("");
+  const [selectedRoles, setSelectedRoles] = useState([0, 1, 2, 3, 4]);
+  const [scSearch, setScSearch] = useState("");
+  const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Voyager Plus Program Rights", "Senior"];
 
   const accessRoles = ["Administrator", "Accounting Manager", "Leasing Agent", "Property Manager"];
   const noAccessRoles = ["Maintenance Tech", "Read Only", "Vendor Portal"];
@@ -594,7 +619,7 @@ function UserDrawer({ user, onClose }) {
               ))}
             </div>
           )}
-          {tab === "Voyager Plus" && (() => {
+          {tab === "Voyager Plus Program Rights" && (() => {
             const vpRights = [
               "Residential Leasing Pad", "SFH Leasing Pad", "Cash Management",
               "Commercial Leasing Pad", "Concierge Plus", "Energy",
@@ -624,129 +649,306 @@ function UserDrawer({ user, onClose }) {
           })()}
           {tab === "Senior" && (
             <div>
-              <div style={{ display: "flex", gap: 0, marginBottom: 16, borderBottom: `1px solid ${c.border}`, flexWrap: "wrap" }}>
-                {["Login Setup", "Discipline", "Shift", "Zone", "Wage", "Coverage Area", "Availability"].map(s => (
-                  <div key={s} style={{ ...st.drawerTab, ...(seniorTab === s ? st.drawerTabActive : {}), fontSize: 11 }} onClick={() => setSeniorTab(s)}>{s}</div>
-                ))}
+              {/* Basic Information */}
+              <div style={st.sectionTitle}>Basic Information</div>
+              <div style={st.formRow}>
+                <div style={st.formGroup}>
+                  <label style={st.label}>Initials <span style={{ color: c.danger }}>*</span></label>
+                  <input style={st.inputFull} placeholder="e.g. KAB" maxLength={3} />
+                </div>
+                <div style={st.formGroup}>
+                  <label style={st.label}>4 Character PIN <span style={{ color: c.danger }}>*</span></label>
+                  <input style={st.inputFull} type="password" placeholder="••••" maxLength={4} />
+                </div>
+              </div>
+              <div style={st.formRow}>
+                <div style={st.formGroup}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                    <input type="checkbox" />
+                    <span>Force PIN Reset</span>
+                  </label>
+                  <div style={{ fontSize: 12, color: c.textMuted, marginTop: 4 }}>Require user to set a new PIN on next login</div>
+                </div>
               </div>
 
-              {seniorTab === "Login Setup" && (
-                <div style={{ display: "flex", gap: 24 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={st.formRow}>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>Group <span style={{ color: c.textLight, fontWeight: 400 }}>(set under Details)</span></label>
-                        <input style={{ ...st.inputFull, background: "#f3f4f6", color: c.textMuted, cursor: "not-allowed" }} value={user.group} readOnly />
-                      </div>
-                    </div>
-                    <div style={st.formRow}>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>Property <span style={{ color: c.textLight, fontWeight: 400 }}>(set under Details)</span></label>
-                        <input style={{ ...st.inputFull, background: "#f3f4f6", color: c.textMuted, cursor: "not-allowed" }} value={user.property || ""} placeholder="No property assigned" readOnly />
-                      </div>
-                    </div>
-                    <div style={st.formRow}>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>Global Contact</label>
-                        <select style={st.inputFull}><option>choose...</option></select>
-                      </div>
-                    </div>
-                    <div style={st.formRow}>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>Initials <span style={{ color: c.danger }}>*</span></label>
-                        <input style={st.inputFull} placeholder="e.g. KAB" maxLength={3} />
-                      </div>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>4 Character PIN <span style={{ color: c.danger }}>*</span></label>
-                        <input style={st.inputFull} type="password" placeholder="••••" maxLength={4} />
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                      <Toggle defaultChecked={true} />
-                      <span style={{ fontSize: 13 }}>Allow EHR Login</span>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: c.text }}>Login</div>
-                    <div style={st.formRow}>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>Username <span style={{ color: c.danger }}>*</span></label>
-                        <input style={st.inputFull} placeholder="user@example.com" />
-                      </div>
-                    </div>
-                    <div style={st.formRow}>
-                      <div style={st.formGroup}>
-                        <label style={st.label}>Password <span style={{ color: c.danger }}>*</span></label>
-                        <input style={st.inputFull} type="password" placeholder="••••••••" />
-                      </div>
-                    </div>
-                  </div>
+              {/* EHR Setup accordion */}
+              <div style={{ marginTop: 24, border: `1px solid ${c.border}`, borderRadius: 8, overflow: "hidden" }}>
+                <div onClick={() => setEhrOpen(!ehrOpen)} style={{ background: ehrOpen ? c.primaryLight : "#f9fafb", borderBottom: ehrOpen ? `1px solid ${c.border}` : "none", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: ehrOpen ? c.primary : c.text }}>EHR Setup</span>
+                  <span style={{ fontSize: 11, color: c.textMuted, transform: ehrOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.2s" }}>▼</span>
                 </div>
-              )}
 
-              {seniorTab === "Shift" && (
-                <div>
-                  <div style={{ background: c.primaryLight, border: `1px solid #bfdbfe`, borderRadius: 6, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#1e40af" }}>
-                    Shifts must be selected in order for the user to view residents. For ySupport, set this to <strong>All Shifts</strong>. The client sets this based on the user's work schedule.
-                  </div>
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 8 }}>Allow access to</div>
-                    <div style={{ display: "flex", gap: 20 }}>
-                      {["All shifts", "Specified shifts"].map(opt => (
-                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
-                          <input type="radio" name="shiftAccess" defaultChecked={opt === "All shifts"} /> {opt}
-                        </label>
+                {ehrOpen && (
+                  <div>
+                    {/* EHR sub-tabs */}
+                    <div style={{ borderBottom: `1px solid ${c.border}`, display: "flex", padding: "0 16px", background: "#fafafa", flexWrap: "wrap" }}>
+                      {["Login Setup", "Discipline", "Shift", "Zone"].map(t => (
+                        <div key={t} style={{ ...st.drawerTab, ...(ehrTab === t ? st.drawerTabActive : {}) }} onClick={() => setEhrTab(t)}>{t}</div>
                       ))}
                     </div>
-                  </div>
-                  <table style={st.table}>
-                    <thead><tr><th style={st.th}>Name</th><th style={st.th}>Selected</th><th style={st.th}>Primary</th></tr></thead>
-                    <tbody>
-                      {[["Day Shift (7–12)", true, false], ["Morning", true, false], ["Evening (3–9)", true, false]].map(([name, sel, primary]) => (
-                        <tr key={name}>
-                          <td style={st.td}>{name}</td>
-                          <td style={st.td}><Toggle defaultChecked={sel} /></td>
-                          <td style={st.td}><Toggle defaultChecked={primary} /></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
 
-              {seniorTab === "Zone" && (
-                <div>
-                  <div style={{ background: c.primaryLight, border: `1px solid #bfdbfe`, borderRadius: 6, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#1e40af" }}>
-                    Zones must be selected in order for the user to view residents. For ySupport, set this to <strong>All Zones</strong>. The client sets this based on the user's responsibility area.
-                  </div>
-                  <div style={{ marginBottom: 14 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 8 }}>Allow access to</div>
-                    <div style={{ display: "flex", gap: 20 }}>
-                      {["All zones", "Specified zones"].map(opt => (
-                        <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
-                          <input type="radio" name="zoneAccess" defaultChecked={opt === "All zones"} /> {opt}
-                        </label>
-                      ))}
+                    <div style={{ padding: 16 }}>
+
+                      {/* Login Setup */}
+                      {ehrTab === "Login Setup" && (
+                        <div style={{ maxWidth: 480 }}>
+                          <div style={st.formRow}>
+                            <div style={st.formGroup}>
+                              <label style={st.label}>Global Contact</label>
+                              <select style={st.inputFull}><option>choose...</option></select>
+                            </div>
+                          </div>
+                          <div style={st.formRow}>
+                            <div style={st.formGroup}>
+                              <label style={st.label}>EHR Title</label>
+                              <select style={st.inputFull}><option>choose...</option></select>
+                            </div>
+                          </div>
+                          <div style={st.formRow}>
+                            <div style={st.formGroup}>
+                              <label style={st.label}>EHR Certification</label>
+                              <select style={st.inputFull}><option>choose...</option></select>
+                            </div>
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 4 }}>
+                            <label style={{ ...st.label, marginBottom: 0 }}>Allow EHR Login</label>
+                            <Toggle defaultChecked={true} />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Discipline */}
+                      {ehrTab === "Discipline" && (
+                        <div>
+                          <div style={{ ...st.toolbar, marginBottom: 12 }}>
+                            <input style={st.input} placeholder="Search disciplines..." />
+                          </div>
+                          <table style={st.table}>
+                            <thead><tr>
+                              <th style={st.th}></th>
+                              <th style={st.th}>Discipline</th>
+                              <th style={st.th}>Code</th>
+                            </tr></thead>
+                            <tbody>
+                              {[
+                                ["CNA", "Certified Nursing Assistant", true],
+                                ["RN",  "Registered Nurse",            true],
+                                ["LPN", "Licensed Practical Nurse",    false],
+                                ["PT",  "Physical Therapist",          false],
+                                ["OT",  "Occupational Therapist",      false],
+                                ["SLP", "Speech-Language Pathologist", false],
+                                ["ACT", "Activities",                  false],
+                                ["DET", "Dietary",                     false],
+                                ["SS",  "Social Services",             false],
+                                ["ADM", "Administrative",              false],
+                              ].map(([code, name, checked]) => (
+                                <tr key={code}>
+                                  <td style={st.td}><input type="checkbox" defaultChecked={checked} /></td>
+                                  <td style={st.td}>{name}</td>
+                                  <td style={st.td}><span style={st.pill}>{code}</span></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Shift */}
+                      {ehrTab === "Shift" && (
+                        <div>
+                          <div style={{ background: c.primaryLight, border: `1px solid #bfdbfe`, borderRadius: 6, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#1e40af" }}>
+                            Shifts must be selected in order for the user to view residents. For ySupport, set this to <strong>All Shifts</strong>. The client sets this based on the user's work schedule.
+                          </div>
+                          <div style={{ marginBottom: 14 }}>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 8 }}>Allow access to</div>
+                            <div style={{ display: "flex", gap: 20 }}>
+                              {["All shifts", "Specified shifts"].map(opt => (
+                                <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                                  <input type="radio" name="shiftAccess" defaultChecked={opt === "All shifts"} /> {opt}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                          <table style={st.table}>
+                            <thead><tr>
+                              <th style={st.th}>Name</th>
+                              <th style={st.th}>Selected</th>
+                              <th style={st.th}>Primary</th>
+                            </tr></thead>
+                            <tbody>
+                              {[["Day Shift (7–12)", true, false], ["Morning", true, false], ["Evening (3–9)", true, false]].map(([name, sel, primary]) => (
+                                <tr key={name}>
+                                  <td style={st.td}>{name}</td>
+                                  <td style={st.td}><Toggle defaultChecked={sel} /></td>
+                                  <td style={st.td}><Toggle defaultChecked={primary} /></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Zone */}
+                      {ehrTab === "Zone" && (
+                        <div>
+                          <div style={{ background: c.primaryLight, border: `1px solid #bfdbfe`, borderRadius: 6, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#1e40af" }}>
+                            Zones must be selected in order for the user to view residents. For ySupport, set this to <strong>All Zones</strong>. The client sets this based on the user's responsibility area.
+                          </div>
+                          <div style={{ marginBottom: 14 }}>
+                            <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 8 }}>Allow access to</div>
+                            <div style={{ display: "flex", gap: 20 }}>
+                              {["All zones", "Specified zones"].map(opt => (
+                                <label key={opt} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                                  <input type="radio" name="zoneAccess" defaultChecked={opt === "All zones"} /> {opt}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                          <table style={st.table}>
+                            <thead><tr>
+                              <th style={st.th}>Name</th>
+                              <th style={st.th}>Community</th>
+                              <th style={st.th}>Selected</th>
+                            </tr></thead>
+                            <tbody>
+                              {[["Zone A", "Sunrise Gardens", true], ["Zone B", "Sunrise Gardens", true], ["Zone C", "Maple Creek", true]].map(([name, community, sel]) => (
+                                <tr key={name}>
+                                  <td style={st.td}>{name}</td>
+                                  <td style={st.td}>{community}</td>
+                                  <td style={st.td}><Toggle defaultChecked={sel} /></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
                     </div>
                   </div>
-                  <table style={st.table}>
-                    <thead><tr><th style={st.th}>Name</th><th style={st.th}>Community</th><th style={st.th}>Selected</th></tr></thead>
-                    <tbody>
-                      {[["Zone A", "Sunrise Gardens", true], ["Zone B", "Sunrise Gardens", true], ["Zone C", "Maple Creek", true]].map(([name, community, sel]) => (
-                        <tr key={name}>
-                          <td style={st.td}>{name}</td>
-                          <td style={st.td}>{community}</td>
-                          <td style={st.td}><Toggle defaultChecked={sel} /></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                )}
+              </div>
 
-              {!["Login Setup", "Shift", "Zone"].includes(seniorTab) && (
-                <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>{seniorTab} configuration for Senior EHR.</div>
-              )}
+              {/* CRM Setup accordion */}
+              <div style={{ marginTop: 16, border: `1px solid ${c.border}`, borderRadius: 8, overflow: "hidden" }}>
+                <div onClick={() => setCrmOpen(!crmOpen)} style={{ background: crmOpen ? c.primaryLight : "#f9fafb", borderBottom: crmOpen ? `1px solid ${c.border}` : "none", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: crmOpen ? c.primary : c.text }}>CRM Setup</span>
+                  <span style={{ fontSize: 11, color: c.textMuted, transform: crmOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.2s" }}>▼</span>
+                </div>
+
+                {crmOpen && (
+                  <div>
+                    {/* CRM sub-tabs */}
+                    <div style={{ borderBottom: `1px solid ${c.border}`, display: "flex", padding: "0 16px", background: "#fafafa" }}>
+                      {["Roles", "Sales Counselor"].map(t => (
+                        <div key={t} style={{ ...st.drawerTab, ...(crmTab === t ? st.drawerTabActive : {}) }} onClick={() => setCrmTab(t)}>{t}</div>
+                      ))}
+                    </div>
+
+                    <div style={{ padding: 16 }}>
+
+                      {/* Roles */}
+                      {crmTab === "Roles" && (
+                        <div>
+                          {(() => {
+                            const crmRoles = [
+                              "CRM Activity Role - Executive Director",
+                              "Incentive Approver - Incentive Approver",
+                              "Proposal Approver - Corporate",
+                              "Proposal Approver - Executive Director",
+                              "Proposal Approver - Regional Vice President",
+                              "Proposal Approver - Sales Director",
+                              "Sales Counselor",
+                              "Leasing Manager",
+                              "Outreach Coordinator",
+                            ];
+                            const filtered = crmRoles.filter(r => r.toLowerCase().includes(roleSearch.toLowerCase()));
+                            const toggleRole = i => setSelectedRoles(p => p.includes(i) ? p.filter(x => x !== i) : [...p, i]);
+                            return (
+                              <>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                                  <span style={{ fontSize: 13, color: c.textMuted }}>{selectedRoles.length} item{selectedRoles.length !== 1 ? "s" : ""} selected</span>
+                                  <input style={{ ...st.input, width: 200 }} placeholder="Search..." value={roleSearch} onChange={e => setRoleSearch(e.target.value)} />
+                                </div>
+                                <table style={st.table}>
+                                  <thead><tr>
+                                    <th style={st.th}></th>
+                                    <th style={st.th}>Role</th>
+                                  </tr></thead>
+                                  <tbody>
+                                    {filtered.map(role => {
+                                      const origIdx = crmRoles.indexOf(role);
+                                      const checked = selectedRoles.includes(origIdx);
+                                      return (
+                                        <tr key={role} style={{ background: checked ? c.primaryLight : "transparent" }}>
+                                          <td style={{ ...st.td, width: 40 }}>
+                                            <input type="checkbox" checked={checked} onChange={() => toggleRole(origIdx)} />
+                                          </td>
+                                          <td style={{ ...st.td, fontSize: 13 }}>{role}</td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+
+                      {/* Sales Counselor */}
+                      {crmTab === "Sales Counselor" && (
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                            <label style={{ ...st.label, marginBottom: 0 }}>Is Sales Counselor</label>
+                            <Toggle defaultChecked={isSalesCounselor} onChange={v => setIsSalesCounselor(v)} />
+                          </div>
+                          {isSalesCounselor && (() => {
+                            const filtered = archivedProperties.filter(p =>
+                              p.name.toLowerCase().includes(scSearch.toLowerCase()) ||
+                              p.code.toLowerCase().includes(scSearch.toLowerCase())
+                            );
+                            return (
+                              <>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                                  <span style={{ fontSize: 13, color: c.textMuted }}>{filtered.length} propert{filtered.length !== 1 ? "ies" : "y"}</span>
+                                  <input style={{ ...st.input, width: 220 }} placeholder="Search properties..." value={scSearch} onChange={e => setScSearch(e.target.value)} />
+                                </div>
+                                <table style={st.table}>
+                                  <thead><tr>
+                                    <th style={st.th}>Community</th>
+                                    <th style={st.th}>Code</th>
+                                    <th style={st.th}>Inactive Date</th>
+                                  </tr></thead>
+                                  <tbody>
+                                    {filtered.map(p => (
+                                      <tr key={p.id}>
+                                        <td style={{ ...st.td, fontSize: 13 }}>{p.name}</td>
+                                        <td style={st.td}><span style={st.pill}>{p.code}</span></td>
+                                        <td style={st.td}><input type="date" style={{ ...st.input, padding: "4px 8px", fontSize: 12 }} /></td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </>
+                            );
+                          })()}
+                          {!isSalesCounselor && (
+                            <div style={{ fontSize: 13, color: c.textMuted, padding: "8px 0" }}>
+                              Enable "Is Sales Counselor" to configure community assignments.
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                <button style={st.btnOutline} onClick={onClose}>Cancel</button>
+                <button style={st.btn}>Save</button>
+              </div>
             </div>
           )}
         </div>
@@ -786,7 +988,7 @@ function ReportsTab() {
   return (
     <div>
       {toast && (
-        <div style={{ position: "fixed", top: 20, right: 20, background: c.success, color: "#fff", padding: "12px 20px", borderRadius: 6, zIndex: 200, fontSize: 13, fontWeight: 500 }}>
+        <div style={{ position: "fixed", bottom: 16, right: 16, background: c.success, color: "#fff", padding: "12px 20px", borderRadius: 8, zIndex: 200, fontSize: 13, fontWeight: 500 }}>
           ✓ Roles assigned successfully
         </div>
       )}
@@ -1202,7 +1404,7 @@ function PermissionsTab() {
     <div style={{ display: "flex", gap: 20, minHeight: "70vh" }}>
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: 80, right: 20, background: c.success, color: "#fff", padding: "12px 20px", borderRadius: 6, zIndex: 200, fontSize: 13, fontWeight: 500, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+        <div style={{ position: "fixed", bottom: 16, right: 16, background: c.success, color: "#fff", padding: "12px 20px", borderRadius: 8, zIndex: 200, fontSize: 13, fontWeight: 500, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
           ✓ {toast}
         </div>
       )}
@@ -1567,9 +1769,12 @@ export default function SecurityHub() {
 
       {/* Page Header */}
       <div style={st.pageHeader}>
+        <div style={{ width: 40, height: 40, borderRadius: 8, background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Shield size={20} color="#2563eb" />
+        </div>
         <div>
           <div style={st.pageTitle}>Security Hub</div>
-          <div style={st.pageSubtitle}>Manage security groups, user access, roles, and permissions</div>
+          <div style={st.pageSubtitle}>Manage security groups and user access • Ctrl+S to save • Esc to close</div>
         </div>
       </div>
 
@@ -1584,7 +1789,7 @@ export default function SecurityHub() {
       <div style={st.content}>
         {activeTab === "Security Groups" && (
           <div>
-            <div style={st.toolbar}>
+            <div style={st.toolbarStrip}>
               <input style={st.input} placeholder="Search groups..." value={search} onChange={e => setSearch(e.target.value)} />
               <select style={st.select} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option>All</option><option>Active</option><option>Inactive</option>
@@ -1611,7 +1816,7 @@ export default function SecurityHub() {
 
         {activeTab === "Users" && (
           <div>
-            <div style={st.toolbar}>
+            <div style={st.toolbarStrip}>
               <input style={st.input} placeholder="Search users..." value={search} onChange={e => setSearch(e.target.value)} />
               <select style={st.select}><option>All Groups</option>{groups.map(g => <option key={g.id}>{g.code}</option>)}</select>
               <div style={{ flex: 1 }} />
@@ -1638,7 +1843,7 @@ export default function SecurityHub() {
 
         {activeTab === "Roles" && (
           <div>
-            <div style={st.toolbar}>
+            <div style={st.toolbarStrip}>
               <input style={st.input} placeholder="Search roles..." />
               <div style={{ flex: 1 }} />
               <button style={st.btn}>+ New Role</button>
