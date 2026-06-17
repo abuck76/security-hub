@@ -937,8 +937,12 @@ function UserDrawer({ user, onClose }) {
                             );
                           })()}
                           {!isSalesCounselor && (
-                            <div style={{ fontSize: 13, color: c.textMuted, padding: "8px 0" }}>
-                              Enable "Is Sales Counselor" to configure community assignments.
+                            <div style={st.formRow}>
+                              <div style={st.formGroup}>
+                                <label style={st.label}>Inactive Date</label>
+                                <input style={st.inputFull} type="date" />
+                              </div>
+                              <div style={st.formGroup} />
                             </div>
                           )}
                         </div>
