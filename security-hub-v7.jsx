@@ -336,7 +336,17 @@ function SecurityGroupDrawer({ group, onClose }) {
   const [accounts, setAccounts] = useState(glAccounts.slice(0, 36));
   const [trees, setTrees] = useState(acctTrees.slice(0, 11));
   const [codes, setCodes] = useState(chargeCodes.slice(0, 14));
-  const tabs = ["Security Group", "Users", "Permissions", "Accounts", "Acct Trees", "Charge Codes", "Display Types", "Expense Type Restrictions", "Books", "Voyager 7s Menus"];
+  const [vpRows, setVpRows] = useState([
+    { menuset: "EHRAdmin",      appType: "EHRX",           def: true  },
+    { menuset: "CRM Admin",     appType: "Senior CRM",     def: true  },
+    { menuset: "claimsmanager", appType: "Claims Manager", def: true  },
+    { menuset: "",              appType: "",               def: false },
+    { menuset: "",              appType: "",               def: false },
+    { menuset: "",              appType: "",               def: false },
+    { menuset: "",              appType: "",               def: false },
+    { menuset: "",              appType: "",               def: false },
+  ]);
+  const tabs = ["Security Group", "Users", "Permissions", "Accounts", "Acct Trees", "Charge Codes", "Display Types", "Expense Type Restrictions", "Books", "Voyager 7s Menus", "VoyagerPlus App Menus"];
 
   const permRows = [
     { desc: "1098: Electronic File Generation for 1098", access: "Read & Write", type: "Core" },
@@ -474,6 +484,60 @@ function SecurityGroupDrawer({ group, onClose }) {
           {tab === "Voyager 7s Menus" && (
             <div style={{ color: c.textMuted, fontSize: 13, padding: 20, textAlign: "center" }}>No Voyager 7 menu items configured for this group.</div>
           )}
+          {tab === "VoyagerPlus App Menus" && (() => {
+            const menusetAppTypes = {
+              "EHRAdmin":      "EHRX",
+              "CRM Admin":     "Senior CRM",
+              "claimsmanager": "Claims Manager",
+              "seniorhousing": "Senior Housing",
+              "seniorcrm":     "Senior CRM Plus",
+            };
+            const menusetOptions = ["EHRAdmin", "CRM Admin", "claimsmanager", "seniorhousing", "seniorcrm"];
+            const updateRow = (i, field, value) => {
+              setVpRows(prev => prev.map((r, idx) => {
+                if (idx !== i) return r;
+                if (field === "menuset") return { ...r, menuset: value, appType: menusetAppTypes[value] || "" };
+                return { ...r, [field]: value };
+              }));
+            };
+            return (
+              <table style={st.table}>
+                <thead>
+                  <tr>
+                    <th style={st.th}>Menuset Name</th>
+                    <th style={st.th}>App Type</th>
+                    <th style={{ ...st.th, width: 80, textAlign: "center" }}>Default</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vpRows.map((row, i) => (
+                    <tr key={i}>
+                      <td style={st.td}>
+                        <select
+                          style={{ ...st.select, width: "100%" }}
+                          value={row.menuset}
+                          onChange={e => updateRow(i, "menuset", e.target.value)}
+                        >
+                          <option value="">--- Select ---</option>
+                          {menusetOptions.map(m => <option key={m} value={m}>{m}</option>)}
+                        </select>
+                      </td>
+                      <td style={{ ...st.td, color: row.appType ? c.text : c.textLight }}>
+                        {row.appType || ""}
+                      </td>
+                      <td style={{ ...st.td, textAlign: "center" }}>
+                        <input
+                          type="checkbox"
+                          checked={row.def}
+                          onChange={e => updateRow(i, "def", e.target.checked)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            );
+          })()}
         </div>
       </div>
     </>
