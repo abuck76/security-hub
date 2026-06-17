@@ -728,24 +728,26 @@ function UserDrawer({ user, onClose }) {
                               <th style={st.th}></th>
                               <th style={st.th}>Discipline</th>
                               <th style={st.th}>Code</th>
+                              <th style={st.th}>Primary</th>
                             </tr></thead>
                             <tbody>
                               {[
-                                ["CNA", "Certified Nursing Assistant", true],
-                                ["RN",  "Registered Nurse",            true],
-                                ["LPN", "Licensed Practical Nurse",    false],
-                                ["PT",  "Physical Therapist",          false],
-                                ["OT",  "Occupational Therapist",      false],
-                                ["SLP", "Speech-Language Pathologist", false],
-                                ["ACT", "Activities",                  false],
-                                ["DET", "Dietary",                     false],
-                                ["SS",  "Social Services",             false],
-                                ["ADM", "Administrative",              false],
-                              ].map(([code, name, checked]) => (
+                                ["CNA", "Certified Nursing Assistant", true,  true],
+                                ["RN",  "Registered Nurse",            true,  false],
+                                ["LPN", "Licensed Practical Nurse",    false, false],
+                                ["PT",  "Physical Therapist",          false, false],
+                                ["OT",  "Occupational Therapist",      false, false],
+                                ["SLP", "Speech-Language Pathologist", false, false],
+                                ["ACT", "Activities",                  false, false],
+                                ["DET", "Dietary",                     false, false],
+                                ["SS",  "Social Services",             false, false],
+                                ["ADM", "Administrative",              false, false],
+                              ].map(([code, name, checked, primary]) => (
                                 <tr key={code}>
                                   <td style={st.td}><input type="checkbox" defaultChecked={checked} /></td>
                                   <td style={st.td}>{name}</td>
                                   <td style={st.td}><span style={st.pill}>{code}</span></td>
+                                  <td style={st.td}><input type="checkbox" defaultChecked={primary} /></td>
                                 </tr>
                               ))}
                             </tbody>
@@ -809,13 +811,15 @@ function UserDrawer({ user, onClose }) {
                               <th style={st.th}>Name</th>
                               <th style={st.th}>Community</th>
                               <th style={st.th}>Selected</th>
+                              <th style={st.th}>Primary</th>
                             </tr></thead>
                             <tbody>
-                              {[["Zone A", "Sunrise Gardens", true], ["Zone B", "Sunrise Gardens", true], ["Zone C", "Maple Creek", true]].map(([name, community, sel]) => (
+                              {[["Zone A", "Sunrise Gardens", true, false], ["Zone B", "Sunrise Gardens", true, false], ["Zone C", "Maple Creek", true, false]].map(([name, community, sel, primary]) => (
                                 <tr key={name}>
                                   <td style={st.td}>{name}</td>
                                   <td style={st.td}>{community}</td>
                                   <td style={st.td}><Toggle defaultChecked={sel} /></td>
+                                  <td style={st.td}><Toggle defaultChecked={primary} /></td>
                                 </tr>
                               ))}
                             </tbody>
