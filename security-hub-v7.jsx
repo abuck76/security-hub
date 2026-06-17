@@ -983,6 +983,7 @@ function UserDrawer({ user, onClose }) {
                                 </div>
                                 <table style={st.table}>
                                   <thead><tr>
+                                    <th style={st.th}></th>
                                     <th style={st.th}>Community</th>
                                     <th style={st.th}>Code</th>
                                     <th style={st.th}>Inactive Date</th>
@@ -990,6 +991,7 @@ function UserDrawer({ user, onClose }) {
                                   <tbody>
                                     {filtered.map(p => (
                                       <tr key={p.id}>
+                                        <td style={{ ...st.td, width: 40 }}><input type="checkbox" /></td>
                                         <td style={{ ...st.td, fontSize: 13 }}>{p.name}</td>
                                         <td style={st.td}><span style={st.pill}>{p.code}</span></td>
                                         <td style={st.td}><input type="date" style={{ ...st.input, padding: "4px 8px", fontSize: 12 }} /></td>
