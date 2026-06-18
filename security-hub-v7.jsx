@@ -550,6 +550,7 @@ function UserDrawer({ user, onClose }) {
   const [roleSubTab, setRoleSubTab] = useState("Access");
   const [ehrOpen, setEhrOpen] = useState(true);
   const [ehrTab, setEhrTab] = useState("Login Setup");
+  const [vpOpen, setVpOpen] = useState(false);
   const [crmOpen, setCrmOpen] = useState(false);
   const [crmTab, setCrmTab] = useState("Roles");
   const [isSalesCounselor, setIsSalesCounselor] = useState(false);
@@ -706,13 +707,22 @@ function UserDrawer({ user, onClose }) {
                   <div style={{ fontSize: 12, color: c.textMuted, marginTop: 4 }}>Require user to set a new PIN on next login</div>
                 </div>
               </div>
-              <div style={{ marginTop: 8 }}>
-                {["EHRX", "Senior CRM", "Claims Manager"].map(right => (
-                  <div key={right} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 }}>
-                    <span>{right}</span>
-                    <input type="checkbox" />
+              {/* Voyager Plus Program Rights accordion */}
+              <div style={{ marginTop: 16, border: `1px solid ${c.border}`, borderRadius: 8, overflow: "hidden" }}>
+                <div onClick={() => setVpOpen(!vpOpen)} style={{ background: vpOpen ? c.primaryLight : "#f9fafb", borderBottom: vpOpen ? `1px solid ${c.border}` : "none", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: vpOpen ? c.primary : c.text }}>Voyager Plus Program Rights</span>
+                  <span style={{ fontSize: 11, color: c.textMuted, transform: vpOpen ? "rotate(180deg)" : "none", display: "inline-block", transition: "transform 0.2s" }}>▼</span>
+                </div>
+                {vpOpen && (
+                  <div style={{ padding: 16 }}>
+                    {["EHRX", "Senior CRM", "Claims Manager"].map(right => (
+                      <div key={right} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 }}>
+                        <span>{right}</span>
+                        <input type="checkbox" />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
 
               {/* EHR Setup accordion */}
