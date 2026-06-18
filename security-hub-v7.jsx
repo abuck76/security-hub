@@ -556,7 +556,7 @@ function UserDrawer({ user, onClose }) {
   const [roleSearch, setRoleSearch] = useState("");
   const [selectedRoles, setSelectedRoles] = useState([0, 1, 2, 3, 4]);
   const [scSearch, setScSearch] = useState("");
-  const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Voyager Plus Program Rights", "Senior"];
+  const tabs = ["Roles", "Details", "Settings", "Program Rights", "Regional Settings", "Page Access", "Element Access", "Voyager Access", "Senior"];
 
   const accessRoles = ["Administrator", "Accounting Manager", "Leasing Agent", "Property Manager"];
   const noAccessRoles = ["Maintenance Tech", "Read Only", "Vendor Portal"];
@@ -683,34 +683,6 @@ function UserDrawer({ user, onClose }) {
               ))}
             </div>
           )}
-          {tab === "Voyager Plus Program Rights" && (() => {
-            const vpRights = [
-              "Residential Leasing Pad", "SFH Leasing Pad", "Cash Management",
-              "Commercial Leasing Pad", "Concierge Plus", "Energy",
-              "Orion BI", "LOBOS FDD", "Condo CRM Plus",
-              "EHRX", "P2P Plus", "RENTCafe CRM (International)",
-              "Investor Plus", "Facilities Manager", "EnergyTStat",
-              "Data Aggregation Services", "Student Leasing Pad", "RentCafe EDocs",
-              "Senior CRM", "Yes Plus", "Unit Sales CRM",
-              "Compliance Manager", "Orion Document Management", "Claims Manager",
-              "Construction Management", "Admin Utilities",
-            ];
-            const cols = [vpRights.filter((_, i) => i % 3 === 0), vpRights.filter((_, i) => i % 3 === 1), vpRights.filter((_, i) => i % 3 === 2)];
-            return (
-              <div style={{ display: "flex", gap: 0 }}>
-                {cols.map((col, ci) => (
-                  <div key={ci} style={{ flex: 1 }}>
-                    {col.map(name => (
-                      <div key={name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 10px", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 }}>
-                        <span>{name}</span>
-                        <input type="checkbox" />
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
           {tab === "Senior" && (
             <div>
               {/* Basic Information */}
@@ -733,6 +705,14 @@ function UserDrawer({ user, onClose }) {
                   </label>
                   <div style={{ fontSize: 12, color: c.textMuted, marginTop: 4 }}>Require user to set a new PIN on next login</div>
                 </div>
+              </div>
+              <div style={{ marginTop: 8 }}>
+                {["EHRX", "Senior CRM", "Claims Manager"].map(right => (
+                  <div key={right} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 }}>
+                    <span>{right}</span>
+                    <input type="checkbox" />
+                  </div>
+                ))}
               </div>
 
               {/* EHR Setup accordion */}
