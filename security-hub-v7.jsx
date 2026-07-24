@@ -1075,6 +1075,13 @@ function ReportsTab() {
   const [assignSearch, setAssignSearch] = useState("");
   const [assignProduct, setAssignProduct] = useState("");
   const [assignRoleSel, setAssignRoleSel] = useState([]);
+  const [showCopy, setShowCopy] = useState(false);
+  const [copySource, setCopySource] = useState("");
+  const [copyTargets, setCopyTargets] = useState([]);
+  const [copyMode, setCopyMode] = useState("add");
+  const [copyScope, setCopyScope] = useState("both");
+  const [copySearch, setCopySearch] = useState("");
+  const [copyProduct, setCopyProduct] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState("");
   // reports held in state so role assignments (and the Roles count) update when saved.
@@ -1123,6 +1130,33 @@ function ReportsTab() {
   };
   const removeFromRoles = () => { showToast(`Removed ${selected.length} report(s) from roles`); setSelected([]); };
 
+  // Copy Report Settings — replicate one role's full report set onto other roles
+  const reportsForRole = id => reportRows.filter(r => r.assignedRoleIds.includes(id));
+  const openCopy = () => { setCopySource(""); setCopyTargets([]); setCopyMode("add"); setCopyScope("both"); setCopySearch(""); setCopyProduct(""); setShowCopy(true); };
+  const toggleCopyTarget = id => setCopyTargets(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  const confirmCopy = () => {
+    const src = Number(copySource);
+    const targets = copyTargets;
+    const scoped = r => copyScope === "both" || r.type === copyScope;
+    const count = reportsForRole(src).filter(scoped).length;
+    setReportRows(rows => rows.map(r => {
+      if (!scoped(r)) return r; // leave out-of-scope report types untouched
+      const inSource = r.assignedRoleIds.includes(src);
+      const set = new Set(r.assignedRoleIds);
+      if (copyMode === "add") {
+        if (inSource) targets.forEach(t => set.add(t));
+      } else { // replace: target's access for this report matches the source
+        targets.forEach(t => { if (inSource) set.add(t); else set.delete(t); });
+      }
+      const ids = Array.from(set);
+      return { ...r, assignedRoleIds: ids, roles: ids.length };
+    }));
+    setShowCopy(false);
+    const srcName = assignableRoles.find(x => x.id === src)?.name || "role";
+    const scopeLabel = copyScope === "both" ? "" : copyScope + " ";
+    showToast(`Copied ${count} ${scopeLabel}report setting(s) from ${srcName} to ${targets.length} role(s)`);
+  };
+
   const SortTh = ({ label, k, style }) => (
     <th style={{ ...st.th, cursor: "pointer", ...style }} onClick={() => setSort(s => ({ key: k, dir: s.key === k && s.dir === "asc" ? "desc" : "asc" }))}>
       {label} <span style={{ color: c.textLight, fontSize: 10 }}>{sort.key === k ? (sort.dir === "asc" ? "▲" : "▼") : "⇅"}</span>
@@ -1153,6 +1187,7 @@ function ReportsTab() {
         <span style={{ width: 26, height: 26, borderRadius: "50%", background: c.primary, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600 }}>{typeReports.length}</span>
         <span style={{ fontSize: 14, fontWeight: 600 }}>{reportType} Role Access</span>
         <div style={{ flex: 1 }} />
+        <button style={st.btnOutline} onClick={openCopy}>⧉ Copy Report Settings</button>
         {selected.length > 0 ? (
           <>
             <button style={st.btn} onClick={() => openAssign(selected)}>+ Assign to Roles</button>
@@ -1253,6 +1288,107 @@ function ReportsTab() {
               <div style={{ display: "flex", gap: 10 }}>
                 <button style={st.btnOutline} onClick={() => setShowAssign(false)}>Cancel</button>
                 <button style={st.btn} onClick={confirmAssign}>Add</button>
+              </div>
+            </div>
+          </div>
+        </>
+        );
+      })()}
+
+      {/* Copy Report Settings Drawer */}
+      {showCopy && (() => {
+        const srcId = copySource === "" ? null : Number(copySource);
+        const inScope = r => copyScope === "both" || r.type === copyScope;
+        const srcCount = srcId ? reportsForRole(srcId).filter(inScope).length : 0;
+        const targetRoles = assignableRoles.filter(r =>
+          r.id !== srcId &&
+          (copyProduct === "" || r.product === copyProduct) &&
+          (r.name.toLowerCase().includes(copySearch.toLowerCase()) || r.menu.toLowerCase().includes(copySearch.toLowerCase()))
+        );
+        const allTargetsChecked = targetRoles.length > 0 && targetRoles.every(r => copyTargets.includes(r.id));
+        return (
+        <>
+          <div style={st.overlay} onClick={() => setShowCopy(false)} />
+          <div style={st.drawer}>
+            <div style={st.drawerHeader}>
+              <div>
+                <div style={st.drawerTitle}>Copy Report Settings</div>
+                <div style={{ fontSize: 12, color: c.textMuted, marginTop: 2 }}>Copy every report assigned to one role onto one or more other roles</div>
+              </div>
+              <CloseBtn onClick={() => setShowCopy(false)} />
+            </div>
+
+            <div style={{ padding: "16px 24px", borderBottom: `1px solid ${c.border}` }}>
+              <label style={st.label}>Copy from (source role)</label>
+              <select style={{ ...st.inputFull, marginBottom: 12 }} value={copySource} onChange={e => { setCopySource(e.target.value); setCopyTargets([]); }}>
+                <option value="">Select a source role…</option>
+                {assignableRoles.map(r => <option key={r.id} value={r.id}>{r.name} — {reportsForRole(r.id).filter(inScope).length} reports</option>)}
+              </select>
+
+              <label style={st.label}>Report type</label>
+              <div style={{ display: "flex", gap: 18, marginBottom: 4 }}>
+                {[["both", "Both"], ["YSR", "YSR"], ["SQL", "SQL"]].map(([val, lbl]) => (
+                  <label key={val} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                    <input type="radio" name="copyScope" checked={copyScope === val} onChange={() => setCopyScope(val)} /> {lbl}
+                  </label>
+                ))}
+              </div>
+              {srcId && <div style={{ fontSize: 12, color: c.textMuted }}>{srcCount} {copyScope === "both" ? "" : copyScope + " "}report{srcCount !== 1 ? "s" : ""} will be copied.</div>}
+
+              <label style={{ ...st.label, marginTop: 12 }}>Apply as</label>
+              <div style={{ display: "flex", gap: 18 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                  <input type="radio" name="copyMode" checked={copyMode === "add"} onChange={() => setCopyMode("add")} /> Add to existing access
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                  <input type="radio" name="copyMode" checked={copyMode === "replace"} onChange={() => setCopyMode("replace")} /> Replace existing access
+                </label>
+              </div>
+              <div style={{ fontSize: 11, color: c.textMuted, marginTop: 6 }}>
+                {copyMode === "add"
+                  ? "Target roles keep their current reports; the source's reports are added."
+                  : "Target roles' report access is overwritten to exactly match the source."}
+              </div>
+            </div>
+
+            <div style={{ padding: "12px 24px", borderBottom: `1px solid ${c.border}`, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>Copy to</div>
+              <input style={{ ...st.input, flex: 1, minWidth: 160 }} placeholder="Search roles" value={copySearch} onChange={e => setCopySearch(e.target.value)} />
+              <select style={st.select} value={copyProduct} onChange={e => setCopyProduct(e.target.value)}>
+                <option value="">Select Product</option>
+                {assignableProducts.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              <table style={{ ...st.table, border: "none", borderRadius: 0 }}>
+                <thead><tr>
+                  <th style={{ ...st.th, width: 40 }}><input type="checkbox" checked={allTargetsChecked} onChange={e => setCopyTargets(e.target.checked ? targetRoles.map(r => r.id) : [])} /></th>
+                  <th style={st.th}>Role</th><th style={st.th}>Product</th><th style={{ ...st.th, textAlign: "right" }}>Current Reports</th>
+                </tr></thead>
+                <tbody>{targetRoles.map(r => {
+                  const sel = copyTargets.includes(r.id);
+                  return (
+                    <tr key={r.id} style={sel ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={sel} onChange={() => toggleCopyTarget(r.id)} /></td>
+                      <td style={st.td}>{r.name}</td>
+                      <td style={st.td}><span style={st.pill}>{r.product}</span></td>
+                      <td style={{ ...st.td, textAlign: "right", color: c.textMuted }}>{reportsForRole(r.id).filter(inScope).length}</td>
+                    </tr>
+                  );
+                })}
+                {srcId && targetRoles.length === 0 && (
+                  <tr><td style={{ ...st.td, textAlign: "center", color: c.textMuted }} colSpan={4}>No other roles match.</td></tr>
+                )}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ padding: "14px 24px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, color: c.textMuted }}>{copyTargets.length} target role(s) selected</span>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button style={st.btnOutline} onClick={() => setShowCopy(false)}>Cancel</button>
+                <button style={{ ...st.btn, opacity: (!srcId || copyTargets.length === 0) ? 0.5 : 1 }} disabled={!srcId || copyTargets.length === 0} onClick={confirmCopy}>Copy Settings</button>
               </div>
             </div>
           </div>
