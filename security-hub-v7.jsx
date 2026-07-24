@@ -124,6 +124,53 @@ const assignableRoles = [
   { id: 26, name: "Investment Analyst", menu: "InvestmentAnalyst", product: "Asset IQ Nb" },
 ];
 
+// Roles shown on the Roles tab (also source/targets for Copy Role Settings) — mirrors production
+const roleList = [
+  { id: 1, name: ".Voyager 8 Residential-Cash", menu: "Voyager 8 Residential 07/16", product: "Res Manager", roleType: "Company Specific", status: "Active" },
+  { id: 2, name: "Amol-Cash", menu: "BillPayCSD", product: "Procure to Pay", roleType: "Company Specific", status: "Active" },
+  { id: 3, name: "CRM IQ-Clone_Test1-Cash", menu: "crmiqnet", product: "CRM IQ Net", roleType: "Company Specific", status: "Active" },
+  { id: 4, name: "Data Connect Test-Cash", menu: "DataConnectNet", product: "Data Connect", roleType: "Company Specific", status: "Active" },
+  { id: 5, name: "Storage Manager QA", menu: "storagemanagernet", product: "Storage Manager", roleType: "Company Specific", status: "Active" },
+  { id: 6, name: "V8 Admin (Test)-Cash", menu: "VoyagerSetup_orig", product: "VoyagerSetup", roleType: "Company Specific", status: "Active" },
+  { id: 7, name: "V8 Admin (Test)-Cash 1 test", menu: "VoyagerSetup_orig", product: "VoyagerSetup", roleType: "Company Specific", status: "Active" },
+  { id: 8, name: "V8 Res (Test)-Cash", menu: "Voyager 8 Residential 07/16", product: "Res Manager", roleType: "Company Specific", status: "Active" },
+  { id: 9, name: "V8 Res Clone-Cash", menu: "Voyager 8 Residential 07/16", product: "Res Manager", roleType: "Company Specific", status: "Active" },
+  { id: 10, name: "V8 Res-Cash", menu: "Voyager 8 Residential 07/16", product: "Res Manager", roleType: "Company Specific", status: "Active" },
+  { id: 11, name: "V8CRMIQ-admin-Cash", menu: "Voyager 8 CRM IQ - Admin 07/16", product: "CRM IQ Net", roleType: "Company Specific", status: "Active" },
+  { id: 12, name: "V8Res17Nov-Cash", menu: "Voyager 8 Residential 07/16", product: "Res Manager", roleType: "Company Specific", status: "Active" },
+  { id: 13, name: "Voyager 8 Residential G401-Cash", menu: "Voyager 8 Residential 07/16", product: "Res Manager", roleType: "Company Specific", status: "Active" },
+];
+const roleProducts = ["Res Manager", "Procure to Pay", "CRM IQ Net", "Data Connect", "Storage Manager", "VoyagerSetup"];
+
+// Copy Role Settings — the configuration areas that can be copied (match the role slide-out config tabs)
+const roleSettingAreas = ["Voyager Databases", "Function Configuration", "Element Configuration", "Menu Configuration", "YSR Reports", "SQL Reports"];
+
+// Representative content for the Role drawer's tabs (mirrors production)
+const linkedUsers = [{ user: "Andrew.Buchanan@Yardi.Com", group: "ysuper2" }];
+const nonLinkedUsers = [
+  { user: "j.smith@yardi.com", group: "ysuper1" }, { user: "m.lee@yardi.com", group: "ysuper3" },
+  { user: "t.davis@yardi.com", group: "admin" }, { user: "k.wilson@yardi.com", group: "ysuper2" },
+];
+const nonLinkedUsersCount = 138;
+const voyagerDatabasesList = ["1999825011", "abcdeyvivhvgq_cpr_052426", "AKAM_live_060226", "aorlypz_live_071526", "Avenue Living_052526", "Avison Young Real Estate_060426", "Balaciano_052626", "BBTKlo", "Bell Partners Inc_061926", "BellPartners_060926", "BentallGreenOak_062926", "Berkshire_061126", "billpayeu_052526", "BPXUSMR02", "BPXUSMR03"];
+const functionTokensList = ["Communication > Automation", "Communication > Analytics", "Communication > Contact IQ", "Communication > Tracking & Routing", "Reports > Lead Stage Summary", "Reports > Conversion Ratio", "Reports > ChatIQ Handoff", "Reports > Incoming Traffic", "Do not use Communication > CampaignQ", "Do not use Communication > Campaigns > ScheduleSend Now"];
+const elementConfigList = ["Prospect > Edit", "Communication > Campaigns > Create Campaign", "Communication > Manage Templates > Create Template > Campaign", "Communication > Create Automation Templates", "Communication > Campaigns > Create Audience", "Communication > Campaigns > Create Campaign > Override Unsubscribe Status", "Communication > Tracking & Routing > Bulk Convert", "Communication > Tracking & Routing > Add New Tracking Source", "Communication > Tracking & Routing > Campaigns", "Communication > Tracking & Routing > Schedules"];
+const elementAccessTypes = ["Read & Write", "Read Only", "No Access"];
+const menuConfigList = ["Financial Reports w/ Notes", "Financial Packets", "Segment Analytics", "Receivable Analytics", "AR Calendar", "Bank Reconciliation", "Bank Analytics", "Custom Financial Analytics", "AP Analytics", "Register Reports", "Payee Ledger", "Deposit Interest Distribution"];
+const roleYsrReports = ["$0 1099 Correction", "$0 1099 Correction for Portal Recipient", "1096 Vendor - by Bank", "Print Receipt", "Print Receipt 2", "1098 Vendor", "1098 MISC Owner - by Management Company", "1099 Portal Div Dividends by Management Company", "1099 Summary Report YSR", "1099 INT Interest - by Owner"];
+const roleSqlReports = [
+  { name: "_CAM Renewal Lease", file: "rs_sql_CAM_Renewal_Lease.txt" },
+  { name: "_CAM Renewal Lease2", file: "rs_sql_CAM_Renewal_Lease2.txt" },
+  { name: "_Audit History Table Changes", file: "rs_sql_Audit_History.txt" },
+  { name: "No Title", file: "rs_sql_TR_Compliance_Transfer_Notice_Filter.txt" },
+  { name: "No Title", file: "rs_sql_TR_Express_Policy_Notification_Script.txt" },
+  { name: "No Title", file: "rs_sql_TR_Compliance_Recert_Resident_Filter.txt" },
+  { name: "No Title", file: "rs_sql_TR_Introduction_Notice_Filter.txt" },
+  { name: "No Title", file: "rs_sql_TR_Express_Renewal_Notice_Script.txt" },
+  { name: "No Title", file: "rs_sql_TR_Introduction_Voluntary_Script.txt" },
+  { name: "No Title", file: "rs_sql_TR_Compliance_Notice_Script.txt" },
+];
+
 const permissionCategories = [
   { cat: "Residents", items: ["View Residents", "Edit Residents", "Move-In", "Move-Out", "Eviction"] },
   { cat: "Leasing", items: ["View Prospects", "Edit Applications", "Approve Leases", "Cancel Leases"] },
@@ -2044,6 +2091,435 @@ function PermissionsTab() {
   );
 }
 
+// ─── Role Drawer (view a role's settings across all areas) ─────────────────────
+function RoleDrawer({ role, onClose }) {
+  const tabs = ["Users", "Voyager Database", "Function Configuration", "Element Configuration", "Menu Configuration", "YSR Reports", "SQL Reports"];
+  const [tab, setTab] = useState("Users");
+  const [q, setQ] = useState("");
+  const [userSub, setUserSub] = useState("Linked");
+  const [dbSel, setDbSel] = useState(() => voyagerDatabasesList.slice(0, 3));
+  const [fnSel, setFnSel] = useState(() => functionTokensList.slice());
+  const [menuSel, setMenuSel] = useState(() => menuConfigList.slice());
+  const [ysrSel, setYsrSel] = useState(() => roleYsrReports.slice(0, 3));
+  const [sqlSel, setSqlSel] = useState([]);
+  const [elemAccess, setElemAccess] = useState(() => { const o = {}; elementConfigList.forEach(e => { o[e] = "Read & Write"; }); return o; });
+
+  const toggle = (arr, setter, val) => setter(arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]);
+  const match = s => s.toLowerCase().includes(q.toLowerCase());
+  const switchTab = t => { setTab(t); setQ(""); };
+
+  const head = (count, label, extra) => (
+    <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+      <input style={{ ...st.input, width: 260 }} placeholder="Search" value={q} onChange={e => setQ(e.target.value)} />
+      <span style={{ minWidth: 24, height: 24, padding: "0 7px", borderRadius: 9999, background: c.primary, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600 }}>{count}</span>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>{label}</span>
+      {extra}
+    </div>
+  );
+  const yes = <span style={{ color: c.success, fontWeight: 700 }}>✓</span>;
+
+  return (
+    <>
+      <div style={st.overlay} onClick={onClose} />
+      <div style={st.drawer}>
+        <div style={st.drawerHeader}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: c.primaryLight, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Shield size={16} color={c.primary} />
+            </div>
+            <div>
+              <div style={st.drawerTitle}>{role.name}</div>
+              <div style={{ fontSize: 12, color: c.textMuted, marginTop: 2 }}>{role.menu}</div>
+            </div>
+          </div>
+          <CloseBtn onClick={onClose} />
+        </div>
+
+        <div style={st.drawerTabBar}>
+          {tabs.map(t => (
+            <div key={t} style={{ ...st.drawerTab, ...(tab === t ? st.drawerTabActive : {}) }} onClick={() => switchTab(t)}>{t}</div>
+          ))}
+        </div>
+
+        <div style={st.drawerContent}>
+          {tab === "Users" && (() => {
+            const list = (userSub === "Linked" ? linkedUsers : nonLinkedUsers).filter(u => match(u.user) || match(u.group));
+            return (
+              <div>
+                <div style={{ display: "flex", gap: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 12 }}>
+                  {[["Linked", linkedUsers.length], ["Non-Linked", nonLinkedUsersCount]].map(([lbl, cnt]) => (
+                    <div key={lbl} onClick={() => { setUserSub(lbl); setQ(""); }} style={{ ...st.drawerTab, ...(userSub === lbl ? st.drawerTabActive : {}), display: "flex", alignItems: "center", gap: 6 }}>
+                      {lbl} Users <span style={st.badge(c.primary, c.primaryLight)}>{cnt}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+                  <input style={{ ...st.input, width: 240 }} placeholder="Search" value={q} onChange={e => setQ(e.target.value)} />
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>{list.length} User{list.length !== 1 ? "s" : ""}</span>
+                  <div style={{ flex: 1 }} />
+                  <select style={st.select}><option>--- Select ---</option>{groups.map(g => <option key={g.id}>{g.code}</option>)}</select>
+                  <select style={st.select}><option>All</option><option>Active</option><option>Inactive</option></select>
+                </div>
+                <table style={st.table}>
+                  <thead><tr><th style={st.th}>User</th><th style={st.th}>Security Group</th><th style={{ ...st.th, width: 40 }}></th></tr></thead>
+                  <tbody>{list.map(u => (
+                    <tr key={u.user}>
+                      <td style={{ ...st.td, color: c.primary }}>{u.user}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>{u.group}</td>
+                      <td style={st.td}><input type="checkbox" /></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {tab === "Voyager Database" && (() => {
+            const list = voyagerDatabasesList.filter(match);
+            return (
+              <div>
+                {head(dbSel.length, `of ${voyagerDatabasesList.length} Databases`)}
+                <table style={st.table}>
+                  <thead><tr><th style={{ ...st.th, width: 40 }}></th><th style={st.th}>Name</th></tr></thead>
+                  <tbody>{list.map(n => (
+                    <tr key={n} style={dbSel.includes(n) ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={dbSel.includes(n)} onChange={() => toggle(dbSel, setDbSel, n)} /></td>
+                      <td style={st.td}>{n}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {tab === "Function Configuration" && (() => {
+            const list = functionTokensList.filter(match);
+            return (
+              <div>
+                {head(fnSel.length, `of ${functionTokensList.length} Tokens`)}
+                <table style={st.table}>
+                  <thead><tr>
+                    <th style={{ ...st.th, width: 40 }}></th><th style={st.th}>Security Token</th>
+                    <th style={{ ...st.th, textAlign: "center", width: 90 }}>Licensed</th><th style={st.th}>Product</th>
+                    <th style={{ ...st.th, textAlign: "center", width: 80 }}>Shared</th>
+                  </tr></thead>
+                  <tbody>{list.map(n => (
+                    <tr key={n} style={fnSel.includes(n) ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={fnSel.includes(n)} onChange={() => toggle(fnSel, setFnSel, n)} /></td>
+                      <td style={st.td}>{n}</td>
+                      <td style={{ ...st.td, textAlign: "center" }}>{yes}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>Res Manager</td>
+                      <td style={{ ...st.td, textAlign: "center" }}></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {tab === "Element Configuration" && (() => {
+            const list = elementConfigList.filter(match);
+            return (
+              <div>
+                {head(list.length, "Elements")}
+                <table style={st.table}>
+                  <thead><tr>
+                    <th style={{ ...st.th, width: 150 }}>Access Type</th><th style={st.th}>Element</th>
+                    <th style={{ ...st.th, textAlign: "center", width: 90 }}>Licensed</th><th style={st.th}>Product</th>
+                    <th style={{ ...st.th, textAlign: "center", width: 80 }}>Shared</th>
+                  </tr></thead>
+                  <tbody>{list.map(n => (
+                    <tr key={n}>
+                      <td style={st.td}>
+                        <select style={{ ...st.select, padding: "4px 8px", fontSize: 12 }} value={elemAccess[n]} onChange={e => setElemAccess(p => ({ ...p, [n]: e.target.value }))}>
+                          {elementAccessTypes.map(a => <option key={a}>{a}</option>)}
+                        </select>
+                      </td>
+                      <td style={st.td}>{n}</td>
+                      <td style={{ ...st.td, textAlign: "center" }}>{yes}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>Res Manager</td>
+                      <td style={{ ...st.td, textAlign: "center" }}></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {tab === "Menu Configuration" && (() => {
+            const list = menuConfigList.filter(match);
+            return (
+              <div>
+                {head(menuSel.length, `of ${menuConfigList.length} Menus`)}
+                <table style={st.table}>
+                  <thead><tr>
+                    <th style={{ ...st.th, width: 40 }}></th><th style={st.th}>Security Token</th>
+                    <th style={{ ...st.th, textAlign: "center", width: 90 }}>Licensed</th><th style={st.th}>Product</th>
+                    <th style={{ ...st.th, textAlign: "center", width: 80 }}>Shared</th>
+                  </tr></thead>
+                  <tbody>{list.map(n => (
+                    <tr key={n} style={menuSel.includes(n) ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={menuSel.includes(n)} onChange={() => toggle(menuSel, setMenuSel, n)} /></td>
+                      <td style={st.td}>{n}</td>
+                      <td style={{ ...st.td, textAlign: "center" }}>{yes}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>GL Manager (mri)</td>
+                      <td style={{ ...st.td, textAlign: "center" }}>{yes}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {tab === "YSR Reports" && (() => {
+            const list = roleYsrReports.filter(match);
+            return (
+              <div>
+                {head(ysrSel.length, "selected")}
+                <table style={st.table}>
+                  <thead><tr><th style={{ ...st.th, width: 40 }}></th><th style={st.th}>Report Name</th></tr></thead>
+                  <tbody>{list.map(n => (
+                    <tr key={n} style={ysrSel.includes(n) ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={ysrSel.includes(n)} onChange={() => toggle(ysrSel, setYsrSel, n)} /></td>
+                      <td style={st.td}>{n}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+
+          {tab === "SQL Reports" && (() => {
+            const list = roleSqlReports.filter(rr => match(rr.name) || match(rr.file));
+            return (
+              <div>
+                {head(roleSqlReports.length, "Reports")}
+                <table style={st.table}>
+                  <thead><tr><th style={{ ...st.th, width: 40 }}></th><th style={st.th}>Report Name</th><th style={st.th}>File Name</th></tr></thead>
+                  <tbody>{list.map((rr, i) => (
+                    <tr key={i} style={sqlSel.includes(rr.file) ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={sqlSel.includes(rr.file)} onChange={() => toggle(sqlSel, setSqlSel, rr.file)} /></td>
+                      <td style={st.td}>{rr.name}</td>
+                      <td style={{ ...st.td, color: c.textMuted, fontFamily: "monospace", fontSize: 12 }}>{rr.file}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            );
+          })()}
+        </div>
+
+        <div style={{ padding: "14px 24px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <button style={st.btnOutline} onClick={onClose}>Cancel</button>
+          <button style={st.btn} onClick={onClose}>{tab === "Users" ? "Link/Unlink Selected" : "Save"}</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── Roles Tab ────────────────────────────────────────────────────────────────
+function RolesTab() {
+  const [search, setSearch] = useState("");
+  const [productFilter, setProductFilter] = useState("");
+  const [openRole, setOpenRole] = useState(null);
+  const [cloneRole, setCloneRole] = useState(null);
+  const [newRoleName, setNewRoleName] = useState("");
+  const [showCopy, setShowCopy] = useState(false);
+  const [copySource, setCopySource] = useState("");
+  const [copyTargets, setCopyTargets] = useState([]);
+  const [copyAreas, setCopyAreas] = useState(roleSettingAreas.slice());
+  const [copyMode, setCopyMode] = useState("add");
+  const [copySearch, setCopySearch] = useState("");
+  const [toast, setToast] = useState("");
+
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+  const filtered = roleList.filter(r =>
+    (productFilter === "" || r.product === productFilter) &&
+    (r.name.toLowerCase().includes(search.toLowerCase()) || r.menu.toLowerCase().includes(search.toLowerCase()) || r.product.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  const openCopy = () => { setCopySource(""); setCopyTargets([]); setCopyAreas(roleSettingAreas.slice()); setCopyMode("add"); setCopySearch(""); setShowCopy(true); };
+  const toggleTarget = id => setCopyTargets(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  const toggleArea = a => setCopyAreas(p => p.includes(a) ? p.filter(x => x !== a) : [...p, a]);
+  const confirmCopy = () => {
+    const srcName = roleList.find(r => r.id === Number(copySource))?.name || "role";
+    setShowCopy(false);
+    showToast(`Copied ${copyAreas.length} setting area(s) from ${srcName} to ${copyTargets.length} role(s)`);
+  };
+  const openClone = r => { setCloneRole(r); setNewRoleName(""); };
+  const confirmClone = () => { const n = newRoleName.trim(); const src = cloneRole.name; setCloneRole(null); showToast(`Cloned "${src}"${n ? ` to "${n}"` : ""}`); };
+
+  return (
+    <div>
+      {toast && (
+        <div style={{ position: "fixed", bottom: 16, right: 16, background: c.success, color: "#fff", padding: "12px 20px", borderRadius: 8, zIndex: 200, fontSize: 13, fontWeight: 500 }}>
+          ✓ {toast}
+        </div>
+      )}
+
+      <div style={st.toolbarStrip}>
+        <input style={st.input} placeholder="Search roles..." value={search} onChange={e => setSearch(e.target.value)} />
+        <span style={{ minWidth: 26, height: 26, padding: "0 8px", borderRadius: 9999, background: c.primary, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600 }}>{roleList.length}</span>
+        <span style={{ fontSize: 14, fontWeight: 600 }}>Roles</span>
+        <div style={{ flex: 1 }} />
+        <select style={st.select} value={productFilter} onChange={e => setProductFilter(e.target.value)}>
+          <option value="">Select Product</option>
+          {roleProducts.map(p => <option key={p} value={p}>{p}</option>)}
+        </select>
+        <button style={st.btnOutline} onClick={openCopy}>⧉ Copy Role Settings</button>
+        <button style={st.btn}>+ New Role</button>
+      </div>
+
+      <table style={st.table}>
+        <thead><tr>
+          <th style={st.th}>Role</th><th style={st.th}>Menu</th><th style={st.th}>Product</th>
+          <th style={st.th}>Role Type</th><th style={st.th}>Status</th><th style={{ ...st.th, textAlign: "right" }}>Action</th>
+        </tr></thead>
+        <tbody>{filtered.map(r => (
+          <tr key={r.id} className="role-row">
+            <td style={{ ...st.td, color: c.primary, fontWeight: 500, cursor: "pointer" }} onClick={() => setOpenRole(r)}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><Shield size={14} color={c.primary} />{r.name}</span>
+            </td>
+            <td style={{ ...st.td, color: c.textMuted }}>{r.menu}</td>
+            <td style={st.td}>{r.product}</td>
+            <td style={{ ...st.td, color: c.textMuted }}>{r.roleType}</td>
+            <td style={st.td}><StatusBadge status={r.status} /></td>
+            <td style={{ ...st.td, textAlign: "right" }}><button style={st.btnSmall} onClick={() => openClone(r)}>Clone Role</button></td>
+          </tr>
+        ))}</tbody>
+      </table>
+
+      {openRole && <RoleDrawer role={openRole} onClose={() => setOpenRole(null)} />}
+
+      {/* Clone Role slide-out */}
+      {cloneRole && (
+        <>
+          <div style={st.overlay} onClick={() => setCloneRole(null)} />
+          <div style={{ ...st.drawer, width: 480 }}>
+            <div style={st.drawerHeader}>
+              <div style={st.drawerTitle}>Clone Role</div>
+              <CloseBtn onClick={() => setCloneRole(null)} />
+            </div>
+            <div style={st.drawerContent}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={st.label}>Role Name <span style={{ color: c.danger }}>*</span></label>
+                <input style={{ ...st.inputFull, background: c.bg, color: c.textMuted }} value={cloneRole.name} readOnly />
+              </div>
+              <div>
+                <label style={st.label}>New Role Name <span style={{ color: c.danger }}>*</span></label>
+                <input style={st.inputFull} placeholder="Enter New Role Name" value={newRoleName} onChange={e => setNewRoleName(e.target.value)} autoFocus />
+              </div>
+            </div>
+            <div style={{ padding: "14px 24px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button style={st.btnOutline} onClick={() => setCloneRole(null)}>Close</button>
+              <button style={{ ...st.btn, opacity: newRoleName.trim() ? 1 : 0.5 }} disabled={!newRoleName.trim()} onClick={confirmClone}>Save</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Copy Role Settings Drawer */}
+      {showCopy && (() => {
+        const srcId = copySource === "" ? null : Number(copySource);
+        const targetRoles = roleList.filter(r =>
+          r.id !== srcId &&
+          (r.name.toLowerCase().includes(copySearch.toLowerCase()) || r.menu.toLowerCase().includes(copySearch.toLowerCase()) || r.product.toLowerCase().includes(copySearch.toLowerCase()))
+        );
+        const allTargetsChecked = targetRoles.length > 0 && targetRoles.every(r => copyTargets.includes(r.id));
+        return (
+        <>
+          <div style={st.overlay} onClick={() => setShowCopy(false)} />
+          <div style={st.drawer}>
+            <div style={st.drawerHeader}>
+              <div>
+                <div style={st.drawerTitle}>Copy Role Settings</div>
+                <div style={{ fontSize: 12, color: c.textMuted, marginTop: 2 }}>Copy one role's configuration onto one or more other roles</div>
+              </div>
+              <CloseBtn onClick={() => setShowCopy(false)} />
+            </div>
+
+            <div style={{ padding: "16px 24px", borderBottom: `1px solid ${c.border}` }}>
+              <label style={st.label}>Copy from (source role)</label>
+              <select style={{ ...st.inputFull, marginBottom: 12 }} value={copySource} onChange={e => { setCopySource(e.target.value); setCopyTargets([]); }}>
+                <option value="">Select a source role…</option>
+                {roleList.map(r => <option key={r.id} value={r.id}>{r.name} — {r.product}</option>)}
+              </select>
+
+              <label style={st.label}>Settings to copy</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 18px", marginBottom: 4 }}>
+                {roleSettingAreas.map(a => (
+                  <label key={a} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                    <input type="checkbox" checked={copyAreas.includes(a)} onChange={() => toggleArea(a)} /> {a}
+                  </label>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: c.textMuted }}>{copyAreas.length} of {roleSettingAreas.length} setting areas selected</div>
+
+              <label style={{ ...st.label, marginTop: 12 }}>Apply as</label>
+              <div style={{ display: "flex", gap: 18 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                  <input type="radio" name="roleCopyMode" checked={copyMode === "add"} onChange={() => setCopyMode("add")} /> Add to existing settings
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                  <input type="radio" name="roleCopyMode" checked={copyMode === "replace"} onChange={() => setCopyMode("replace")} /> Replace existing settings
+                </label>
+              </div>
+              <div style={{ fontSize: 11, color: c.textMuted, marginTop: 6 }}>
+                {copyMode === "add"
+                  ? "Target roles keep their current settings; the source's selected settings are merged in."
+                  : "For the selected areas, target roles are overwritten to exactly match the source."}
+              </div>
+            </div>
+
+            <div style={{ padding: "12px 24px", borderBottom: `1px solid ${c.border}`, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>Copy to</div>
+              <input style={{ ...st.input, flex: 1, minWidth: 160 }} placeholder="Search roles" value={copySearch} onChange={e => setCopySearch(e.target.value)} />
+            </div>
+
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              <table style={{ ...st.table, border: "none", borderRadius: 0 }}>
+                <thead><tr>
+                  <th style={{ ...st.th, width: 40 }}><input type="checkbox" checked={allTargetsChecked} onChange={e => setCopyTargets(e.target.checked ? targetRoles.map(r => r.id) : [])} /></th>
+                  <th style={st.th}>Role</th><th style={st.th}>Menu</th><th style={st.th}>Product</th>
+                </tr></thead>
+                <tbody>{targetRoles.map(r => {
+                  const sel = copyTargets.includes(r.id);
+                  return (
+                    <tr key={r.id} style={sel ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={sel} onChange={() => toggleTarget(r.id)} /></td>
+                      <td style={st.td}>{r.name}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>{r.menu}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>{r.product}</td>
+                    </tr>
+                  );
+                })}
+                {srcId && targetRoles.length === 0 && (
+                  <tr><td style={{ ...st.td, textAlign: "center", color: c.textMuted }} colSpan={4}>No other roles match.</td></tr>
+                )}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ padding: "14px 24px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, color: c.textMuted }}>{copyTargets.length} target role(s) selected</span>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button style={st.btnOutline} onClick={() => setShowCopy(false)}>Cancel</button>
+                <button
+                  style={{ ...st.btn, opacity: (!srcId || copyTargets.length === 0 || copyAreas.length === 0) ? 0.5 : 1 }}
+                  disabled={!srcId || copyTargets.length === 0 || copyAreas.length === 0}
+                  onClick={confirmCopy}
+                >Copy Settings</button>
+              </div>
+            </div>
+          </div>
+        </>
+        );
+      })()}
+    </div>
+  );
+}
+
 // ─── Main App ────────────────────────────────────────────────────────────────
 export default function SecurityHub() {
   const [activeTab, setActiveTab] = useState("Security Groups");
@@ -2146,26 +2622,7 @@ export default function SecurityHub() {
           </div>
         )}
 
-        {activeTab === "Roles" && (
-          <div>
-            <div style={st.toolbarStrip}>
-              <input style={st.input} placeholder="Search roles..." />
-              <div style={{ flex: 1 }} />
-              <button style={st.btn}>+ New Role</button>
-            </div>
-            <table style={st.table}>
-              <thead><tr><th style={st.th}>Role Name</th><th style={st.th}>Description</th><th style={st.th}>Users</th><th style={st.th}></th></tr></thead>
-              <tbody>{[["Administrator", "Full system access", 3], ["Accounting Manager", "GL and AP access", 5], ["Leasing Agent", "Leasing module", 18], ["Read Only", "View only", 2]].map(([name, desc, cnt], i) => (
-                <tr key={i}>
-                  <td style={{ ...st.td, color: c.primary, fontWeight: 500 }}>{name}</td>
-                  <td style={{ ...st.td, color: c.textMuted }}>{desc}</td>
-                  <td style={st.td}><span style={st.pill}>{cnt}</span></td>
-                  <td style={st.td}><button style={st.btnSmall}>Edit</button></td>
-                </tr>
-              ))}</tbody>
-            </table>
-          </div>
-        )}
+        {activeTab === "Roles" && <RolesTab />}
 
         {activeTab === "Reports" && <ReportsTab />}
         {activeTab === "Permissions" && <PermissionsTab />}
