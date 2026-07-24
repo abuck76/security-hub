@@ -80,12 +80,48 @@ const users = [
 ];
 
 const reports = [
-  { id: 1, name: "Balance Sheet", type: "SQL", menu: "Financials", roles: 4 },
-  { id: 2, name: "Rent Roll", type: "YSR", menu: "Leasing", roles: 6 },
-  { id: 3, name: "AR Aging", type: "SQL", menu: "Financials", roles: 5 },
-  { id: 4, name: "Trial Balance", type: "SQL", menu: "Financials", roles: 3 },
-  { id: 5, name: "Occupancy Report", type: "YSR", menu: "Operations", roles: 7 },
-  { id: 6, name: "Delinquency Report", type: "SQL", menu: "Leasing", roles: 2 },
+  // YSR reports
+  { id: 1, name: "$0 1099 Correction", code: "1099ZERO", type: "YSR", roles: 4 },
+  { id: 2, name: "$0 1099 Correction for Portal Recipient", code: "1099ZEROESTMT", type: "YSR", roles: 5 },
+  { id: 3, name: "1096 Vendor - by Bank", code: "1096VBB", type: "YSR", roles: 15 },
+  { id: 4, name: "Print Receipt", code: "ReceiptDetail", type: "YSR", roles: 24 },
+  { id: 5, name: "Print Receipt 2", code: "ReceiptDet", type: "YSR", roles: 24 },
+  // SQL reports
+  { id: 6, name: "Balance Sheet", code: "BS_STD", type: "SQL", roles: 4 },
+  { id: 7, name: "AR Aging Detail", code: "ARAGEDET", type: "SQL", roles: 5 },
+  { id: 8, name: "Trial Balance", code: "TB_STD", type: "SQL", roles: 3 },
+  { id: 9, name: "Delinquency Summary", code: "DELINQSUM", type: "SQL", roles: 2 },
+];
+
+// Roles available to assign reports to (Role · Menu · Product) — used by the Assign to Roles drawer
+const assignableProducts = ["Res Manager", "Performance Manager", "Procure to Pay - Mri", "Procure to Pay - Net", "CRM IQ Net", "Construction Manager", "Commercial Manager", "Asset IQ Nb", "Maintenance IQ"];
+const assignableRoles = [
+  { id: 1, name: "Voyager 8 Residential 07/18", menu: "Voyager 8 Residential 07/18", product: "Res Manager" },
+  { id: 2, name: "Acquisition Manager - Admin", menu: "AcquisitionManagerAdmin", product: "Performance Manager" },
+  { id: 3, name: "Acquisition Manager", menu: "AcquisitionManager", product: "Performance Manager" },
+  { id: 4, name: "AP Manager", menu: "APManager", product: "Procure to Pay - Mri" },
+  { id: 5, name: "AP Manager (West)", menu: "APManagerWest", product: "Procure to Pay - Mri" },
+  { id: 6, name: "AP Manager (without PO)", menu: "APManagerNoPO", product: "Procure to Pay - Mri" },
+  { id: 7, name: "Asset IQ Set Admin", menu: "AssetIQAdmin", product: "Asset IQ Nb" },
+  { id: 8, name: "BillPay CID", menu: "BillPayCID", product: "Procure to Pay - Mri" },
+  { id: 9, name: "C Test P2P Pipeline", menu: "ProcureToPayNet", product: "Procure to Pay - Net" },
+  { id: 10, name: "Canadian Multifamily IQ", menu: "CanadianMultifamilyIQ", product: "CRM IQ Net" },
+  { id: 11, name: "Case Manager", menu: "CaseManager", product: "Construction Manager" },
+  { id: 12, name: "CM_Dev_X8x", menu: "CM_Dev_X8x", product: "Construction Manager" },
+  { id: 13, name: "CIA_Implementation", menu: "CIA_Implementation", product: "Construction Manager" },
+  { id: 14, name: "Commercial Manager", menu: "CommercialManager", product: "Commercial Manager" },
+  { id: 15, name: "CRM IQ Agent", menu: "CRMIQAgent", product: "CRM IQ Net" },
+  { id: 16, name: "Facilities Manager", menu: "FacilitiesManager", product: "Maintenance IQ" },
+  { id: 17, name: "Leasing Agent", menu: "LeasingAgent", product: "CRM IQ Net" },
+  { id: 18, name: "Regional Manager", menu: "RegionalManager", product: "Res Manager" },
+  { id: 19, name: "GL Accountant", menu: "GLAccountant", product: "Res Manager" },
+  { id: 20, name: "AP Processor", menu: "APProcessor", product: "Procure to Pay - Mri" },
+  { id: 21, name: "Maintenance Tech", menu: "MaintenanceTech", product: "Maintenance IQ" },
+  { id: 22, name: "Compliance Analyst", menu: "ComplianceAnalyst", product: "Performance Manager" },
+  { id: 23, name: "Collections Specialist", menu: "CollectionsSpecialist", product: "Res Manager" },
+  { id: 24, name: "Owner Portal Admin", menu: "OwnerPortalAdmin", product: "Commercial Manager" },
+  { id: 25, name: "Vendor Manager", menu: "VendorManager", product: "Procure to Pay - Net" },
+  { id: 26, name: "Investment Analyst", menu: "InvestmentAnalyst", product: "Asset IQ Nb" },
 ];
 
 const permissionCategories = [
@@ -1022,150 +1058,219 @@ function UserDrawer({ user, onClose }) {
 }
 
 // ─── Reports Tab ──────────────────────────────────────────────────────────────
-function ReportsTab() {
-  const [search, setSearch] = useState("");
-  const [menuFilter, setMenuFilter] = useState("All");
-  const [typeFilter, setTypeFilter] = useState("All");
-  const [selected, setSelected] = useState([]);
-  const [drillReport, setDrillReport] = useState(null);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [assignStep, setAssignStep] = useState(1);
-  const [toast, setToast] = useState(false);
+const FileIcon = ({ color = "currentColor" }) => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
+  </svg>
+);
 
-  const filtered = reports.filter(r =>
-    (menuFilter === "All" || r.menu === menuFilter) &&
-    (typeFilter === "All" || r.type === typeFilter) &&
-    r.name.toLowerCase().includes(search.toLowerCase())
+function ReportsTab() {
+  const [reportType, setReportType] = useState("YSR");
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState([]);
+  const [sort, setSort] = useState({ key: "name", dir: "asc" });
+  const [assignTarget, setAssignTarget] = useState([]);
+  const [showAssign, setShowAssign] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [assignSearch, setAssignSearch] = useState("");
+  const [assignProduct, setAssignProduct] = useState("");
+  const [assignRoleSel, setAssignRoleSel] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [toast, setToast] = useState("");
+  // reports held in state so role assignments (and the Roles count) update when saved.
+  // assignedRoleIds seeds from each report's role count (first N roles) for the mockup.
+  const [reportRows, setReportRows] = useState(() =>
+    reports.map(r => ({ ...r, assignedRoleIds: Array.from({ length: Math.min(r.roles, assignableRoles.length) }, (_, i) => i + 1) }))
   );
 
-  const toggleSel = id => setSelected(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
-  const handleAssignConfirm = () => {
-    setShowAssignModal(false);
-    setAssignStep(1);
-    setSelected([]);
-    setToast(true);
-    setTimeout(() => setToast(false), 3000);
+  const typeReports = reportRows.filter(r => r.type === reportType);
+  const filtered = typeReports
+    .filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.code.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      const dir = sort.dir === "asc" ? 1 : -1;
+      if (sort.key === "roles") return (a.roles - b.roles) * dir;
+      return String(a[sort.key]).localeCompare(String(b[sort.key])) * dir;
+    });
+
+  const switchType = t => { setReportType(t); setSelected([]); setSearch(""); };
+  const toggleSel = id => setSelected(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  const allChecked = filtered.length > 0 && filtered.every(r => selected.includes(r.id));
+
+  const filteredRoles = assignableRoles.filter(r =>
+    (assignProduct === "" || r.product === assignProduct) &&
+    (r.name.toLowerCase().includes(assignSearch.toLowerCase()) || r.menu.toLowerCase().includes(assignSearch.toLowerCase()))
+  );
+  const toggleAssignRole = id => setAssignRoleSel(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+
+  const openAssign = targetIds => {
+    const ids = targetIds && targetIds.length ? targetIds : selected;
+    // Pre-check roles already assigned to the target report(s) (union across the target set).
+    const sel = reportRows.filter(r => ids.includes(r.id));
+    const preChecked = Array.from(new Set(sel.flatMap(r => r.assignedRoleIds)));
+    setAssignTarget(ids);
+    setAssignRoleSel(preChecked);
+    setAssignSearch(""); setAssignProduct(""); setShowAssign(true);
   };
+  const confirmAssign = () => {
+    setReportRows(rows => rows.map(r =>
+      assignTarget.includes(r.id) ? { ...r, assignedRoleIds: [...assignRoleSel], roles: assignRoleSel.length } : r
+    ));
+    setShowAssign(false);
+    showToast(`Updated role access for ${assignTarget.length} report(s)`);
+    setSelected([]);
+  };
+  const removeFromRoles = () => { showToast(`Removed ${selected.length} report(s) from roles`); setSelected([]); };
+
+  const SortTh = ({ label, k, style }) => (
+    <th style={{ ...st.th, cursor: "pointer", ...style }} onClick={() => setSort(s => ({ key: k, dir: s.key === k && s.dir === "asc" ? "desc" : "asc" }))}>
+      {label} <span style={{ color: c.textLight, fontSize: 10 }}>{sort.key === k ? (sort.dir === "asc" ? "▲" : "▼") : "⇅"}</span>
+    </th>
+  );
 
   return (
     <div>
       {toast && (
         <div style={{ position: "fixed", bottom: 16, right: 16, background: c.success, color: "#fff", padding: "12px 20px", borderRadius: 8, zIndex: 200, fontSize: 13, fontWeight: 500 }}>
-          ✓ Roles assigned successfully
+          ✓ {toast}
         </div>
       )}
-      <div style={st.toolbar}>
-        <input style={st.input} placeholder="Search reports..." value={search} onChange={e => setSearch(e.target.value)} />
-        <select style={st.select} value={menuFilter} onChange={e => setMenuFilter(e.target.value)}>
-          <option>All</option><option>Financials</option><option>Leasing</option><option>Operations</option>
-        </select>
-        <select style={st.select} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-          <option>All</option><option>SQL</option><option>YSR</option>
-        </select>
-        <div style={{ flex: 1 }} />
-        {selected.length > 0 && (
-          <button style={st.btn} onClick={() => setShowAssignModal(true)}>Assign to Roles ({selected.length})</button>
-        )}
-        <button style={st.btn} onClick={() => setShowAddModal(true)}>+ Add Report</button>
+
+      {/* YSR / SQL sub-tabs */}
+      <div style={{ display: "flex", gap: 4, borderBottom: `1px solid ${c.border}`, margin: "-8px 0 20px" }}>
+        {["YSR", "SQL"].map(t => (
+          <div key={t} onClick={() => switchType(t)}
+            style={{ ...st.tab, fontSize: 13, display: "flex", alignItems: "center", gap: 6, ...(reportType === t ? st.tabActive : {}) }}>
+            <FileIcon /> {t}
+          </div>
+        ))}
       </div>
+
+      {/* Toolbar */}
+      <div style={st.toolbar}>
+        <input style={{ ...st.input, width: 240 }} placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+        <span style={{ width: 26, height: 26, borderRadius: "50%", background: c.primary, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600 }}>{typeReports.length}</span>
+        <span style={{ fontSize: 14, fontWeight: 600 }}>{reportType} Role Access</span>
+        <div style={{ flex: 1 }} />
+        {selected.length > 0 ? (
+          <>
+            <button style={st.btn} onClick={() => openAssign(selected)}>+ Assign to Roles</button>
+            <button style={st.btnOutline} onClick={removeFromRoles}>− Remove from Roles</button>
+          </>
+        ) : (
+          <button style={st.btn} onClick={() => setShowAdd(true)}>+ Add Reports</button>
+        )}
+        <div style={{ position: "relative" }}>
+          <button style={{ ...st.btnOutline, padding: "6px 10px", borderColor: c.border, color: c.textMuted, fontSize: 18, lineHeight: 1 }} onClick={() => setMenuOpen(o => !o)}>⋮</button>
+          {menuOpen && (
+            <>
+              <div style={{ position: "fixed", inset: 0, zIndex: 50 }} onClick={() => setMenuOpen(false)} />
+              <div style={{ position: "absolute", right: 0, top: "110%", background: c.surface, border: `1px solid ${c.border}`, borderRadius: 8, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 60, minWidth: 160, overflow: "hidden" }}>
+                {["Export list", "Import reports", "Manage columns"].map(item => (
+                  <div key={item} style={{ padding: "9px 14px", fontSize: 13, cursor: "pointer" }}
+                    onClick={() => { setMenuOpen(false); showToast(item); }}
+                    onMouseEnter={e => e.currentTarget.style.background = c.borderLight}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>{item}</div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Reports table */}
       <table style={st.table}>
         <thead><tr>
-          <th style={st.th}><input type="checkbox" onChange={e => setSelected(e.target.checked ? filtered.map(r => r.id) : [])} /></th>
-          <th style={st.th}>Report Name</th><th style={st.th}>Type</th><th style={st.th}>Menu</th><th style={st.th}>Roles</th>
+          <th style={{ ...st.th, width: 40 }}><input type="checkbox" checked={allChecked} onChange={e => setSelected(e.target.checked ? filtered.map(r => r.id) : [])} /></th>
+          <SortTh label="Report Name" k="name" />
+          <SortTh label="Report Code" k="code" />
+          <SortTh label="Roles" k="roles" style={{ textAlign: "right", width: 120 }} />
         </tr></thead>
-        <tbody>{filtered.map(r => (
-          <tr key={r.id}>
-            <td style={st.td}><input type="checkbox" checked={selected.includes(r.id)} onChange={() => toggleSel(r.id)} /></td>
-            <td style={{ ...st.td, color: c.primary, fontWeight: 500, cursor: "pointer" }} onClick={() => setDrillReport(r)}>{r.name}</td>
-            <td style={st.td}><TypeBadge type={r.type} /></td>
-            <td style={st.td}><span style={st.pill}>{r.menu}</span></td>
-            <td style={st.td}>
-              <span style={{ ...st.badge(c.success, c.successBg), cursor: "pointer" }} onClick={() => setDrillReport(r)}>{r.roles}</span>
-            </td>
-          </tr>
-        ))}</tbody>
+        <tbody>
+          {filtered.map(r => {
+            const sel = selected.includes(r.id);
+            return (
+              <tr key={r.id} style={sel ? { background: c.primaryLight } : undefined}>
+                <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={sel} onChange={() => toggleSel(r.id)} /></td>
+                <td style={{ ...st.td, color: c.text, cursor: "pointer" }} onClick={() => openAssign([r.id])}>{r.name}</td>
+                <td style={{ ...st.td, color: c.textMuted }}>{r.code}</td>
+                <td style={{ ...st.td, textAlign: "right" }}>
+                  <span style={{ ...st.badge("#fff", c.primary), cursor: "pointer", minWidth: 34, textAlign: "center" }} onClick={() => openAssign([r.id])}>{r.roles}</span>
+                </td>
+              </tr>
+            );
+          })}
+          {filtered.length === 0 && (
+            <tr><td style={{ ...st.td, textAlign: "center", color: c.textMuted }} colSpan={4}>No {reportType} reports match your search.</td></tr>
+          )}
+        </tbody>
       </table>
 
-      {/* Role Drill-Down Panel */}
-      {drillReport && (
+      {/* Assign to Roles Drawer — lists ALL roles with checkboxes (checked = assigned) */}
+      {showAssign && (() => {
+        const targetReport = assignTarget.length === 1 ? reportRows.find(r => r.id === assignTarget[0]) : null;
+        return (
         <>
-          <div style={st.overlay} onClick={() => setDrillReport(null)} />
-          <div style={{ ...st.drawer, width: 420 }}>
+          <div style={st.overlay} onClick={() => setShowAssign(false)} />
+          <div style={st.drawer}>
             <div style={st.drawerHeader}>
-              <div><div style={st.drawerTitle}>{drillReport.name}</div><div style={{ fontSize: 12, color: c.textMuted }}><TypeBadge type={drillReport.type} /> · {drillReport.menu}</div></div>
-              <CloseBtn onClick={() => setDrillReport(null)} />
+              <div>
+                <div style={st.drawerTitle}>{targetReport ? targetReport.name : `${assignTarget.length} Reports Selected to be Added`}</div>
+                {targetReport && <div style={{ fontSize: 12, color: c.textMuted, marginTop: 2 }}><TypeBadge type={targetReport.type} /> · {targetReport.code} · {assignRoleSel.length} of {assignableRoles.length} roles</div>}
+              </div>
+              <CloseBtn onClick={() => setShowAssign(false)} />
             </div>
-            <div style={st.drawerContent}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: c.textMuted, marginBottom: 10 }}>ASSIGNED ROLES ({drillReport.roles})</div>
-              {Array.from({ length: drillReport.roles }, (_, i) => (
-                <div key={i} style={{ padding: "8px 0", borderBottom: `1px solid ${c.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 13 }}>Role {i + 1}</span>
-                  <button style={st.btnSmall}>Remove</button>
-                </div>
-              ))}
+            <div style={{ padding: "12px 24px", borderBottom: `1px solid ${c.border}`, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ padding: "6px 14px", borderRadius: 6, background: c.primaryLight, color: c.primary, fontSize: 13, fontWeight: 600 }}>Roles</div>
+              <input style={{ ...st.input, flex: 1, minWidth: 180 }} placeholder="Search roles" value={assignSearch} onChange={e => setAssignSearch(e.target.value)} />
+              <select style={st.select} value={assignProduct} onChange={e => setAssignProduct(e.target.value)}>
+                <option value="">Select Product</option>
+                {assignableProducts.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
             </div>
-          </div>
-        </>
-      )}
-
-      {/* Assign to Roles Modal */}
-      {showAssignModal && (
-        <>
-          <div style={{ ...st.overlay, zIndex: 105 }} />
-          <div style={st.modal}>
-            <div style={st.modalHeader}>
-              <div style={{ fontWeight: 600 }}>Assign to Roles — Step {assignStep} of 2</div>
-              <CloseBtn onClick={() => { setShowAssignModal(false); setAssignStep(1); }} />
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              <table style={{ ...st.table, border: "none", borderRadius: 0 }}>
+                <thead><tr>
+                  <th style={{ ...st.th, width: 40 }}><input type="checkbox" checked={filteredRoles.length > 0 && filteredRoles.every(r => assignRoleSel.includes(r.id))} onChange={e => setAssignRoleSel(e.target.checked ? filteredRoles.map(r => r.id) : [])} /></th>
+                  <th style={st.th}>Role</th><th style={st.th}>Menu</th><th style={st.th}>Product</th>
+                </tr></thead>
+                <tbody>{filteredRoles.map(r => {
+                  const sel = assignRoleSel.includes(r.id);
+                  return (
+                    <tr key={r.id} style={sel ? { background: c.primaryLight } : undefined}>
+                      <td style={{ ...st.td, width: 40 }}><input type="checkbox" checked={sel} onChange={() => toggleAssignRole(r.id)} /></td>
+                      <td style={st.td}>{r.name}</td>
+                      <td style={{ ...st.td, color: c.textMuted }}>{r.menu}</td>
+                      <td style={st.td}><span style={st.pill}>{r.product}</span></td>
+                    </tr>
+                  );
+                })}</tbody>
+              </table>
             </div>
-            <div style={st.modalBody}>
-              {assignStep === 1 && (
-                <div>
-                  <div style={{ fontSize: 13, marginBottom: 12, color: c.textMuted }}>Select roles to assign the {selected.length} selected report(s) to:</div>
-                  {groups.map(g => (
-                    <label key={g.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: `1px solid ${c.borderLight}`, fontSize: 13 }}>
-                      <input type="checkbox" /> {g.code} — {g.description}
-                    </label>
-                  ))}
-                </div>
-              )}
-              {assignStep === 2 && (
-                <div>
-                  <div style={{ fontSize: 13, color: c.textMuted, marginBottom: 12 }}>Confirm assigning {selected.length} report(s) to selected roles?</div>
-                  <div style={{ background: c.successBg, border: `1px solid ${c.successBorder}`, borderRadius: 6, padding: 12, fontSize: 13 }}>
-                    This will grant access to the selected reports for all users in the chosen roles.
-                  </div>
-                </div>
-              )}
-            </div>
-            <div style={st.modalFooter}>
-              <button style={st.btnOutline} onClick={() => assignStep === 1 ? setShowAssignModal(false) : setAssignStep(1)}>
-                {assignStep === 1 ? "Cancel" : "Back"}
-              </button>
-              <button style={st.btn} onClick={() => assignStep === 1 ? setAssignStep(2) : handleAssignConfirm()}>
-                {assignStep === 1 ? "Next →" : "Confirm"}
-              </button>
+            <div style={{ padding: "14px 24px", borderTop: `1px solid ${c.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, color: c.textMuted }}>{assignRoleSel.length} role(s) selected</span>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button style={st.btnOutline} onClick={() => setShowAssign(false)}>Cancel</button>
+                <button style={st.btn} onClick={confirmAssign}>Add</button>
+              </div>
             </div>
           </div>
         </>
-      )}
+        );
+      })()}
 
-      {/* Add Report Modal */}
-      {showAddModal && (
+      {/* Add Reports Modal */}
+      {showAdd && (
         <>
           <div style={{ ...st.overlay, zIndex: 105 }} />
           <div style={{ ...st.modal, width: 640 }}>
             <div style={st.modalHeader}>
-              <div style={{ fontWeight: 600 }}>Add Report</div>
-              <CloseBtn onClick={() => setShowAddModal(false)} />
+              <div style={{ fontWeight: 600 }}>Add {reportType} Reports</div>
+              <CloseBtn onClick={() => setShowAdd(false)} />
             </div>
             <div style={st.modalBody}>
-              <div style={st.formRow}>
-                <div style={st.formGroup}><label style={st.label}>Report Name</label><input style={st.inputFull} placeholder="Report name" /></div>
-                <div style={st.formGroup}><label style={st.label}>Menu</label><select style={st.inputFull}><option>Financials</option><option>Leasing</option><option>Operations</option></select></div>
-              </div>
-              <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
+              <div style={{ display: "flex", gap: 16 }}>
                 <div style={{ flex: 1, border: `2px dashed ${c.border}`, borderRadius: 8, padding: 20, textAlign: "center" }}>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>SQL Report</div>
                   <div style={{ fontSize: 12, color: c.textMuted, marginBottom: 10 }}>Upload .txt or .sql file</div>
@@ -1180,8 +1285,8 @@ function ReportsTab() {
               </div>
             </div>
             <div style={st.modalFooter}>
-              <button style={st.btnOutline} onClick={() => setShowAddModal(false)}>Cancel</button>
-              <button style={st.btn}>Add Report</button>
+              <button style={st.btnOutline} onClick={() => setShowAdd(false)}>Cancel</button>
+              <button style={st.btn} onClick={() => { setShowAdd(false); showToast("Report(s) added"); }}>Add Reports</button>
             </div>
           </div>
         </>
